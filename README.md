@@ -139,6 +139,24 @@ The scanner comes with **45+ companies** ready to scan and **19 search queries**
 
 **Job boards searched:** Ashby, Greenhouse, Lever, Wellfound, Workable, RemoteFront
 
+
+## Automated Workflow Runner (OOP)
+
+For teams that want a deterministic CLI workflow (outside slash-command chat), use the orchestrator:
+
+```bash
+npm run workflow -- --input "https://company.com/jobs/123"
+npm run workflow -- --input jds/example.md --dry-run
+npm run workflow:audit
+```
+
+This runner is intentionally opinionated:
+
+- It **does** orchestrate integrity checks, status normalization, dedup/merge, CV sync checks, and PDF generation.
+- It **does not** auto-submit applications, bypass anti-bot/CAPTCHA protections, or claim 100% extraction reliability.
+
+Why: these constraints keep automation realistic, compliant, and reviewable.
+
 ## Dashboard TUI
 
 The built-in terminal dashboard lets you browse your pipeline visually:
