@@ -1,21 +1,17 @@
 {
   "name": "career-ops",
-  "version": "1.6.0",
-  "description": "AI-powered job search pipeline built on Claude Code",
+  "version": "2.0.0",
+  "description": "Autonomous job application system with a verify-or-abstain submission gate",
   "scripts": {
-    "doctor": "node doctor.mjs",
-    "verify": "node verify-pipeline.mjs",
-    "normalize": "node normalize-statuses.mjs",
-    "dedup": "node dedup-tracker.mjs",
-    "merge": "node merge-tracker.mjs",
-    "pdf": "node generate-pdf.mjs",
-    "sync-check": "node cv-sync-check.mjs",
-    "update:check": "node update-system.mjs check",
-    "update": "node update-system.mjs apply",
-    "rollback": "node update-system.mjs rollback",
-    "liveness": "node check-liveness.mjs",
-    "scan": "node scan.mjs",
-    "gemini:eval": "node gemini-eval.mjs"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "scan": "tsx src/scanner/index.ts",
+    "pipeline": "tsx src/pipeline/index.ts",
+    "apply": "tsx src/applier/index.ts",
+    "demo": "tsx scripts/demo.ts",
+    "login": "tsx scripts/login.ts",
+    "pdf": "node generate-pdf.mjs"
   },
   "keywords": [
     "ai",
@@ -24,11 +20,10 @@
     "career",
     "automation"
   ],
-  "author": "Santiago Fernández de Valderrama <hi@santifer.io> (https://santifer.io)",
-  "homepage": "https://santifer.io",
+  "author": "Parv Patodia",
   "repository": {
     "type": "git",
-    "url": "https://github.com/santifer/career-ops"
+    "url": "https://github.com/parvpatodia/career-ops"
   },
   "license": "MIT",
   "dependencies": {
@@ -36,5 +31,10 @@
     "dotenv": "^16.4.5",
     "js-yaml": "^4.1.1",
     "playwright": "^1.58.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
   }
 }

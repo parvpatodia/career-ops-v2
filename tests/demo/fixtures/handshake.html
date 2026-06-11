@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Handshake Quick Apply</title></head>
+<body>
+<!-- No /login or /sign-in in URL — already authenticated -->
+<div id="job-posting">
+  <h1>Machine Learning Engineer Intern — Demo Corp</h1>
+  <p>Posted 3 days ago | Cambridge, MA | Full-time internship</p>
+  <div class="job-description">
+    <p>We are looking for an ML Engineer Intern...</p>
+  </div>
+
+  <!-- Native Handshake Quick Apply form — rendered directly (no popup needed) -->
+  <!-- HandshakeHandler will skip external ATS check (no greenhouse/lever links) -->
+  <!-- and fall through to fillNativeForm() immediately -->
+  <form id="quick-apply-form">
+    <h2>Quick Apply</h2>
+
+    <div class="field-group">
+      <label>First Name *</label>
+      <input name="first_name" type="text" required>
+    </div>
+
+    <div class="field-group">
+      <label>Last Name *</label>
+      <input name="last_name" type="text" required>
+    </div>
+
+    <div class="field-group">
+      <label>Email *</label>
+      <input name="email" type="email" required>
+    </div>
+
+    <div class="field-group">
+      <label>Phone</label>
+      <input name="phone" type="tel">
+    </div>
+
+    <div class="field-group">
+      <label>Resume</label>
+      <input type="file" accept=".pdf">
+    </div>
+
+    <button type="submit">Submit Application</button>
+  </form>
+</div>
+</body>
+</html>

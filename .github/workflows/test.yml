@@ -1,6 +1,8 @@
 name: Tests
 
 on:
+  push:
+    branches: [main, 'feat/**', 'fix/**']
   pull_request:
     branches: [main]
 
@@ -12,8 +14,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
-      - uses: actions/setup-go@v6
-        with:
-          go-version: '1.22'
-      - run: npm install
-      - run: node test-all.mjs --quick
+          cache: 'npm'
+      - run: npm ci
+        env:
+          # Unit tests never launch a browser; skip the ~200MB download.
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      # Same command devs run locally. Profile-dependent suites self-skip
+      # because config/profile.yml is gitignored personal data.
+      - run: npx vitest run

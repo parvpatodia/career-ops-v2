@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Lever Application Form</title></head>
+<body>
+<form id="application-form">
+  <h1>Apply — Demo Corp (Lever)</h1>
+
+  <div class="field-group">
+    <label>Full Name *</label>
+    <input name="name" type="text" placeholder="Full name" required>
+  </div>
+
+  <div class="field-group">
+    <label>Email *</label>
+    <input name="email" type="email" placeholder="Email address" required>
+  </div>
+
+  <div class="field-group">
+    <label>Phone</label>
+    <input name="phone" type="tel" placeholder="Phone number">
+  </div>
+
+  <div class="field-group">
+    <label>Current Company / University</label>
+    <input name="org" type="text" placeholder="Company or school">
+  </div>
+
+  <div class="field-group">
+    <label>LinkedIn URL</label>
+    <input name="urls[LinkedIn]" type="url" placeholder="https://linkedin.com/in/...">
+  </div>
+
+  <div class="field-group">
+    <label>GitHub URL</label>
+    <input name="urls[GitHub]" type="url" placeholder="https://github.com/...">
+  </div>
+
+  <div class="field-group">
+    <label>Portfolio / Website</label>
+    <input name="urls[Portfolio]" type="url" placeholder="https://...">
+  </div>
+
+  <div class="field-group">
+    <label>Cover Letter</label>
+    <textarea name="comments" placeholder="Tell us about yourself..."></textarea>
+  </div>
+
+  <!-- Custom questions — .application-question class -->
+  <div class="application-question">
+    <label>Are you legally authorized to work in the United States?</label>
+    <input type="text">
+  </div>
+
+  <div class="application-question">
+    <label>How did you hear about this position?</label>
+    <input type="text">
+  </div>
+
+  <button type="submit">Submit Application</button>
+</form>
+</body>
+</html>

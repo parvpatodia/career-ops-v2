@@ -35,3 +35,14 @@ node_modules/
 .claude/settings.local.json
 .claude/memory/
 career-dashboard
+
+# Secrets and personal data (2026-06-10 audit: live token + password were exposed)
+.env
+.env.*
+.browser-profile/
+.playwright-mcp/
+data/applications.json
+cv/
+files.zip
+files_extracted/
+*.png

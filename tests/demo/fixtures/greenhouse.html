@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Greenhouse Application Form</title></head>
+<body>
+<form id="application_form">
+  <h1>Apply — Demo Corp (Greenhouse)</h1>
+
+  <div class="field-group">
+    <label for="first_name">First Name *</label>
+    <input id="first_name" name="job_application[first_name]" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label for="last_name">Last Name *</label>
+    <input id="last_name" name="job_application[last_name]" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label for="email">Email *</label>
+    <input id="email" name="job_application[email]" type="email" required>
+  </div>
+
+  <div class="field-group">
+    <label for="phone">Phone</label>
+    <input id="phone" name="job_application[phone]" type="tel">
+  </div>
+
+  <div class="field-group">
+    <label for="resume">Resume (PDF)</label>
+    <input id="resume" name="job_application[resume]" type="file" accept=".pdf">
+  </div>
+
+  <!-- Custom questions — stable id^="question_" pattern -->
+  <div class="field-group">
+    <label for="question_100">Are you authorized to work in the United States?</label>
+    <input id="question_100" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="question_200">Will you now or in the future require visa sponsorship?</label>
+    <input id="question_200" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="question_300">How did you hear about this role?</label>
+    <input id="question_300" type="text">
+  </div>
+
+  <button type="submit">Submit Application</button>
+</form>
+</body>
+</html>
