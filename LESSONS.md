@@ -15,3 +15,4 @@
 - 2026-06-10 | market | Ashby's API silently drops applications when the response success field goes unchecked | check the ATS confirmation on every submit path
 - 2026-06-10 | market | Application volume is now negative-value: Greenhouse ships spam scoring (Real Talent), recruiters reject LLM boilerplate on sight | quality-gated low volume, tailored from real profile facts only
 - 2026-06-11 | M0 | CI invoked a file that never existed for the project's whole life; nobody noticed because it only ran on PRs that were never opened | CI runs on push and PR and runs the exact command devs run locally
+- 2026-06-11 | M0 gate | Fresh-clone gate caught 15 failures the local run hid: Evaluator and Tailor tests read gitignored cv/ files | every suite touching gitignored personal data carries a skipIf guard; the gate is a fresh clone, never the dev machine

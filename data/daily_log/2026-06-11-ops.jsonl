@@ -58,3 +58,33 @@
 {"ts":"2026-06-11T18:05:34.207Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
 {"ts":"2026-06-11T18:05:34.207Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
 {"ts":"2026-06-11T18:05:34.207Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.365Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1781203983363"],"location":"Bay Area"}}
+{"ts":"2026-06-11T18:53:03.366Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-11T18:53:03.366Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-11T18:53:03.367Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-11T18:53:03.368Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1781203983363"],"location":"Bay Area"}}
+{"ts":"2026-06-11T18:53:03.369Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-11T18:53:03.369Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-11T18:53:03.370Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1781203983363"],"location":"Bay Area"}}
+{"ts":"2026-06-11T18:53:03.370Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-11T18:53:03.370Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-11T18:53:03.370Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-11T18:53:03.371Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-06-11T18:53:03.379Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.380Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.381Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.381Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-11T18:53:03.383Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.384Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.385Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-11T18:53:03.387Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.388Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.388Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-06-11T18:53:03.389Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.389Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.389Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.389Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.390Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.390Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.390Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-11T18:53:03.390Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
