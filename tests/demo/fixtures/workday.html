@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Workday Application Form</title></head>
+<body>
+<!-- No auth wall elements (no sign-in button, no create-account, no email placeholder) -->
+<div id="workday-application">
+  <h1>Apply — Demo Corp (Workday)</h1>
+  <p>Step 1: Personal Information</p>
+
+  <div class="field-group">
+    <label>First Name *</label>
+    <input data-automation-id="legalNameSection_firstName" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label>Last Name *</label>
+    <input data-automation-id="legalNameSection_lastName" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label>Email *</label>
+    <input data-automation-id="email" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label>Phone Number</label>
+    <input data-automation-id="phone-number" type="tel">
+  </div>
+
+  <div class="field-group">
+    <label>Address Line 1</label>
+    <input data-automation-id="addressSection_addressLine1" type="text">
+  </div>
+
+  <div class="field-group">
+    <label>Resume</label>
+    <input data-automation-id="file-upload-input" type="file" accept=".pdf">
+  </div>
+
+  <button data-automation-id="nextButton" type="button">Next</button>
+</div>
+</body>
+</html>

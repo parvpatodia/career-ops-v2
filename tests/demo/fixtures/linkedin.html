@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: LinkedIn Easy Apply</title>
+<script>
+  // Simulate LinkedIn's React modal — show it when the Easy Apply button is clicked.
+  function openModal() {
+    document.getElementById('easy-apply-modal').style.display = 'block';
+  }
+</script>
+</head>
+<body>
+<div id="job-view">
+  <h1>Machine Learning Engineer Intern — Demo Corp</h1>
+  <p>Job description text here...</p>
+
+  <!-- Easy Apply button -->
+  <button class="jobs-apply-button" aria-label="Easy Apply" onclick="openModal()">
+    Easy Apply
+  </button>
+</div>
+
+<!-- Modal — hidden until button click -->
+<div id="easy-apply-modal" class="jobs-easy-apply-modal" style="display:none">
+  <div data-test-modal-id="easy-apply-modal">
+    <h2>Apply to Demo Corp</h2>
+
+    <!-- Step 1: Contact info -->
+    <div class="jobs-easy-apply-content">
+
+      <!-- Name fields -->
+      <div class="field-group">
+        <label for="easyApply-firstName">First Name</label>
+        <input id="easyApply-firstName" name="firstName"
+               placeholder="First name" type="text">
+      </div>
+
+      <div class="field-group">
+        <label for="easyApply-lastName">Last Name</label>
+        <input id="easyApply-lastName" name="lastName"
+               placeholder="Last name" type="text">
+      </div>
+
+      <div class="field-group">
+        <label for="easyApply-phone">Phone number</label>
+        <input id="easyApply-phone" name="phone" type="tel">
+      </div>
+
+      <!-- Screening question (text) -->
+      <div class="jobs-easy-apply-form-element">
+        <label>Are you legally authorized to work in the United States?</label>
+        <input type="text">
+      </div>
+
+      <!-- Screening question (select) -->
+      <div class="jobs-easy-apply-form-element">
+        <legend>What is your highest level of education?</legend>
+        <select>
+          <option value="">Select...</option>
+          <option value="Bachelor's Degree">Bachelor's Degree</option>
+          <option value="Master's Degree">Master's Degree</option>
+          <option value="PhD">PhD</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- No "Next step" and no review button here.
+         The handler fills this step, then finds no "Next" button and exits the loop.
+         The review button would only appear on the FINAL step in a real multi-step form. -->
+    <footer>
+      <button aria-label="Close" type="button">✕</button>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

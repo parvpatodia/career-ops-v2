@@ -1,0 +1,85 @@
+# Platform Configuration
+# Defines where to scan and how to authenticate.
+
+platforms:
+  linkedin:
+    enabled: true
+    type: "apify"
+    actor_id: "curious_coder/linkedin-jobs-scraper"
+    base_url: "https://www.linkedin.com/jobs"
+    daily_limit: 25
+    default_query:
+      keywords: ["ML Engineer", "AI Engineer", "Machine Learning", "Computer Vision", "Software Engineer"]
+      location: "San Francisco Bay Area"
+      posted_within_days: 14
+      job_types: ["internship", "full-time"]
+    auth:
+      # LinkedIn credentials in .env: LINKEDIN_EMAIL, LINKEDIN_PASSWORD
+      requires_login: true
+
+  wellfound:
+    enabled: true
+    type: "apify"
+    actor_id: "trudax/wellfound-scraper"
+    base_url: "https://wellfound.com/jobs"
+    daily_limit: 10
+    default_query:
+      keywords: ["machine learning", "AI engineer", "computer vision"]
+      location: "San Francisco"
+      remote: true
+      posted_within_days: 14
+
+  handshake:
+    enabled: true
+    type: "playwright"
+    base_url: "https://app.joinhandshake.com/stu/postings"
+    daily_limit: 50
+    default_query:
+      keywords: ["machine learning", "AI", "software engineer", "data scientist"]
+      job_types: ["internship", "co-op"]
+      posted_within_days: 14
+    auth:
+      # Handshake credentials in .env: HANDSHAKE_EMAIL, HANDSHAKE_PASSWORD
+      requires_login: true
+
+  swelist:
+    enabled: true
+    type: "github"
+    repo: "SimplifyJobs/Summer2026-Internships"
+    branch: "dev"
+    readme_path: "README.md"
+    daily_limit: 100  # No rate limit, it's a static page
+    filter:
+      keywords: ["machine learning", "AI", "computer vision", "software engineer", "data"]
+      exclude: ["closed", "no longer available"]
+      posted_within_days: 14
+
+  googlejobs:
+    enabled: true
+    type: "apify"
+    actor_id: "bebity/google-jobs-scraper"
+    daily_limit: 50
+    default_query:
+      queries:
+        - "ML engineer intern bay area"
+        - "AI engineer intern summer 2026"
+        - "computer vision engineer intern"
+        - "software engineer intern AI bay area"
+      posted_within_days: 14
+
+# ATS detection patterns for the applier module
+ats_patterns:
+  greenhouse:
+    url_patterns: ["greenhouse.io", "boards.greenhouse.io"]
+    apply_button: "[data-mapped='true'], a[href*='greenhouse']"
+  lever:
+    url_patterns: ["jobs.lever.co", "lever.co/"]
+    apply_button: "a.template-btn-submit, .postings-btn"
+  workday:
+    url_patterns: ["myworkdayjobs.com", "wd1.myworkdayjobs.com", "wd3.myworkdayjobs.com"]
+    apply_button: "a[data-automation-id='applyButton']"
+  linkedin_easy_apply:
+    url_patterns: ["linkedin.com/jobs/view"]
+    apply_button: ".jobs-apply-button, button[aria-label*='Easy Apply']"
+  generic:
+    apply_button: "a[href*='apply'], button[contains(text(),'Apply')]"

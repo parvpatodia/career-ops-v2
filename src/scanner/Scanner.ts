@@ -1,0 +1,86 @@
+/**
+ * Abstract base scanner. Each platform extends this.
+ * WHY: Abstract base with template method (scanWithCache) enforces caching
+ * across all implementations without duplicating the cache logic per scanner.
+ */
+
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import type { Job, Platform, ScanQuery } from '../types.js';
+import { Logger } from '../utils/Logger.js';
+
+const CACHE_DIR = 'data/daily_log';
+const TODAY = new Date().toISOString().split('T')[0];
+
+export abstract class Scanner {
+  abstract readonly platform: Platform;
+  protected log: Logger;
+
+  constructor() {
+    this.log = new Logger(this.constructor.name);
+  }
+
+  /** Scan for jobs matching the query. Implement per platform. */
+  protected abstract scan(query: ScanQuery): Promise<Job[]>;
+
+  /**
+   * Public entry point. Returns cached results if scanned today.
+   * WHY: Prevents re-scraping the same platform multiple times per day,
+   * saving token budget and rate-limit headroom.
+   */
+  async scanWithCache(query: ScanQuery): Promise<Job[]> {
+    const cacheKey = this.getCacheKey(query);
+    const cached = this.loadCache(cacheKey);
+    if (cached) {
+      this.log.info(`Cache hit for ${this.platform}, returning ${cached.length} jobs`);
+      return cached;
+    }
+
+    this.log.info(`Scanning ${this.platform}...`, query);
+    const results = await this.scan(query);
+    this.saveCache(cacheKey, results);
+    this.log.info(`Found ${results.length} jobs on ${this.platform}`);
+    return results;
+  }
+
+  protected generateJobId(company: string, title: string, url: string): string {
+    const hash = crypto
+      .createHash('sha256')
+      .update(`${company}:${title}:${url}`)
+      .digest('hex')
+      .slice(0, 8);
+    return `${this.platform}-${hash}`;
+  }
+
+  private getCacheKey(query: ScanQuery): string {
+    const hash = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(query))
+      .digest('hex')
+      .slice(0, 8);
+    return `${TODAY}-${this.platform}-${hash}`;
+  }
+
+  private loadCache(key: string): Job[] | null {
+    const file = path.join(CACHE_DIR, `${key}.json`);
+    if (!fs.existsSync(file)) return null;
+    try {
+      return JSON.parse(fs.readFileSync(file, 'utf8')) as Job[];
+    } catch {
+      return null;
+    }
+  }
+
+  private saveCache(key: string, jobs: Job[]): void {
+    try {
+      fs.mkdirSync(CACHE_DIR, { recursive: true });
+      fs.writeFileSync(
+        path.join(CACHE_DIR, `${key}.json`),
+        JSON.stringify(jobs, null, 2)
+      );
+    } catch (err) {
+      this.log.warn('Failed to write cache', err);
+    }
+  }
+}

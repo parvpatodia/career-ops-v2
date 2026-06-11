@@ -1,0 +1,1010 @@
+{"ts":"2026-05-04T18:50:57.138Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T18:50:57.139Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777920657135"],"location":"Bay Area"}}
+{"ts":"2026-05-04T18:50:57.140Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T18:50:57.141Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777920657135"],"location":"Bay Area"}}
+{"ts":"2026-05-04T18:50:57.141Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T18:50:57.141Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T18:50:57.142Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T18:50:57.142Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777920657135"],"location":"Bay Area"}}
+{"ts":"2026-05-04T18:50:57.143Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T18:50:57.143Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T18:50:57.143Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T18:50:57.143Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T18:50:57.154Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.156Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.156Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T18:50:57.157Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.157Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.157Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.157Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.158Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.158Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.158Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.159Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T18:50:57.163Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T18:50:57.164Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T18:50:57.166Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T18:50:57.167Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T18:50:57.168Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T18:50:57.170Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T18:50:57.171Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.545Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777922392541"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:19:52.547Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T19:19:52.549Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777922392541"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:19:52.549Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T19:19:52.550Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777922392541"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:19:52.551Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T19:19:52.551Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T19:19:52.566Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.571Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.570Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.575Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.577Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.577Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T19:19:52.578Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.578Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.579Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T19:19:52.579Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.581Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.582Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.583Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.583Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.584Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:19:52.586Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.588Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.591Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:19:52.712Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:19:52.714Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:19:52.714Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:19:52.715Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:19:52.716Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T19:43:08.805Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#school--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#school--0').first()\n"}
+{"ts":"2026-05-04T19:43:11.809Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#degree--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#degree--0').first()\n"}
+{"ts":"2026-05-04T19:43:14.811Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#discipline--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#discipline--0').first()\n"}
+{"ts":"2026-05-04T19:43:17.814Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#start-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#start-month--0').first()\n"}
+{"ts":"2026-05-04T19:43:21.816Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#start-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('#start-year--0').first()\n"}
+{"ts":"2026-05-04T19:43:24.819Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#end-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#end-month--0').first()\n"}
+{"ts":"2026-05-04T19:43:28.821Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#end-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('#end-year--0').first()\n"}
+{"ts":"2026-05-04T19:43:31.823Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#gender] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#gender').first()\n"}
+{"ts":"2026-05-04T19:43:34.825Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#hispanic_ethnicity] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#hispanic_ethnicity').first()\n"}
+{"ts":"2026-05-04T19:43:37.827Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#veteran_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#veteran_status').first()\n"}
+{"ts":"2026-05-04T19:43:40.828Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#disability_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#disability_status').first()\n"}
+{"ts":"2026-05-04T19:43:46.537Z","level":"info","module":"GreenhouseHandler","msg":"Screenshot → /Users/parvpatodia/career-ops/output/gh-filled-demo-greenhouse.png"}
+{"ts":"2026-05-04T19:44:12.397Z","level":"warn","module":"WorkdayHandler","msg":"safeType failed [[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input').first()\n"}
+{"ts":"2026-05-04T19:44:12.540Z","level":"info","module":"EasyApplyHandler","msg":"Easy Apply modal opened"}
+{"ts":"2026-05-04T19:44:13.345Z","level":"info","module":"EasyApplyHandler","msg":"Reached review step after 1 step(s). Stopping."}
+{"ts":"2026-05-04T19:45:42.906Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#school--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#school--0').first()\n"}
+{"ts":"2026-05-04T19:45:45.909Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#degree--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#degree--0').first()\n"}
+{"ts":"2026-05-04T19:45:48.915Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#discipline--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#discipline--0').first()\n"}
+{"ts":"2026-05-04T19:45:51.916Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#start-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#start-month--0').first()\n"}
+{"ts":"2026-05-04T19:45:55.920Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#start-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('#start-year--0').first()\n"}
+{"ts":"2026-05-04T19:45:58.922Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#end-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#end-month--0').first()\n"}
+{"ts":"2026-05-04T19:46:02.925Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#end-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('#end-year--0').first()\n"}
+{"ts":"2026-05-04T19:46:05.928Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#gender] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#gender').first()\n"}
+{"ts":"2026-05-04T19:46:08.930Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#hispanic_ethnicity] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#hispanic_ethnicity').first()\n"}
+{"ts":"2026-05-04T19:46:11.933Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#veteran_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#veteran_status').first()\n"}
+{"ts":"2026-05-04T19:46:14.935Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#disability_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator('#disability_status').first()\n"}
+{"ts":"2026-05-04T19:46:20.763Z","level":"info","module":"GreenhouseHandler","msg":"Screenshot → /Users/parvpatodia/career-ops/output/gh-filled-demo-greenhouse.png"}
+{"ts":"2026-05-04T19:46:46.928Z","level":"warn","module":"WorkdayHandler","msg":"safeType failed [[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n  - waiting for locator('[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input').first()\n"}
+{"ts":"2026-05-04T19:46:47.131Z","level":"info","module":"EasyApplyHandler","msg":"Easy Apply modal opened"}
+{"ts":"2026-05-04T19:46:49.038Z","level":"info","module":"EasyApplyHandler","msg":"No \"Next\" button found — reached end of steps"}
+{"ts":"2026-05-04T19:47:21.971Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777924041966"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:47:21.973Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T19:47:21.978Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777924041966"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:47:21.979Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T19:47:21.980Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777924041966"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:47:21.980Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T19:47:21.981Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T19:47:21.995Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:21.998Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:21.997Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.000Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.000Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T19:47:22.001Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.001Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.002Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:22.002Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.002Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T19:47:22.003Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.004Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.004Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.005Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.005Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:47:22.006Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:22.007Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:22.009Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:47:22.132Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:47:22.133Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:47:22.134Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:47:22.134Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:47:22.135Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T19:48:41.494Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#school--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#school--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:48:44.499Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#degree--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#degree--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:48:47.501Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#discipline--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#discipline--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:48:50.503Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#start-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:48:54.507Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#start-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:48:57.509Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#end-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:01.509Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#end-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:04.512Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#gender] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#gender').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:07.513Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#hispanic_ethnicity] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#hispanic_ethnicity').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:10.515Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#veteran_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#veteran_status').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:13.517Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#disability_status] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#disability_status').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:19.257Z","level":"info","module":"GreenhouseHandler","msg":"Screenshot → /Users/parvpatodia/career-ops/output/gh-filled-demo-greenhouse.png"}
+{"ts":"2026-05-04T19:49:45.099Z","level":"warn","module":"WorkdayHandler","msg":"safeType failed [[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-automation-id*=\"address\"] input, [data-automation-id=\"addressSection_addressLine1\"] input').first()\u001b[22m\n"}
+{"ts":"2026-05-04T19:49:45.323Z","level":"info","module":"EasyApplyHandler","msg":"Easy Apply modal opened"}
+{"ts":"2026-05-04T19:49:47.254Z","level":"info","module":"EasyApplyHandler","msg":"No \"Next\" button found — reached end of steps"}
+{"ts":"2026-05-04T19:56:34.154Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777924594148"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:56:34.156Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T19:56:34.159Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777924594148"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:56:34.159Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T19:56:34.160Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777924594148"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:56:34.161Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T19:56:34.161Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T19:56:34.198Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.201Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.206Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.206Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T19:56:34.209Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.212Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.213Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:56:34.213Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.217Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.217Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T19:56:34.218Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.218Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.219Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.219Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.221Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.222Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.223Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.224Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:56:34.342Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:56:34.343Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:56:34.344Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:56:34.344Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:56:34.345Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T19:59:18.739Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777924758733"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:59:18.741Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T19:59:18.742Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777924758733"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:59:18.743Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T19:59:18.743Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777924758733"],"location":"Bay Area"}}
+{"ts":"2026-05-04T19:59:18.744Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T19:59:18.744Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T19:59:18.763Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.765Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.771Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.771Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T19:59:18.777Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.778Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.783Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T19:59:18.816Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.819Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T19:59:18.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.821Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.823Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.824Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.824Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.825Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.828Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.828Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T19:59:18.953Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:59:18.954Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:59:18.954Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:59:18.955Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T19:59:18.955Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T20:32:03.281Z","level":"info","module":"Evaluator","msg":"Evaluated DEEP Measures - AI Agent Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.287Z","level":"info","module":"Evaluator","msg":"Evaluated Unknown - Founding Software Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.290Z","level":"info","module":"Evaluator","msg":"Evaluated Reinforce Labs - Machine Learning Engineer: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.290Z","level":"info","module":"Evaluator","msg":"Evaluated Agentix - AI/Engineer Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.291Z","level":"info","module":"Evaluator","msg":"Evaluated Evolution Design Lab - AI Operations Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.291Z","level":"info","module":"Evaluator","msg":"Evaluated Machine & Minds - AI/ML Solutions Engineer - Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.291Z","level":"info","module":"Evaluator","msg":"Evaluated Matroid - Deep Learning Field Engineer: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.291Z","level":"info","module":"Evaluator","msg":"Evaluated Unknown - Robot Operator: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Socure - Intern – Computer Vision & Machine Learning Research: 89/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Preference Model - Machine Learning Engineer (New Grad): 87/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Acelab - Full-Stack AI Engineer: 70/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Crescent Peak - Software Engineering Internship/Co-op (AI / Data Focus): 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Klaviyo - AI Builder Resident: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated iCustomer - AI/ML Engineer / Decision Scientist Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated iCustomer - AI/ML Engineer Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.292Z","level":"info","module":"Evaluator","msg":"Evaluated Asha Health - Software Engineer, AI Agents: 70/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.294Z","level":"info","module":"Evaluator","msg":"Evaluated FX Shoulder Solutions, Inc. - Computer Vision Intern: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.297Z","level":"info","module":"Evaluator","msg":"Evaluated Neurohire.ai - AI Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.297Z","level":"info","module":"Evaluator","msg":"Evaluated Sain Technologies - AI Machine Learning Engineer: 84/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.297Z","level":"info","module":"Evaluator","msg":"Evaluated Symbotic - New Grad- Software Engineer, ML Ops: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.301Z","level":"info","module":"Evaluator","msg":"Evaluated Mphasis Corp - Associate AI Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.301Z","level":"info","module":"Evaluator","msg":"Evaluated Community Works - AI & Automation Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.301Z","level":"info","module":"Evaluator","msg":"Evaluated Tenstorrent - Software Intern - AI Compilers: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.302Z","level":"info","module":"Evaluator","msg":"Evaluated Neurohire.ai - Machine Learning Engineer: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.302Z","level":"info","module":"Evaluator","msg":"Evaluated AIQ Markets - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.303Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Intern (Ads Infrastructure) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.303Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Frontend Software Engineer Intern (Ads Measurement Signal and Privacy) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.303Z","level":"info","module":"Evaluator","msg":"Evaluated Astranis Space Technologies - Software Engineer- Backend Intern (Summer 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.304Z","level":"info","module":"Evaluator","msg":"Evaluated Joby Aviation - Cell Test Engineering Intern (Summer/Fall 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.304Z","level":"info","module":"Evaluator","msg":"Evaluated Astranis Space Technologies - Software Engineer Intern - Data Platform (Summer 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.304Z","level":"info","module":"Evaluator","msg":"Evaluated Tesla - Internship, Software Engineer, Integration Tools (Fall 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.305Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Intern (Ads Measurement Signal and Privacy) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.305Z","level":"info","module":"Evaluator","msg":"Evaluated Cohere - Software Engineer Intern (Fall / Winter 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.305Z","level":"info","module":"Evaluator","msg":"Evaluated Astranis Space Technologies - Hardware Design Intern, Software Defined Radio Team (Summer 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.305Z","level":"info","module":"Evaluator","msg":"Evaluated Tesla - Internship, Technical Program Manager, Cell Manufacturing (Summer 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.306Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Security Software Engineer Project Intern (Network Security) - 2026 Start (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.306Z","level":"info","module":"Evaluator","msg":"Evaluated Tesla - Internship, Technical Program Manager, Cell Manufacturing (Fall 2026): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.307Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Student Researcher - (Seed Infra-Compiler) - 2026 Start (PhD): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.308Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Software Engineer Project Intern (Security-Data) - 2026 Start (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.308Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Student Researcher - (Seed Infra-Compiler) - 2026 Start (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.310Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Student Researcher (Seed Vision – Long-Range Video Generation) – 2026 Start (PhD): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.311Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Security Software Engineer Project Intern (Product Security) - 2026 Start (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.312Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - (General Hire) Research Scientist Intern (TikTok Recommendation) - 2026 Start (PhD): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.312Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Research Scientist Intern (TikTok-Privacy Innovation Lab-GPU Systems & Model Optimization) - 2026 Start (PhD): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.312Z","level":"info","module":"Evaluator","msg":"Evaluated NewsBreak - MBA Intern_NexBreak Venture (Product Engineering): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.312Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Machine Learning Engineer Intern (Monetization Technology - Ads Core Global) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.312Z","level":"info","module":"Evaluator","msg":"Evaluated San Francisco Giants - Baseball Operations R&D Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated KIOXIA America, Inc. - AI Platform/System Storage Intern - i-0059: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - GPU/AI Application System Software Engineer Intern (System Technologies and Engineering) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Machine Learning Engineer Intern (Monetization Technology)- 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Machine Learning Engineer Intern (Ads Measurement Signal and Privacy) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Machine Learning Scientist Intern (TikTok-Recommendation) - 2026 Start (PhD): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated Rocket Lawyer - AI/ML Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - (General Hire) Software Engineer Intern (TikTok Eng-Short Video) - 2026 Summer (BS/MS): 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.313Z","level":"info","module":"Evaluator","msg":"Evaluated Workato - Intern, AI Engineering: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.314Z","level":"info","module":"Evaluator","msg":"Evaluated Stewart - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.314Z","level":"info","module":"Evaluator","msg":"Evaluated Applied Materials - Software Engineer New College Grad: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.314Z","level":"info","module":"Evaluator","msg":"Evaluated Uber - Software Engineer 1 - I: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.315Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.315Z","level":"info","module":"Evaluator","msg":"Evaluated Allied Solutions - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.315Z","level":"info","module":"Evaluator","msg":"Evaluated Speechify - Software Engineer, iOS Core Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.316Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer, iOS Core Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.316Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer, iOS Core Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.317Z","level":"info","module":"Evaluator","msg":"Evaluated IXL Learning - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.318Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.318Z","level":"info","module":"Evaluator","msg":"Evaluated Esri - Software Engineer 1 - AI Assistant Framework - Arcgis Enterprise: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.318Z","level":"info","module":"Evaluator","msg":"Evaluated Airbnb - Software Engineer New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.319Z","level":"info","module":"Evaluator","msg":"Evaluated Blue Yonder - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.319Z","level":"info","module":"Evaluator","msg":"Evaluated U.S. Venture - Software Engineer I - IGEN 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.320Z","level":"info","module":"Evaluator","msg":"Evaluated Cox - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.320Z","level":"info","module":"Evaluator","msg":"Evaluated Twitch - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.320Z","level":"info","module":"Evaluator","msg":"Evaluated GE Healthcare - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.320Z","level":"info","module":"Evaluator","msg":"Evaluated Airbnb - iOS Software Engineer – New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.320Z","level":"info","module":"Evaluator","msg":"Evaluated Amentum - Entry Level Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.321Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Entry Level Software Engineer 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.321Z","level":"info","module":"Evaluator","msg":"Evaluated Notion - Software Engineer – New Grad - AI: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.321Z","level":"info","module":"Evaluator","msg":"Evaluated Handshake - Software Engineer 1 - Coding Pod: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.321Z","level":"info","module":"Evaluator","msg":"Evaluated SeatGeek - Software Engineer – New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.321Z","level":"info","module":"Evaluator","msg":"Evaluated Abnormal Security - Software Engineer 1 - Dev Accelerator: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.322Z","level":"info","module":"Evaluator","msg":"Evaluated Mirage - Software Engineer – Early Career: 50/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.322Z","level":"info","module":"Evaluator","msg":"Evaluated Motorola - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.322Z","level":"info","module":"Evaluator","msg":"Evaluated Twitch - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.323Z","level":"info","module":"Evaluator","msg":"Evaluated Uber - Software Engineer 1 🎓: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.323Z","level":"info","module":"Evaluator","msg":"Evaluated Wonderschool - Early Career Software Engineer - Applied AI: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.323Z","level":"info","module":"Evaluator","msg":"Evaluated Flexport - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.323Z","level":"info","module":"Evaluator","msg":"Evaluated Notion - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.324Z","level":"info","module":"Evaluator","msg":"Evaluated Julius AI - Software Engineer – New Grad - Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.324Z","level":"info","module":"Evaluator","msg":"Evaluated Handshake - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.324Z","level":"info","module":"Evaluator","msg":"Evaluated Gumloop - Software Engineer: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.324Z","level":"info","module":"Evaluator","msg":"Evaluated Alarm.com - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.324Z","level":"info","module":"Evaluator","msg":"Evaluated Anduril - Early Career Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.325Z","level":"info","module":"Evaluator","msg":"Evaluated Cadence Design Systems - Software Engineer 1 🎓: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.326Z","level":"info","module":"Evaluator","msg":"Evaluated Apex Fintech Solutions - Software Engineer 1: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.326Z","level":"info","module":"Evaluator","msg":"Evaluated KBR - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.326Z","level":"info","module":"Evaluator","msg":"Evaluated TransMarket Group - Junior Software Engineer: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.327Z","level":"info","module":"Evaluator","msg":"Evaluated Uber - Graduate Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.327Z","level":"info","module":"Evaluator","msg":"Evaluated FlexAI - Software Engineer – New Grad: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.327Z","level":"info","module":"Evaluator","msg":"Evaluated Aquatic Capital Management - Software Engineer – Early Career: 50/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.327Z","level":"info","module":"Evaluator","msg":"Evaluated Berkshire Hathaway Energy - Software Engineer 1 Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Entry Level Software Engineer 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer – Entry Level 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated StubHub - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 - New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated Attentive - Software Engineer 1 - AI Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated True Anomaly - Software Engineer 1 - Full Stack: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.328Z","level":"info","module":"Evaluator","msg":"Evaluated Ellipsis Labs - Software Engineer – New Grads - Multiple Teams: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.329Z","level":"info","module":"Evaluator","msg":"Evaluated Twitch - Software Engineer 1 - Commerce Engineering: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.329Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 - Commerce Engineering: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.329Z","level":"info","module":"Evaluator","msg":"Evaluated Freedom Technology Solutions Group - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.329Z","level":"info","module":"Evaluator","msg":"Evaluated Ping Identity - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.329Z","level":"info","module":"Evaluator","msg":"Evaluated Jonas Software - Junior AI Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated McDonald's - Software Engineer 1: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Remodel Health - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Twitch - Software Engineer 1: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Geneva Trading - Junior Software Engineer: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Uber - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Smartsheet - Software Engineer 1 - Secure Platform Operations: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated Ivo - Software Engineer, Frontend: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer, Backend: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.330Z","level":"info","module":"Evaluator","msg":"Evaluated N1 - New Grad Software Engineer - Backend Rust: 56/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated Wyetech - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated Orb - Software Engineer – Early Career - Core Product: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated PingWind - BI Dashboard Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated Twitch - Software Engineer 1 - Monetization ML: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 - Monetization ML: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.331Z","level":"info","module":"Evaluator","msg":"Evaluated Whoop - Software Engineer 1 - Frontend - Growth: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated OakNorth Bank - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated Aurora Innovation - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Entry Level Infrastructure Software Engineer 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated Northslope Technologies - Forward Deployed Software Engineer - New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated General Motors - Software Engineer – Early Career - Autonomous Vehicles Software Systems 🎓: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.332Z","level":"info","module":"Evaluator","msg":"Evaluated KRG Technologies - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated StubHub - Software Engineer 1 - New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 – New Grad: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated Deliveroo - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated Peraton - Cloud Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated Capital One - Associate – New Grad Card Expansion - Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated DLH - Software Engineer 1 - Job: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated North Star Staffing Solutions - Software Engineer 1: 59/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated Abbott - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.333Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.334Z","level":"info","module":"Evaluator","msg":"Evaluated Whoop - Software Engineer 1 - Backend: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.334Z","level":"info","module":"Evaluator","msg":"Evaluated Salesforce - Software Engineering AMTS/MTS – College Grad: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.334Z","level":"info","module":"Evaluator","msg":"Evaluated Giga AI - Software Engineer – New Grads: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 / 2 - New York: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated Axon - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated Clearer.io - Associate Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated Nectar Social - Software Engineer – Early Career: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated The Travelers Companies - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated Lindy - Full Stack Software Engineer – Early Career: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.335Z","level":"info","module":"Evaluator","msg":"Evaluated Hewlett Packard Enterprise - Software Engineer 1: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated Google - Software Engineer – Early Career - AI/ML - PhD 🎓: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer – Entry Level 🇺🇸: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated Honeywell - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated Cadence Design Systems - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated Revefi - Software Engineer – New Graduate - Seattle: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.336Z","level":"info","module":"Evaluator","msg":"Evaluated 8VC - Software Engineer New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.337Z","level":"info","module":"Evaluator","msg":"Evaluated Nymbus - AI-First Software Engineer – Entry Level: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.337Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer – Entry Level: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.337Z","level":"info","module":"Evaluator","msg":"Evaluated Klaviyo - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.337Z","level":"info","module":"Evaluator","msg":"Evaluated Loop - 2026 New Grad - Software Engineer - Full-Stack: 50/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Perpay - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Ophelia - Software Engineer 1: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Aurora Innovation - Software Engineer 1 - Visualization: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Underdog Fantasy - Associate Software Engineer – 2026 New Grad: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Citizen Health - Early Career Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.338Z","level":"info","module":"Evaluator","msg":"Evaluated Uare.ai - Software Engineer – Early Career: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.339Z","level":"info","module":"Evaluator","msg":"Evaluated mthree - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.339Z","level":"info","module":"Evaluator","msg":"Evaluated Palantir - Software Engineer – New Grad - Production Infrastructure: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.339Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer – New Grad - Production Infrastructure: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.339Z","level":"info","module":"Evaluator","msg":"Evaluated Continue - Software Engineer – New grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.340Z","level":"info","module":"Evaluator","msg":"Evaluated N1 - New Grad Software Engineer - Full Stack: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.340Z","level":"info","module":"Evaluator","msg":"Evaluated Google - Software Engineer Early Career - Infrastructure 🎓: 57/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.340Z","level":"info","module":"Evaluator","msg":"Evaluated Steel Point Solutions - Software Engineer 1 - Software Engineering: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.341Z","level":"info","module":"Evaluator","msg":"Evaluated Netic - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.341Z","level":"info","module":"Evaluator","msg":"Evaluated Citadel Securities - Software Engineer – University Graduate - US: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.342Z","level":"info","module":"Evaluator","msg":"Evaluated Wyetech - Software Engineer 0: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.342Z","level":"info","module":"Evaluator","msg":"Evaluated Amentum - Entry Level Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.343Z","level":"info","module":"Evaluator","msg":"Evaluated Promise - Software Engineer – New Grad - Forward Deployed AI: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.343Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer – New Grad - Forward Deployed AI: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.343Z","level":"info","module":"Evaluator","msg":"Evaluated Intuit - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.343Z","level":"info","module":"Evaluator","msg":"Evaluated Replit - Software Engineer – New Grad - Summer 2026: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.343Z","level":"info","module":"Evaluator","msg":"Evaluated McDonald's - Software Engineer 1 - iOS - iOS: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.344Z","level":"info","module":"Evaluator","msg":"Evaluated Sierra - Software Engineer – New Grad - Agent: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.344Z","level":"info","module":"Evaluator","msg":"Evaluated WeRide - New Grads 2026 - General Software Engineer: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.344Z","level":"info","module":"Evaluator","msg":"Evaluated Macy's - Macy's Tech Early Careers - Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.345Z","level":"info","module":"Evaluator","msg":"Evaluated Eventual - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.345Z","level":"info","module":"Evaluator","msg":"Evaluated Scale AI - Software Engineer – New Grad: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.345Z","level":"info","module":"Evaluator","msg":"Evaluated NVIDIA - Deep Learning Architect, LLM Inference 🎓: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.345Z","level":"info","module":"Evaluator","msg":"Evaluated NVIDIA - Deep Learning Software Engineer – New College Grad - Flashinfer: 87/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.345Z","level":"info","module":"Evaluator","msg":"Evaluated NVIDIA - Deep Learning Software Engineer – New College Grad - TensorRT Performance: 87/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated NVIDIA - Applied Machine Learning Engineer – New College Grad 2026 - Circuit Design 🎓: 87/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated Klaviyo - Machine Learning Engineer 1 - Machine Learning - Full-stack Engineering 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated Nextdoor - Machine Learning Engineer – New Grad 2026 - Machine Learning - Nextdoor: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated Adobe - University Graduate - Machine Learning Engineer 🎓: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated WeRide - New Grads 2026 - Software Engineer - Computer Vision: 87/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.346Z","level":"info","module":"Evaluator","msg":"Evaluated PathAI - Machine Learning Engineer 1/2/3: 79/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.347Z","level":"info","module":"Evaluator","msg":"Evaluated RTX - Software Engineer 1 - Space and Radio Frequency Sensors: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.347Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer – Entry Level: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.347Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Embedded Software Engineer – Entry Level: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.347Z","level":"info","module":"Evaluator","msg":"Evaluated Brain Corp - Software Engineer 1 - Firmware: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.347Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer 1 - Manufacturing: 52/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Northwood Space - Software Engineer – New grad / early career: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Life Fitness - Embedded Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated True Anomaly - Flight Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer – Entry Level: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Aurora Innovation - Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Junior Software Engineer: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Honeywell - Software Engineer 1: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Aurora Innovation - Embedded Software Engineer 1: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated ASM International - Software Engineer – Early Career - Spring 2026: 74/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.348Z","level":"info","module":"Evaluator","msg":"Evaluated Nuro - Software Engineer – New Grad - AI Platform: 80/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated WeRide - New Grads 2026 - Software Engineer - Algorithm 🎓: 57/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Snorkel AI - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Vestwell - AI Engineer Intern - Tech: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Kira - Software Engineering Intern 🛂: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineering Intern 🛂: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Vital Lyfe - Software Engineering Internship: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Rainmaker - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Axiomatic AI - Software Engineering Internship – Platform/DevOps 🛂: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineering Internship – AI/Agentic Systems 🛂: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Constant Contact - Software Engineer Co-op: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.349Z","level":"info","module":"Evaluator","msg":"Evaluated Hewlett Packard (HP) - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.350Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.350Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer Entry Level Intern Conversion: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.350Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer – Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.350Z","level":"info","module":"Evaluator","msg":"Evaluated AeroVironment - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.350Z","level":"info","module":"Evaluator","msg":"Evaluated d-Matrix - Applied AI Engineering Intern 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated Gelber Group - Software Engineer Intern - Technical Operations Team: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineering Intern - Backoffice Team: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated NCR Voyix - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated Remedy Scientific - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated RTX - Raytheon Part Time Co-op-Java Software Engineer: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.351Z","level":"info","module":"Evaluator","msg":"Evaluated AeroVironment - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.352Z","level":"info","module":"Evaluator","msg":"Evaluated Quadric - Software Engineer Intern - Compiler: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.352Z","level":"info","module":"Evaluator","msg":"Evaluated Cambium Learning Group - Software Engineer Intern - AI Applications: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.352Z","level":"info","module":"Evaluator","msg":"Evaluated Sieve - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer – Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated Horace Mann - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated Globalization Partners - Software Engineering Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - AI/ML Software Engineer Intern - Data Platform: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated TIFIN - AI Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated Electronic Arts - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated Chamberlain Group - AI/ML Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.353Z","level":"info","module":"Evaluator","msg":"Evaluated Cadence Design Systems - Software Engineering Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineering Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Intern - Multiple Teams: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated ACI Worldwide - Software Engineering Intern: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated AssetMark - Software Engineering Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated Axway - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated Togetherwork - AI Engineering Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated AssetWorks - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated Veeva Systems - Software Engineer in Test Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Project Intern - Recommendation Infrastructure: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.354Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Intern - AI Model Optimization: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated Astranis - Software Engineer Intern - Data Platform: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated Snyk - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated Farsight - Software Engineering Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Software Engineer Project Intern - Content AI Infrastructure: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated CIBC - Intern - Software Engineer: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated PsiQuantum - Intern – Software Engineering: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated Teledyne - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated American Rare Earths - AI Engineer Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated Shake Shack - Intern – AI Engineering: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated DoubleVerify - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.355Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Software Engineer Project Intern - Network Security: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Littelfuse - AI Engineering Intern: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Magna - Intern Software Engineer - Integration and Test: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Intrepid Direct Insurance - Software Engineer Intern 🛂: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - Security Software Engineer Project Intern - Network Security - BS/MS: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer Intern - Security-Data - BS/MS: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Urban Science - Software Engineering Intern 🛂: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Judi Health - Software Engineering Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Givelify - Software Engineering Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Creatify Lab - Software Engineer Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Baxter International - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated Avnet - AI Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.356Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - AI Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Vantage - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Affirm - Software Engineering Apprentice - Backend: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Snyk - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated W.R. Berkley - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Synchrony Financial - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Backend Software Engineer Intern - Foundation Platform: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Neuralink - Software Engineer Intern - Internal Apps: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.357Z","level":"info","module":"Evaluator","msg":"Evaluated Notability - Android Software Engineer Co-op: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated Palantir - Forward Deployed Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated PowerSchool Group - AI Engineering: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated Smiths Detection - Software Engineering Intern (Cyber focus) 🇺🇸: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated General Dynamics Mission Systems - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated Hayden AI - Intern Software Engineer 🎓: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer - Quality Assurance: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Intern Software Engineer: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated Copart - Software Engineering Intern 🎓: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.358Z","level":"info","module":"Evaluator","msg":"Evaluated AeroVect - Software Engineer - Intern - Perception 🎓: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.359Z","level":"info","module":"Evaluator","msg":"Evaluated LogicGate - Software Engineer Intern: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.359Z","level":"info","module":"Evaluator","msg":"Evaluated Arrowstreet Capital - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.359Z","level":"info","module":"Evaluator","msg":"Evaluated Smiths Detection Group - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.359Z","level":"info","module":"Evaluator","msg":"Evaluated Tatari - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.359Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Software Engineer Intern: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated Taara - Software Engineering Intern: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated CAE - Software Engineering Co-op Instructional Systems: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated Coherent - Intern – Software Engineering: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated Alarm.com - Software Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated ACI Worldwide - Intern Software Engineering: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated ByteDance - AI Product Manager Intern - Applied Machine Learning: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.360Z","level":"info","module":"Evaluator","msg":"Evaluated BillionToOne - Product Management Intern - Software Engineering 🎓: 75/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated TMEIC - Intern - Applications, AI and Machine Learning 🛂: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated Flagship Pioneering - Pioneering Intelligence Machine Learning Co-Op: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated Adobe - AI/ML Intern - Machine Learning Engineer: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Machine Learning Engineer Intern 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated Skydio - Autonomy Engineer Intern - Deep Learning - Computational Photography 🎓: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.361Z","level":"info","module":"Evaluator","msg":"Evaluated X Development - PhD / Masters Residency Intern - Machine Learning / Software Engineering 🎓: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Cirrus Logic - Intern - Embedded Machine Learning Engineer - AI/ML 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Bosch Group - Automated Driving Machine Learning Intern 🎓: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Adobe - AI/ML Intern - Machine Learning Engineer 🎓: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Perplexity AI - Intern - Search Machine Learning Engineer: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Snap - Machine Learning Engineer Intern: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Adobe - Intern - Machine Learning Engineer: 90/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated TikTok - Machine Learning Scientist Intern - Global E-Commerce Content Recommendation 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Halliburton - Machine Learning Geoscientist Intern: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.362Z","level":"info","module":"Evaluator","msg":"Evaluated Roblox - Machine Learning Engineer – Intern - Recommendation Systems 🎓: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Insitro - Machine Learning Intern: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Glydways - Perception Software Engineering Intern 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Coherent - Intern Data Science Software Engineer: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated PowerSchool - Intern, AI Engineering: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Juniper Square - AI Engineer Intern 🎓: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Skydio - PhD Autonomy Engineer Intern - Deep Learning or Computer Vision 🎓: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Magna - Computer Vision AI Intern: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated ↳ - Autonomy Engineer Intern - Computer Vision/Deep Learning Summer 2026: 85/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Motorola - Web Interface Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Thales - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated CAE - DNI Software Engineering Co-op: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated RTX - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.363Z","level":"info","module":"Evaluator","msg":"Evaluated Intel - AI Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated Quadric - Software Engineer Intern - Kernels: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated Bose - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated DiDi Global - Software Engineer Intern - Simulation: 82/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated GE Appliances - Software Engineering Co-op: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated Magna - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated KBR - National Security Solutions – Software Engineering Intern - Nss: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated Space Kinetic - Software Engineering Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.364Z","level":"info","module":"Evaluator","msg":"Evaluated Robert Bosch Venture Capital - Software Engineering Intern/Co-op: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Cohu - Software Engineer Intern: 55/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Shield AI - Embedded Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Magna - Software Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Fresenius Medical Care - Embedded Software Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Particle Measuring Systems - Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Hewlett Packard (HP) - Browser Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Draper - Software Engineer: 72/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Hewlett Packard (HP) - Browser Software Engineer Intern: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:03.365Z","level":"info","module":"Evaluator","msg":"Evaluated Hermeus - Flight Software Engineering Intern 🇺🇸: 77/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.043Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777926753016"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:32:33.060Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T20:32:33.064Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777926753016"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:32:33.071Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T20:32:33.074Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777926753016"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:32:33.076Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.087Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T20:32:33.101Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T20:32:33.116Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.144Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.153Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T20:32:33.150Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.162Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.164Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T20:32:33.169Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.172Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.176Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.179Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.180Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.182Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.183Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.183Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.185Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.188Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:32:33.191Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:32:33.357Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:32:33.367Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:32:33.373Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:32:33.380Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:32:33.385Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T20:35:08.697Z","level":"info","module":"apply","msg":"Opening 5 application(s) (batch size: 5)"}
+{"ts":"2026-05-04T20:35:08.699Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10977226?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T20:35:09.037Z","level":"info","module":"HandshakeHandler","msg":"Launching new browser on CDP port 9271"}
+{"ts":"2026-05-04T20:35:11.260Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T20:35:13.016Z","level":"warn","module":"HandshakeHandler","msg":"Handshake requires login. Start Chrome with --remote-debugging-port=9271, log in at app.joinhandshake.com, then re-run."}
+{"ts":"2026-05-04T20:35:13.017Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] DEEP Measures — AI Agent Engineer Intern","data":{"filled":0,"failed":1,"flagged":0}}
+{"ts":"2026-05-04T20:39:14.893Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777927154883"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:39:14.901Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T20:39:14.903Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777927154883"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:39:14.903Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T20:39:14.903Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777927154883"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:39:14.904Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T20:39:14.904Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T20:39:14.912Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.915Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.916Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.917Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T20:39:14.918Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.920Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.920Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T20:39:14.921Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.921Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.922Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.922Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.923Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.924Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.925Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:39:14.925Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.927Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.927Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:14.928Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:39:15.062Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:39:15.063Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:39:15.064Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:39:15.064Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:39:15.065Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T20:42:04.990Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10982205?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10982205"}
+{"ts":"2026-05-04T20:42:05.467Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing browser (CDP reconnect)"}
+{"ts":"2026-05-04T20:42:06.986Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10982205"}
+{"ts":"2026-05-04T20:42:09.658Z","level":"warn","module":"HandshakeHandler","msg":"Handshake requires login. Start Chrome with --remote-debugging-port=9271, log in at app.joinhandshake.com, then re-run."}
+{"ts":"2026-05-04T20:42:09.660Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] Unknown — Founding Software Engineer","data":{"filled":0,"failed":1,"flagged":0}}
+{"ts":"2026-05-04T20:42:09.660Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/11013002?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/11013002"}
+{"ts":"2026-05-04T20:42:10.010Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing browser (CDP reconnect)"}
+{"ts":"2026-05-04T20:42:10.439Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/11013002"}
+{"ts":"2026-05-04T20:42:10.891Z","level":"warn","module":"HandshakeHandler","msg":"Handshake requires login. Start Chrome with --remote-debugging-port=9271, log in at app.joinhandshake.com, then re-run."}
+{"ts":"2026-05-04T20:42:10.900Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] Reinforce Labs — Machine Learning Engineer","data":{"filled":0,"failed":1,"flagged":0}}
+{"ts":"2026-05-04T20:42:10.901Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10975691?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10975691"}
+{"ts":"2026-05-04T20:42:11.362Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing browser (CDP reconnect)"}
+{"ts":"2026-05-04T20:42:11.569Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10975691"}
+{"ts":"2026-05-04T20:42:11.933Z","level":"warn","module":"HandshakeHandler","msg":"Handshake requires login. Start Chrome with --remote-debugging-port=9271, log in at app.joinhandshake.com, then re-run."}
+{"ts":"2026-05-04T20:42:11.934Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] Agentix — AI/Engineer Intern","data":{"filled":0,"failed":1,"flagged":0}}
+{"ts":"2026-05-04T20:42:11.934Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/11013856?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/11013856"}
+{"ts":"2026-05-04T20:42:12.293Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing browser (CDP reconnect)"}
+{"ts":"2026-05-04T20:42:12.491Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/11013856"}
+{"ts":"2026-05-04T20:42:12.941Z","level":"warn","module":"HandshakeHandler","msg":"Handshake requires login. Start Chrome with --remote-debugging-port=9271, log in at app.joinhandshake.com, then re-run."}
+{"ts":"2026-05-04T20:42:12.942Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] Evolution Design Lab — AI Operations Intern","data":{"filled":0,"failed":1,"flagged":0}}
+{"ts":"2026-05-04T20:46:22.743Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777927582737"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:46:22.744Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T20:46:22.745Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777927582737"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:46:22.746Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T20:46:22.746Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777927582737"],"location":"Bay Area"}}
+{"ts":"2026-05-04T20:46:22.746Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T20:46:22.746Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T20:46:22.775Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.777Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.779Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.779Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T20:46:22.783Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.786Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.788Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T20:46:22.790Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.794Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.795Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T20:46:22.796Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.796Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.797Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.798Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.799Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.800Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.801Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.802Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T20:46:22.924Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:46:22.926Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:46:22.926Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:46:22.927Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T20:46:22.927Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T21:34:41.711Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777930481699"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:34:41.713Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T21:34:41.717Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777930481699"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:34:41.719Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T21:34:41.720Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777930481699"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:34:41.721Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T21:34:41.721Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T21:34:41.735Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:41.738Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.742Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:41.742Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.743Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T21:34:41.744Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.744Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:41.744Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T21:34:41.744Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.745Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.745Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.746Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:41.747Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.747Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.748Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.749Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:41.749Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:34:41.751Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:34:42.220Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:34:42.222Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:34:42.222Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:34:42.223Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:34:42.224Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T21:54:54.195Z","level":"info","module":"apply","msg":"Opening 1 application(s) (batch size: 5)"}
+{"ts":"2026-05-04T21:54:54.197Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10977226?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:54:54.535Z","level":"info","module":"HandshakeHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T21:54:56.574Z","level":"info","module":"HandshakeHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T21:54:56.886Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:55:02.279Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"first_name\"], input[placeholder*=\"First\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"first_name\"], input[placeholder*=\"First\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:55:06.282Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"last_name\"], input[placeholder*=\"Last\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"last_name\"], input[placeholder*=\"Last\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:55:10.285Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"email\"], input[type=\"email\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email\"], input[type=\"email\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:55:14.288Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"phone\"], input[type=\"tel\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"phone\"], input[type=\"tel\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:55:14.294Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] DEEP Measures — AI Agent Engineer Intern","data":{"filled":0,"failed":4,"flagged":0}}
+{"ts":"2026-05-04T21:55:58.183Z","level":"info","module":"apply","msg":"Opening 1 application(s) (batch size: 5)"}
+{"ts":"2026-05-04T21:55:58.186Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10977226?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:55:58.524Z","level":"info","module":"HandshakeHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T21:56:00.057Z","level":"info","module":"HandshakeHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T21:56:00.368Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:56:05.781Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"first_name\"], input[placeholder*=\"First\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"first_name\"], input[placeholder*=\"First\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:56:09.787Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"last_name\"], input[placeholder*=\"Last\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"last_name\"], input[placeholder*=\"Last\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:56:11.494Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"email\"], input[type=\"email\"]]: locator.scrollIntoViewIfNeeded: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email\"], input[type=\"email\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T21:56:11.495Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"phone\"], input[type=\"tel\"]]: locator.scrollIntoViewIfNeeded: Target page, context or browser has been closed"}
+{"ts":"2026-05-04T21:56:11.496Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] DEEP Measures — AI Agent Engineer Intern","data":{"filled":0,"failed":5,"flagged":0}}
+{"ts":"2026-05-04T21:58:01.339Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777931881335"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:01.341Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T21:58:01.345Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777931881335"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:01.346Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T21:58:01.346Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777931881335"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:01.347Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T21:58:01.347Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T21:58:01.363Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.369Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.369Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.371Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.372Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T21:58:01.372Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.372Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.372Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.372Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.373Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T21:58:01.373Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.376Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.377Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.377Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.378Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.378Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:01.379Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.380Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:01.485Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:01.486Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:01.487Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:01.487Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:01.488Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T21:58:18.793Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777931898788"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:18.794Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T21:58:18.796Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777931898788"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:18.796Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T21:58:18.796Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777931898788"],"location":"Bay Area"}}
+{"ts":"2026-05-04T21:58:18.796Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T21:58:18.796Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T21:58:18.812Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.813Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.815Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.816Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.816Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T21:58:18.817Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.818Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.818Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.818Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T21:58:18.818Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.819Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.820Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.821Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T21:58:18.822Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.825Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T21:58:18.926Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:18.927Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:18.928Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:18.928Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T21:58:18.929Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T21:59:36.179Z","level":"info","module":"apply","msg":"Opening 1 application(s) (batch size: 5)"}
+{"ts":"2026-05-04T21:59:36.181Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10977226?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:59:36.515Z","level":"info","module":"HandshakeHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T21:59:38.553Z","level":"info","module":"HandshakeHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T21:59:38.878Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10977226"}
+{"ts":"2026-05-04T21:59:40.272Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T21:59:40.275Z","level":"info","module":"apply","msg":"Marked 001 as Closed"}
+{"ts":"2026-05-04T22:12:19.473Z","level":"info","module":"apply","msg":"Opening 10 application(s) (batch size: 10)"}
+{"ts":"2026-05-04T22:12:19.475Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10982205?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10982205"}
+{"ts":"2026-05-04T22:12:19.822Z","level":"info","module":"HandshakeHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T22:12:22.504Z","level":"info","module":"HandshakeHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T22:12:22.877Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10982205"}
+{"ts":"2026-05-04T22:12:24.326Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:24.330Z","level":"info","module":"apply","msg":"Marked 002 as Closed"}
+{"ts":"2026-05-04T22:12:24.331Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/11013002?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/11013002"}
+{"ts":"2026-05-04T22:12:24.649Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:24.832Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/11013002"}
+{"ts":"2026-05-04T22:12:25.162Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:25.164Z","level":"info","module":"apply","msg":"Marked 003 as Closed"}
+{"ts":"2026-05-04T22:12:25.164Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10975691?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10975691"}
+{"ts":"2026-05-04T22:12:25.477Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:25.686Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10975691"}
+{"ts":"2026-05-04T22:12:26.042Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:26.044Z","level":"info","module":"apply","msg":"Marked 004 as Closed"}
+{"ts":"2026-05-04T22:12:26.044Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/11013856?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/11013856"}
+{"ts":"2026-05-04T22:12:26.359Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:26.579Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/11013856"}
+{"ts":"2026-05-04T22:12:26.856Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:26.858Z","level":"info","module":"apply","msg":"Marked 005 as Closed"}
+{"ts":"2026-05-04T22:12:26.859Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10951781?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10951781"}
+{"ts":"2026-05-04T22:12:27.170Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:27.325Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10951781"}
+{"ts":"2026-05-04T22:12:27.689Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:27.692Z","level":"info","module":"apply","msg":"Marked 006 as Closed"}
+{"ts":"2026-05-04T22:12:27.692Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10972920?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10972920"}
+{"ts":"2026-05-04T22:12:28.001Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:28.165Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10972920"}
+{"ts":"2026-05-04T22:12:28.470Z","level":"info","module":"HandshakeHandler","msg":"Posting closed — skipping: Posting closed — page says: \"does not exist\""}
+{"ts":"2026-05-04T22:12:28.473Z","level":"info","module":"apply","msg":"Marked 007 as Closed"}
+{"ts":"2026-05-04T22:12:28.473Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10725821?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10725821"}
+{"ts":"2026-05-04T22:12:28.783Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:12:28.948Z","level":"info","module":"HandshakeHandler","msg":"Navigating to https://app.joinhandshake.com/stu/postings/10725821"}
+{"ts":"2026-05-04T22:12:34.570Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"first_name\"], input[placeholder*=\"First\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"first_name\"], input[placeholder*=\"First\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:12:38.573Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"last_name\"], input[placeholder*=\"Last\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"last_name\"], input[placeholder*=\"Last\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:12:42.576Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"email\"], input[type=\"email\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email\"], input[type=\"email\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:12:47.280Z","level":"warn","module":"HandshakeHandler","msg":"safeType failed [input[name=\"phone\"], input[type=\"tel\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"phone\"], input[type=\"tel\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:12:47.284Z","level":"info","module":"HandshakeHandler","msg":"[HANDSHAKE] Unknown — Robot Operator","data":{"filled":0,"failed":4,"flagged":0}}
+{"ts":"2026-05-04T22:18:56.332Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.335Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.338Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.338Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T22:18:56.340Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.341Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.342Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:18:56.348Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777933136345"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:18:56.349Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T22:18:56.350Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777933136345"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:18:56.351Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T22:18:56.351Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777933136345"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:18:56.351Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T22:18:56.351Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T22:18:56.371Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.373Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.373Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T22:18:56.373Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.374Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.395Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.397Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.399Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.399Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.400Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.401Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:18:56.517Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:18:56.519Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:18:56.519Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:18:56.520Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:18:56.520Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T22:20:06.940Z","level":"info","module":"apply","msg":"URL resolved: https://app.joinhandshake.com/job-search/10896619?query=machine+learning+AI+engi → https://app.joinhandshake.com/stu/postings/10896619"}
+{"ts":"2026-05-04T22:20:07.308Z","level":"info","module":"HandshakeHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:20:10.026Z","level":"info","module":"apply","msg":"Opening 10 application(s) (batch size: 10)"}
+{"ts":"2026-05-04T22:20:10.363Z","level":"info","module":"GenericHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T22:20:12.467Z","level":"info","module":"GenericHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T22:20:12.719Z","level":"info","module":"GenericHandler","msg":"Navigating to https://lifeattiktok.com/search/7572665884037826869?spread=5MWH5CQ"}
+{"ts":"2026-05-04T22:20:18.773Z","level":"warn","module":"GenericHandler","msg":"Generic: skipping field with no stable selector (no id or name)"}
+{"ts":"2026-05-04T22:20:18.781Z","level":"info","module":"GenericHandler","msg":"[GENERIC] TikTok — Software Engineer Intern (Ads Infrastructure) - 2026 Summer (BS/MS)","data":{"filled":0,"failed":0,"flagged":1}}
+{"ts":"2026-05-04T22:29:24.346Z","level":"info","module":"apply","msg":"Opening 20 application(s) (batch size: 20)"}
+{"ts":"2026-05-04T22:29:24.684Z","level":"info","module":"GreenhouseHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T22:29:27.019Z","level":"info","module":"GreenhouseHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T22:29:27.276Z","level":"info","module":"GreenhouseHandler","msg":"Navigating to https://job-boards.greenhouse.io/astranis/jobs/4648080006?gh_src=602966e76us"}
+{"ts":"2026-05-04T22:29:36.536Z","level":"info","module":"GreenhouseHandler","msg":"Uploaded resume: output/resumes/parv-master.pdf"}
+{"ts":"2026-05-04T22:29:40.544Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [textarea#cover_letter, textarea[id*=\"cover\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea#cover_letter, textarea[id*=\"cover\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:43.550Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#school--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#school--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:46.551Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#degree--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#degree--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:49.553Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#discipline--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#discipline--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:52.556Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#start-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:56.559Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#start-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:29:59.560Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#end-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:30:03.564Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#end-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:30:25.561Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"Website\" — needs manual input"}
+{"ts":"2026-05-04T22:30:26.186Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"What is the most impressive thing you have ever accomplished?*\" — needs manual input"}
+{"ts":"2026-05-04T22:30:26.187Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"Please confirm the season you are applying for. *\" — needs manual input"}
+{"ts":"2026-05-04T22:30:26.189Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"When are you able to join Astranis as an intern? (12 week minimum)*\" — needs manual input"}
+{"ts":"2026-05-04T22:30:26.191Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"When do you plan on ending your internship?*\" — needs manual input"}
+{"ts":"2026-05-04T22:30:29.319Z","level":"info","module":"GreenhouseHandler","msg":"Screenshot → /Users/parvpatodia/career-ops/output/gh-filled-linkedin-3b50ff0d.png"}
+{"ts":"2026-05-04T22:30:29.319Z","level":"info","module":"GreenhouseHandler","msg":"[GREENHOUSE] Astranis Space Technologies — Software Engineer- Backend Intern (Summer 2026)","data":{"filled":9,"failed":3,"flagged":5}}
+{"ts":"2026-05-04T22:34:07.508Z","level":"info","module":"apply","msg":"Marked 1/1 as Applied"}
+{"ts":"2026-05-04T22:34:09.498Z","level":"info","module":"GenericHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T22:34:09.793Z","level":"info","module":"GenericHandler","msg":"Navigating to https://careers-jobyaviation.icims.com/jobs/4413/cell-test-engineering-intern-(summer-fall-2026)/job?mode=apply&iis=LinkedIn&iisn=LinkedIn"}
+{"ts":"2026-05-04T22:34:12.799Z","level":"warn","module":"GenericHandler","msg":"Generic: skipping field with no stable selector (no id or name)"}
+{"ts":"2026-05-04T22:34:12.802Z","level":"info","module":"GenericHandler","msg":"[GENERIC] Joby Aviation — Cell Test Engineering Intern (Summer/Fall 2026)","data":{"filled":0,"failed":0,"flagged":1}}
+{"ts":"2026-05-04T22:45:13.711Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777934713706"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:45:13.713Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T22:45:13.715Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777934713706"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:45:13.716Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T22:45:13.716Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777934713706"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:45:13.716Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T22:45:13.717Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T22:45:13.755Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.758Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.764Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.764Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.765Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T22:45:13.766Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.766Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T22:45:13.767Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.767Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.768Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.769Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.770Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.774Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:45:13.769Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.780Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.782Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.788Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.789Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:45:13.918Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:45:13.920Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:45:13.920Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:45:13.921Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:45:13.921Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T22:47:47.790Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777934867785"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:47:47.791Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T22:47:47.792Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777934867785"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:47:47.792Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T22:47:47.793Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777934867785"],"location":"Bay Area"}}
+{"ts":"2026-05-04T22:47:47.793Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T22:47:47.793Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T22:47:47.801Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.805Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.806Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.807Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T22:47:47.808Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.809Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.812Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T22:47:47.832Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.834Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.834Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T22:47:47.835Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.835Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.836Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.837Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.838Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.840Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.841Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.842Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T22:47:47.952Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:47:47.953Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:47:47.954Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:47:47.954Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T22:47:47.955Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-05-04T22:52:01.101Z","level":"info","module":"apply","msg":"Opening 10 application(s) (batch size: 10)"}
+{"ts":"2026-05-04T22:52:01.440Z","level":"info","module":"GreenhouseHandler","msg":"Launching stealth browser session (/Users/parvpatodia/career-ops/.browser-profile)"}
+{"ts":"2026-05-04T22:52:03.896Z","level":"info","module":"GreenhouseHandler","msg":"Using bundled Chromium (Chrome not found)"}
+{"ts":"2026-05-04T22:52:04.167Z","level":"info","module":"GreenhouseHandler","msg":"Navigating to https://job-boards.greenhouse.io/astranis/jobs/4667477006?gh_src=602966e76us"}
+{"ts":"2026-05-04T22:52:13.329Z","level":"info","module":"GreenhouseHandler","msg":"Uploaded resume: output/resumes/parv-master.pdf"}
+{"ts":"2026-05-04T22:52:17.331Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [textarea#cover_letter, textarea[id*=\"cover\"]]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea#cover_letter, textarea[id*=\"cover\"]').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:17.341Z","level":"info","module":"GreenhouseHandler","msg":"Uploaded cover letter PDF: /Users/parvpatodia/career-ops/cv/cover_letter_ai.pdf"}
+{"ts":"2026-05-04T22:52:20.342Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#school--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#school--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:23.344Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#degree--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#degree--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:26.345Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#discipline--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#discipline--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:29.348Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#start-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:33.351Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#start-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#start-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:36.355Z","level":"warn","module":"GreenhouseHandler","msg":"fillCombobox [#end-month--0] failed: locator.scrollIntoViewIfNeeded: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-month--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:52:40.356Z","level":"warn","module":"GreenhouseHandler","msg":"safeType failed [#end-year--0]: locator.scrollIntoViewIfNeeded: Timeout 4000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#end-year--0').first()\u001b[22m\n"}
+{"ts":"2026-05-04T22:53:04.250Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"What is the most impressive thing you have ever accomplished?*\" — needs manual input"}
+{"ts":"2026-05-04T22:53:04.252Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"Please confirm the season you are applying for. *\" — needs manual input"}
+{"ts":"2026-05-04T22:53:04.254Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"When are you able to join Astranis as an intern? (12 week minimum)*\" — needs manual input"}
+{"ts":"2026-05-04T22:53:04.255Z","level":"warn","module":"GreenhouseHandler","msg":"No answer for custom question: \"When do you plan on ending your internship?*\" — needs manual input"}
+{"ts":"2026-05-04T22:53:07.101Z","level":"warn","module":"GreenhouseHandler","msg":"UFF sweep failed: page.evaluate: ReferenceError: __name is not defined\n    at eval (eval at evaluate (:302:30), <anonymous>:1:851)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"}
+{"ts":"2026-05-04T22:53:07.366Z","level":"info","module":"GreenhouseHandler","msg":"Screenshot → /Users/parvpatodia/career-ops/output/gh-filled-linkedin-b7b08b94.png"}
+{"ts":"2026-05-04T22:53:07.366Z","level":"info","module":"GreenhouseHandler","msg":"[GREENHOUSE] Astranis Space Technologies — Software Engineer Intern - Data Platform (Summer 2026)","data":{"filled":11,"failed":3,"flagged":4}}
+{"ts":"2026-05-04T23:01:50.676Z","level":"info","module":"apply","msg":"Marked 1/1 as Applied"}
+{"ts":"2026-05-04T23:01:51.626Z","level":"info","module":"GenericHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T23:01:52.056Z","level":"info","module":"GenericHandler","msg":"Navigating to https://www.tesla.com/careers/search/job/269445?source=LinkedIn"}
+{"ts":"2026-05-04T23:01:57.808Z","level":"warn","module":"GenericHandler","msg":"UniversalFormFiller failed: page.evaluate: ReferenceError: __name is not defined\n    at eval (eval at evaluate (:302:30), <anonymous>:1:851)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"}
+{"ts":"2026-05-04T23:01:57.832Z","level":"info","module":"GenericHandler","msg":"[GENERIC] Tesla — Internship, Software Engineer, Integration Tools (Fall 2026)","data":{"filled":0,"failed":0,"flagged":0}}
+{"ts":"2026-05-04T23:02:27.009Z","level":"info","module":"GenericHandler","msg":"Reusing existing Chrome session (CDP)"}
+{"ts":"2026-05-04T23:02:27.327Z","level":"info","module":"GenericHandler","msg":"Navigating to https://lifeattiktok.com/search/7595305817516165381?spread=5MWH5CQ"}
+{"ts":"2026-05-04T23:02:31.647Z","level":"warn","module":"GenericHandler","msg":"UniversalFormFiller failed: page.evaluate: ReferenceError: __name is not defined\n    at eval (eval at evaluate (:302:30), <anonymous>:1:851)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"}
+{"ts":"2026-05-04T23:02:31.716Z","level":"warn","module":"GenericHandler","msg":"Generic: skipping field with no stable selector (no id or name)"}
+{"ts":"2026-05-04T23:02:31.738Z","level":"info","module":"GenericHandler","msg":"[GENERIC] TikTok — Software Engineer Intern (Ads Measurement Signal and Privacy) - 2026 Summer (BS/MS)","data":{"filled":0,"failed":0,"flagged":1}}
+{"ts":"2026-05-04T23:24:17.088Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1777937057077"],"location":"Bay Area"}}
+{"ts":"2026-05-04T23:24:17.089Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-05-04T23:24:17.091Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1777937057077"],"location":"Bay Area"}}
+{"ts":"2026-05-04T23:24:17.091Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-05-04T23:24:17.091Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1777937057077"],"location":"Bay Area"}}
+{"ts":"2026-05-04T23:24:17.092Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-05-04T23:24:17.092Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-05-04T23:24:17.189Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.191Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.192Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.192Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.193Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-05-04T23:24:17.193Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.194Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-05-04T23:24:17.194Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.194Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.194Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.195Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.195Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.195Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.196Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.196Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.196Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo — ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-05-04T23:24:17.196Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.197Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-05-04T23:24:17.280Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T23:24:17.283Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T23:24:17.289Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T23:24:17.289Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-05-04T23:24:17.290Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}

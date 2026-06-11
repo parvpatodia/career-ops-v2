@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser", "chrome",
+        "--user-data-dir", "/Users/parvpatodia/career-ops/.browser-profile",
+        "--viewport-size", "1440x900",
+        "--image-responses", "allow",
+        "--allow-unrestricted-file-access",
+        "--init-script", "/Users/parvpatodia/career-ops/scripts/stealth-init.js",
+        "--timeout-action", "10000",
+        "--timeout-navigation", "30000"
+      ]
+    }
+  }
+}

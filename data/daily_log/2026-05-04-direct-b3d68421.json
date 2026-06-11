@@ -1,0 +1,28 @@
+[
+  {
+    "id": "direct-abc123",
+    "title": "ML Engineer Intern",
+    "company": "TestCo",
+    "url": "https://testco.com/jobs/1",
+    "platform": "direct",
+    "location": "San Francisco, CA",
+    "remote": false,
+    "postedAt": "2026-05-04T21:34:41.710Z",
+    "discoveredAt": "2026-05-04T21:34:41.710Z",
+    "jd": "Python, PyTorch required.",
+    "status": "discovered"
+  },
+  {
+    "id": "direct-def456",
+    "title": "ML Engineer Intern",
+    "company": "OtherCo",
+    "url": "https://testco.com/jobs/1",
+    "platform": "direct",
+    "location": "San Francisco, CA",
+    "remote": false,
+    "postedAt": "2026-05-04T21:34:41.710Z",
+    "discoveredAt": "2026-05-04T21:34:41.710Z",
+    "jd": "Python, PyTorch required.",
+    "status": "discovered"
+  }
+]

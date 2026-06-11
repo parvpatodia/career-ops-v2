@@ -1,0 +1,68 @@
+# Scoring Configuration
+# Weights and thresholds for job-resume fit evaluation.
+
+weights:
+  skill_match: 0.30        # % of required skills user has
+  experience_match: 0.20   # years/level alignment
+  location_match: 0.15     # Bay Area / remote / relocation
+  visa_match: 0.15         # sponsors F-1 or doesn't require authorization
+  company_signal: 0.10     # startup stage, funding, tech focus, team quality
+  timing_match: 0.10       # posted <48hrs, start date alignment
+
+thresholds:
+  min_to_apply: 50          # reject below this
+  min_for_cover_letter: 60  # skip cover letter generation below this
+  high_priority: 80         # fast-track for immediate tailoring
+  auto_discard: 30          # auto-mark as SKIP, don't even show
+
+skill_scoring:
+  # Bonus points for particularly strong matches
+  exact_match_bonus: 1.2    # multiplier when skill is verbatim in JD
+  domain_match_bonus: 1.1   # multiplier when domain aligns perfectly
+  # Core skills that always score well
+  core_skills:
+    - "PyTorch"
+    - "Computer Vision"
+    - "Machine Learning"
+    - "Python"
+    - "Deep Learning"
+    - "Transformers"
+
+experience_levels:
+  # Map JD experience requirements to a match score (0-1)
+  intern_no_req: 1.0        # "students welcome" or no exp requirement
+  intern_1yr: 0.9           # "1 year preferred"
+  entry_0_2: 0.85           # "0-2 years"
+  entry_1_3: 0.75           # "1-3 years"
+  mid_3_5: 0.40             # "3-5 years" - mismatch
+  senior_5_plus: 0.10       # "5+ years" - strong mismatch
+
+location_scoring:
+  bay_area: 1.0             # San Jose, SF, Palo Alto, Mountain View, etc.
+  remote: 0.95              # fully remote
+  us_relocation: 0.70       # other US location (open to relocate)
+  international: 0.10       # outside US
+
+visa_scoring:
+  # Higher = more likely to sponsor
+  sponsorship_explicit: 1.0   # "will sponsor F-1/OPT/CPT" stated
+  sponsorship_likely: 0.80    # startup or company with history of sponsoring
+  no_requirement: 0.60        # no authorization mentioned
+  requires_permanent: 0.0     # "must be authorized to work permanently"
+
+company_signal:
+  # Stage-based prior (startups often more flexible with visa)
+  series_abc: 0.90
+  series_de: 0.80
+  public: 0.70
+  stealth: 0.75
+  bigtech: 0.65             # harder sponsorship, competitive
+  # Bonus for AI-native companies
+  ai_native_bonus: 0.15
+
+timing_scoring:
+  posted_0_24h: 1.0
+  posted_1_2d: 0.90
+  posted_3_7d: 0.70
+  posted_1_2w: 0.50
+  posted_older: 0.30

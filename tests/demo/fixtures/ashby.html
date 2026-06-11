@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Ashby Application Form</title></head>
+<body>
+<form id="application-form">
+  <h1>Apply — Demo Corp (Ashby)</h1>
+
+  <!-- Stable system fields — name attributes are consistent across Ashby tenants -->
+  <div class="field-group">
+    <label>Full Name *</label>
+    <input name="_systemfield_name" type="text" required>
+  </div>
+
+  <div class="field-group">
+    <label>Email *</label>
+    <input name="_systemfield_email" type="email" required>
+  </div>
+
+  <div class="field-group">
+    <label>Phone</label>
+    <input name="_systemfield_phone" type="tel">
+  </div>
+
+  <div class="field-group">
+    <label>LinkedIn</label>
+    <input placeholder="LinkedIn" type="url">
+  </div>
+
+  <div class="field-group">
+    <label>GitHub</label>
+    <input placeholder="GitHub" type="url">
+  </div>
+
+  <div class="field-group">
+    <label>Portfolio / Website</label>
+    <input placeholder="Website" type="url">
+  </div>
+
+  <div class="field-group">
+    <label>Resume</label>
+    <input type="file" accept=".pdf">
+  </div>
+
+  <!-- Custom questions — data-qa="application-question" -->
+  <div data-qa="application-question">
+    <label>Are you authorized to work in the US without sponsorship?</label>
+    <textarea></textarea>
+  </div>
+
+  <div data-qa="application-question">
+    <label>Why are you interested in this role?</label>
+    <textarea></textarea>
+  </div>
+
+  <button type="submit">Submit Application</button>
+</form>
+</body>
+</html>

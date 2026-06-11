@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Generic / Custom ATS Form</title></head>
+<body>
+<form id="application-form">
+  <h1>Apply — Demo Corp (Generic/Custom ATS)</h1>
+
+  <!-- Various naming conventions — GenericHandler pattern-matches on id/name/placeholder/label -->
+
+  <div class="field-group">
+    <label for="applicant_first_name">First Name *</label>
+    <input id="applicant_first_name" name="applicant_first_name" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="applicant_last_name">Last Name *</label>
+    <input id="applicant_last_name" name="applicant_last_name" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="email_address">Email Address *</label>
+    <input id="email_address" name="email_address" type="email">
+  </div>
+
+  <div class="field-group">
+    <label for="phone_number">Phone Number</label>
+    <input id="phone_number" name="phone_number" type="tel">
+  </div>
+
+  <div class="field-group">
+    <label for="linkedin_url">LinkedIn URL</label>
+    <input id="linkedin_url" name="linkedin_url" type="url">
+  </div>
+
+  <div class="field-group">
+    <label for="github_url">GitHub URL</label>
+    <input id="github_url" name="github_url" type="url">
+  </div>
+
+  <div class="field-group">
+    <label for="school_name">University / School</label>
+    <input id="school_name" name="school_name" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="graduation_date">Expected Graduation</label>
+    <input id="graduation_date" name="graduation_date" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="city">City</label>
+    <input id="city" name="city" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="zip_code">ZIP Code</label>
+    <input id="zip_code" name="zip_code" type="text">
+  </div>
+
+  <div class="field-group">
+    <label for="resume_file">Resume (PDF)</label>
+    <input id="resume_file" type="file" accept=".pdf">
+  </div>
+
+  <button type="submit">Submit Application</button>
+</form>
+</body>
+</html>
