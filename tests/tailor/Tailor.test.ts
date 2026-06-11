@@ -15,7 +15,11 @@ afterAll(() => {
   }
 });
 
-describe('ResumeBuilder', () => {
+// WHY skipIf: ResumeBuilder reads real resumes from cv/, which is gitignored
+// personal data, so CI machines never have it. Locally these must run.
+const HAS_CV = fs.existsSync('cv/master.md');
+
+describe.skipIf(!HAS_CV)('ResumeBuilder', () => {
   it('creates output file when given valid variant', () => {
     const builder = new ResumeBuilder();
     const result = builder.build('test-001', 'ML Engineer', 'ml', ['Kubernetes']);

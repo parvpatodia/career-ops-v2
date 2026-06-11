@@ -26,7 +26,11 @@ const BASE_JOB: Job = {
   status: 'discovered',
 };
 
-describe('Evaluator', () => {
+// WHY skipIf: Evaluator parses real resumes from cv/, which is gitignored
+// personal data, so CI machines never have it. Locally these must run.
+const HAS_CV = fs.existsSync('cv/master.md');
+
+describe.skipIf(!HAS_CV)('Evaluator', () => {
   let evaluator: Evaluator;
 
   beforeAll(() => {
