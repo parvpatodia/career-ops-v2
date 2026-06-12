@@ -31,10 +31,17 @@ export class Validator {
 
     const identity = profile['identity'] as Record<string, unknown> | undefined;
     if (identity) {
-      for (const f of ['name', 'email', 'visa']) {
+      for (const f of ['name', 'email']) {
         if (!identity[f]) errors.push(`Missing identity.${f}`);
       }
     }
+
+    // WHY work_authorization.visa_type: the validator demanded
+    // identity.visa, a key the real profile schema never had, which made
+    // the scan CLI exit(1) on startup for the project's whole life
+    // (2026-06-10 audit). Validators must track the real schema.
+    const workAuth = profile['work_authorization'] as Record<string, unknown> | undefined;
+    if (!workAuth?.['visa_type']) errors.push('Missing work_authorization.visa_type');
 
     return { valid: errors.length === 0, errors };
   }

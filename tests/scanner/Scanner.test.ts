@@ -1,13 +1,29 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { Scanner } from '../../src/scanner/Scanner.js';
 import type { Job, Platform, ScanQuery } from '../../src/types.js';
+
+// WHY the injected cacheDir: with the default path these mocks wrote
+// TestCo fixtures into the real data/daily_log for a month, and on
+// 2026-06-12 the pipeline queued them as real applications (LESSONS.md).
+let tmpDir: string;
+
+beforeEach(() => {
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'scanner-test-'));
+});
+
+afterEach(() => {
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
 class MockScanner extends Scanner {
   readonly platform: Platform = 'direct';
   private mockJobs: Job[];
 
-  constructor(jobs: Job[] = []) {
-    super();
+  constructor(jobs: Job[] = [], cacheDir?: string) {
+    super(cacheDir ?? tmpDir);
     this.mockJobs = jobs;
   }
 
@@ -33,23 +49,23 @@ function makeJob(overrides: Partial<Job> = {}): Job {
   };
 }
 
-// Use unique queries with timestamps so cached results from previous test runs don't collide.
-const RUN_ID = Date.now().toString();
-const QUERY_1: ScanQuery = { keywords: [`ML Engineer test-1-${RUN_ID}`], location: 'Bay Area' };
-const QUERY_2: ScanQuery = { keywords: [`ML Engineer test-2-${RUN_ID}`], location: 'Bay Area' };
-const QUERY_CACHE: ScanQuery = { keywords: [`ML Engineer test-cache-${RUN_ID}`], location: 'Bay Area' };
+const QUERY: ScanQuery = { keywords: ['ML Engineer'], location: 'Bay Area' };
 
 describe('Scanner (abstract base via MockScanner)', () => {
-  it('returns jobs from scan()', async () => {
+  it('returns jobs from scan() and writes the cache inside the injected dir only', async () => {
     const jobs = [makeJob(), makeJob({ id: 'direct-def456', company: 'OtherCo' })];
     const scanner = new MockScanner(jobs);
-    const results = await scanner.scanWithCache(QUERY_1);
+    const results = await scanner.scanWithCache(QUERY);
     expect(results).toHaveLength(2);
+
+    const written = fs.readdirSync(tmpDir);
+    expect(written).toHaveLength(1);
+    expect(written[0]).toMatch(/direct/);
   });
 
   it('returns empty array when no jobs found', async () => {
     const scanner = new MockScanner([]);
-    const results = await scanner.scanWithCache(QUERY_2);
+    const results = await scanner.scanWithCache(QUERY);
     expect(results).toHaveLength(0);
   });
 
@@ -57,15 +73,17 @@ describe('Scanner (abstract base via MockScanner)', () => {
     let callCount = 0;
     class CountingScanner extends Scanner {
       readonly platform: Platform = 'direct';
+      constructor() {
+        super(tmpDir);
+      }
       protected async scan(_q: ScanQuery): Promise<Job[]> {
         callCount++;
         return [makeJob()];
       }
     }
     const scanner = new CountingScanner();
-    await scanner.scanWithCache(QUERY_CACHE);
-    await scanner.scanWithCache(QUERY_CACHE);
-    // Both calls use the same query → second should hit cache
+    await scanner.scanWithCache(QUERY);
+    await scanner.scanWithCache(QUERY);
     expect(callCount).toBe(1);
   });
 
