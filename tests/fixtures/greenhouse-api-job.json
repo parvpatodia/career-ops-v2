@@ -1,0 +1,103 @@
+{
+  "__source": "Shape verified against live boards-api.greenhouse.io/v1/boards/anthropic/jobs/4461450008?questions=true on 2026-06-12. The 'question_999' entry is synthetic: an unknown field type the mapper must surface, not silently drop.",
+  "id": 4461450008,
+  "title": "Account Executive, AI Native",
+  "absolute_url": "https://job-boards.greenhouse.io/anthropic/jobs/4461450008",
+  "questions": [
+    {
+      "label": "First Name",
+      "required": true,
+      "fields": [{ "name": "first_name", "type": "input_text", "values": [] }]
+    },
+    {
+      "label": "Last Name",
+      "required": true,
+      "fields": [{ "name": "last_name", "type": "input_text", "values": [] }]
+    },
+    {
+      "label": "Email",
+      "required": true,
+      "fields": [{ "name": "email", "type": "input_text", "values": [] }]
+    },
+    {
+      "label": "Phone",
+      "required": true,
+      "fields": [{ "name": "phone", "type": "input_text", "values": [] }]
+    },
+    {
+      "label": "Resume/CV",
+      "required": true,
+      "fields": [
+        { "name": "resume", "type": "input_file", "values": [] },
+        { "name": "resume_text", "type": "textarea", "values": [] }
+      ]
+    },
+    {
+      "label": "LinkedIn Profile",
+      "required": false,
+      "fields": [{ "name": "question_8581812008", "type": "input_text", "values": [] }]
+    },
+    {
+      "label": "Are you authorized to work in the United States?",
+      "required": true,
+      "fields": [
+        {
+          "name": "question_111",
+          "type": "multi_value_single_select",
+          "values": [
+            { "label": "Yes", "value": 1 },
+            { "label": "No", "value": 0 }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Which teams interest you?",
+      "required": false,
+      "fields": [
+        {
+          "name": "question_222",
+          "type": "multi_value_multi_select",
+          "values": [
+            { "label": "Research", "value": 10 },
+            { "label": "Engineering", "value": 11 }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Quantum readiness assessment",
+      "required": true,
+      "fields": [{ "name": "question_999", "type": "input_quantum", "values": [] }]
+    }
+  ],
+  "location_questions": [],
+  "demographic_questions": {
+    "header": "Voluntary Self-Identification",
+    "questions": [
+      {
+        "label": "Gender",
+        "required": false,
+        "fields": [
+          {
+            "name": "gender",
+            "type": "multi_value_single_select",
+            "values": [{ "label": "Male", "value": 1 }, { "label": "Female", "value": 2 }]
+          }
+        ]
+      }
+    ]
+  },
+  "compliance": [
+    {
+      "type": "gdpr",
+      "questions": [
+        {
+          "label": "I consent to processing of my data",
+          "required": false,
+          "fields": [{ "name": "gdpr_consent", "type": "multi_value_single_select", "values": [{ "label": "Yes", "value": 1 }] }]
+        }
+      ]
+    }
+  ]
+}
