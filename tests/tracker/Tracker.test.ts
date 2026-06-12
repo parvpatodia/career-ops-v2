@@ -2,8 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { ApplicationStore } from '../../src/tracker/ApplicationStore.js';
+import { ApplicationStore, DuplicateApplicationError } from '../../src/tracker/ApplicationStore.js';
 import { StatsEngine } from '../../src/tracker/StatsEngine.js';
+import { EventStore } from '../../src/store/EventStore.js';
+import { appIdFor } from '../../src/store/events.js';
 import type { Application } from '../../src/types.js';
 
 // Each test suite gets its own tmp directory — no process.chdir() needed.
@@ -134,5 +136,41 @@ describe('StatsEngine', () => {
     const formatted = engine.format(stats);
     expect(formatted).toContain('Stats');
     expect(formatted).toContain('Applied');
+  });
+});
+
+// Regression tests for the 2026-06-11 review findings (LESSONS.md).
+describe('ApplicationStore event-log semantics', () => {
+  it('marking Interview directly still sets the submitted flag (double-submit guard)', () => {
+    const store = new ApplicationStore(jsonPath, mdPath);
+    store.add(makeApp());
+    store.update('001', { status: 'Interview' });
+
+    const events = new EventStore(path.join(tmpDir, 'events.jsonl'));
+    expect(events.projection().isSubmitted(appIdFor('TestCo', 'ML Engineer Intern'))).toBe(true);
+    expect(store.getById('001')?.status).toBe('Interview');
+  });
+
+  it('repeat Applied marking is a tolerated no-op, not an error', () => {
+    const store = new ApplicationStore(jsonPath, mdPath);
+    store.add(makeApp());
+    store.update('001', { status: 'Applied' });
+    expect(() => store.update('001', { status: 'Applied' })).not.toThrow();
+    expect(store.getById('001')?.status).toBe('Applied');
+  });
+
+  it('duplicate add throws DuplicateApplicationError specifically', () => {
+    const store = new ApplicationStore(jsonPath, mdPath);
+    store.add(makeApp());
+    expect(() => store.add(makeApp({ id: '002' }))).toThrow(DuplicateApplicationError);
+  });
+
+  it('ambiguous legacy ids resolve to nothing instead of the wrong application', () => {
+    const store = new ApplicationStore(jsonPath, mdPath);
+    store.add(makeApp());
+    store.add(makeApp({ id: '001', company: 'OtherCo' }));
+
+    expect(store.getById('001')).toBeUndefined();
+    expect(() => store.update('001', { status: 'Applied' })).toThrow(/ambiguous/);
   });
 });

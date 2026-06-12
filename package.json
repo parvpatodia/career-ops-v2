@@ -1,6 +1,7 @@
 {
   "name": "career-ops",
   "version": "2.0.0",
+  "type": "module",
   "description": "Autonomous job application system with a verify-or-abstain submission gate",
   "scripts": {
     "test": "vitest run",
@@ -10,6 +11,7 @@
     "pipeline": "tsx src/pipeline/index.ts",
     "apply": "tsx src/applier/index.ts",
     "demo": "tsx scripts/demo.ts",
+    "migrate": "tsx scripts/migrate-legacy.ts",
     "login": "tsx scripts/login.ts",
     "pdf": "node generate-pdf.mjs"
   },
@@ -33,6 +35,8 @@
     "playwright": "^1.58.1"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.19.43",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^1.6.1"
