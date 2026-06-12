@@ -25,15 +25,15 @@ import { FreshnessFilter } from './FreshnessFilter.js';
 import { CoverLetterPersonalizer } from './CoverLetterPersonalizer.js';
 import { prepareResumes } from './PrepareResumes.js';
 import { Evaluator } from '../evaluator/Evaluator.js';
-import type { Job } from '../types.js';
+import { ApplicationStore, DuplicateApplicationError } from '../tracker/ApplicationStore.js';
+import type { Application, Job } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('pipeline');
+const store = new ApplicationStore();
 
 const CACHE_DIR = 'data/daily_log';
 const OUTPUT_DIR = 'output/resumes';
-const APPLICATIONS_JSON = 'data/applications.json';
-const APPLICATIONS_MD = 'data/applications.md';
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -164,7 +164,9 @@ async function main(): Promise<void> {
     url: r.job.applyUrl ?? r.job.url,
     jd: r.job.jd,                   // stored for AnswerGenerator context in apply loop
     status: 'Ready' as const,
-    resumeVariant: r.variant,
+    // WHY cast: VariantClassifier types its result as string but can only
+    // produce the five ResumeVariant names; narrowing it there is a v2 task.
+    resumeVariant: r.variant as Application['resumeVariant'],
     pdfPath: r.pdfPath,
     coverLetterPath: r.coverLetterPath,
     notes: `${r.job.platform} | ${r.job.location || 'Remote'}`,
@@ -190,56 +192,34 @@ interface ProcessedJob {
 
 // ── Persistence ───────────────────────────────────────────────────────────
 
+// WHY no direct fs here anymore: all tracker reads and writes go through
+// the event log behind ApplicationStore (AGENTS.md invariant 4). The store
+// also renders applications.md, so the pipeline owns no markdown schema.
 function loadExistingJobIds(): Set<string> {
-  if (!fs.existsSync(APPLICATIONS_JSON)) return new Set();
-  try {
-    const apps = JSON.parse(fs.readFileSync(APPLICATIONS_JSON, 'utf8')) as Array<{ jobId: string }>;
-    return new Set(apps.map((a) => a.jobId));
-  } catch { return new Set(); }
+  return new Set(store.getAll().map((a) => a.jobId));
 }
 
 function loadNextApplicationNumber(): number {
-  if (!fs.existsSync(APPLICATIONS_JSON)) return 1;
-  try {
-    const apps = JSON.parse(fs.readFileSync(APPLICATIONS_JSON, 'utf8')) as Array<{ id: string }>;
-    if (apps.length === 0) return 1;
-    return Math.max(...apps.map((a) => parseInt(a.id, 10))) + 1;
-  } catch { return 1; }
+  return parseInt(store.nextId(), 10);
 }
 
-function saveApplications(newApps: unknown[]): void {
-  fs.mkdirSync(path.dirname(APPLICATIONS_JSON), { recursive: true });
-  let existing: unknown[] = [];
-  if (fs.existsSync(APPLICATIONS_JSON)) {
-    try { existing = JSON.parse(fs.readFileSync(APPLICATIONS_JSON, 'utf8')); } catch {}
+function saveApplications(newApps: Application[]): void {
+  let skipped = 0;
+  for (const app of newApps) {
+    try {
+      store.add(app);
+    } catch (err) {
+      // WHY the instanceof check: only true duplicates may be skipped.
+      // Lock timeouts or disk errors must abort the run loudly, not
+      // masquerade as dedup (review 2026-06-11).
+      if (!(err instanceof DuplicateApplicationError)) throw err;
+      // Duplicate company+role. v1 queued these twice (LESSONS.md
+      // 2026-06-10); the store now rejects them at the source.
+      skipped++;
+      log.warn(`Skipped duplicate: ${app.company} - ${app.role}`);
+    }
   }
-  const all = [...existing, ...newApps];
-  fs.writeFileSync(APPLICATIONS_JSON, JSON.stringify(all, null, 2));
-  rebuildMarkdown(all as Array<Record<string, string | number>>);
-}
-
-// Single canonical markdown schema — matches CLAUDE.md data contract.
-// Columns: # | Date | Company | Role | Score | Status | PDF | Cover Letter | URL
-function rebuildMarkdown(apps: Array<Record<string, string | number>>): void {
-  const header =
-    '# Applications Tracker\n\n' +
-    '| # | Date | Company | Role | Score | Status | PDF | Cover Letter | URL |\n' +
-    '|---|------|---------|------|-------|--------|-----|--------------|-----|\n';
-
-  const rows = apps.map((a) => {
-    const pdf = a['pdfPath'] ? '✅' : '❌';
-    const cl = a['coverLetterPath'] ? `[CL](${a['coverLetterPath']})` : '';
-    const scoreDisplay = typeof a['score'] === 'number' && a['score'] > 0
-      ? `${a['score']}/100`
-      : a['score'] ?? '—';
-    return (
-      `| ${a['id']} | ${a['date']} | ${a['company']} | ${a['role']} | ` +
-      `${scoreDisplay} | ${a['status']} | ${pdf} | ${cl} | [Apply](${a['url']}) |`
-    );
-  }).join('\n');
-
-  fs.mkdirSync(path.dirname(APPLICATIONS_MD), { recursive: true });
-  fs.writeFileSync(APPLICATIONS_MD, header + rows + '\n');
+  if (skipped > 0) log.info(`Deduplicated ${skipped} job(s) already in the tracker`);
 }
 
 function printVariantSummary(results: ProcessedJob[]): void {

@@ -14,7 +14,6 @@
  */
 
 import 'dotenv/config';
-import fs from 'fs';
 import { createInterface } from 'readline/promises';
 import { stdin, stdout } from 'process';
 import { Applier } from './Applier.js';
@@ -26,12 +25,13 @@ import { GenericHandler } from './GenericHandler.js';
 import { AshbyHandler } from './AshbyHandler.js';
 import { HandshakeHandler } from './HandshakeHandler.js';
 import { UrlResolver } from './UrlResolver.js';
+import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import type { Application, Job, TailoringResult } from '../types.js';
 import type { ApplyContext } from './Applier.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('apply');
-const APPLICATIONS_JSON = 'data/applications.json';
+const store = new ApplicationStore();
 const resolver = new UrlResolver();
 
 async function main(): Promise<void> {
@@ -233,35 +233,36 @@ function getHandler(atsType: string): Applier {
   }
 }
 
+// WHY no direct fs here anymore: all tracker writes go through the event
+// log behind ApplicationStore (AGENTS.md invariant 4). v1's three unlocked
+// writers could wipe the tracker on one corrupt parse.
 function loadApplications(): Application[] {
-  if (!fs.existsSync(APPLICATIONS_JSON)) return [];
-  try {
-    return JSON.parse(fs.readFileSync(APPLICATIONS_JSON, 'utf8')) as Application[];
-  } catch { return []; }
+  return store.getAll();
 }
 
 function markApplied(ids: string[]): void {
   if (ids.length === 0) return;
-  const apps = loadApplications();
   let updated = 0;
-  for (const app of apps) {
-    if (ids.includes(app.id)) {
-      (app as Application & { appliedAt?: string }).appliedAt = new Date().toISOString();
-      app.status = 'Applied';
+  for (const id of ids) {
+    try {
+      store.update(id, { status: 'Applied', appliedAt: new Date().toISOString() });
       updated++;
+    } catch (err) {
+      log.warn(`Could not mark ${id} as Applied: ${(err as Error).message}`);
     }
   }
-  fs.writeFileSync(APPLICATIONS_JSON, JSON.stringify(apps, null, 2));
   log.info(`Marked ${updated}/${ids.length} as Applied`);
 }
 
 function markClosed(ids: string[]): void {
   if (ids.length === 0) return;
-  const apps = loadApplications();
-  for (const app of apps) {
-    if (ids.includes(app.id)) app.status = 'Closed' as Application['status'];
+  for (const id of ids) {
+    try {
+      store.update(id, { status: 'Closed' });
+    } catch (err) {
+      log.warn(`Could not mark ${id} as Closed: ${(err as Error).message}`);
+    }
   }
-  fs.writeFileSync(APPLICATIONS_JSON, JSON.stringify(apps, null, 2));
   log.info(`Marked ${ids.join(', ')} as Closed`);
 }
 
