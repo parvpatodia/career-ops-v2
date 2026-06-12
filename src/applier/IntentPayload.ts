@@ -90,7 +90,12 @@ export class IntentPayloadBuilder {
         continue;
       }
 
-      if (this.isLegal(field.label)) {
+      const answer = this.answers.generate(field.label, ctx);
+
+      // Legal/EEO/attestation fields accept ONLY human-approved answers
+      // (AnswerKB entries Parv wrote). Generated answers, however
+      // confident, never pass this gate.
+      if (this.isLegal(field.label) && !answer?.humanApproved) {
         if (field.required) {
           reasons.push({
             fieldId: field.id,
@@ -102,8 +107,6 @@ export class IntentPayloadBuilder {
         }
         continue;
       }
-
-      const answer = this.answers.generate(field.label, ctx);
       if (!answer) {
         if (field.required) {
           reasons.push({ fieldId: field.id, label: field.label, why: 'no known answer (unknown question)' });

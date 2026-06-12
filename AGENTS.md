@@ -19,6 +19,8 @@ End-to-end autonomous job application system. Two goals, in priority order:
 6. No captcha-solving services. Captcha = urgent notification + human takeover window, then resume.
 7. Legal, EEO, and attestation questions are answered only from human-approved AnswerKB entries. Never auto-generated.
 8. Tests green before any commit. CI runs `npx vitest run`, the same command as local.
+9. Freshness (Parv 2026-06-12): never apply to a posting older than 14 days, no company exceptions; an unparseable posting date is NOT fresh. Enforced by FreshnessFilter at the pipeline and `npm run expire` on the queue.
+10. Target focus (Parv 2026-06-12): intern and co-op roles for Summer/Fall 2026. Scanner queries, ranking, and batch selection optimize for this first.
 
 ## Secrets and personal data
 - Gitignored, never commit, never echo into logs: .env, .browser-profile/, cv/, config/profile.yml, data/applications.json, files_extracted/.
@@ -33,4 +35,4 @@ Every defect found in review, testing, or production gets one line in LESSONS.md
 - `npm run demo`: fixture-form fill demo
 
 ## Plan of record
-M0 hygiene (done 2026-06-11) -> M1 event-log data layer (done 2026-06-11, gate green) -> M2 Greenhouse adapter end-to-end with receipts (spec: docs/specs/M2-greenhouse-adapter.md) -> M3 AnswerKB + batch autopilot + Lever/Ashby -> M4 generic browser agent + ActionCache + Workday -> M5 Obsidian/GitHub context ingestion + weekly eval loop. Each milestone has an exit gate; no milestone starts before the previous gate is green.
+M0 hygiene (done 2026-06-11) -> M1 event-log data layer (done 2026-06-11, gate green) -> M2 Greenhouse adapter end-to-end with receipts (spec: docs/specs/M2-greenhouse-adapter.md; pure layer done 2026-06-12, browser glue + canary remain) -> M3 Workday adapter + batch autopilot (PROMOTED per Parv 2026-06-12: Workday is the main target; account vault, wizard state machine, same payload/verifier/receipt core) -> M4 Lever/Ashby + generic browser agent + ActionCache -> M5 Obsidian/GitHub context ingestion + weekly eval loop. AnswerKB (config/answers.yml, human-approved answers) moved INTO M2: it is the accuracy mechanism. Each milestone has an exit gate; no milestone starts before the previous gate is green.

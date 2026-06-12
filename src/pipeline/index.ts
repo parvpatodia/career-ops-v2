@@ -80,10 +80,14 @@ async function main(): Promise<void> {
   });
   log.info(`Loaded ${unique.length} unique jobs from ${cacheFiles.length} cache file(s)`);
 
-  // Freshness filter — stale jobs are not worth applying to
+  // Hard freshness gate (Parv 2026-06-12): nothing older than 14 days, no
+  // exceptions; unparseable dates are a data-quality signal, never fresh.
   const filter = new FreshnessFilter();
-  const { fresh, stale } = filter.filter(unique);
-  log.info(`Fresh (≤14d, MAANG/AI firms ≤60d): ${fresh.length} | Stale (skipped): ${stale.length}`);
+  const { fresh, stale, unknown } = filter.filter(unique);
+  log.info(`Fresh (<=14d): ${fresh.length} | Stale (skipped): ${stale.length} | Unknown date (skipped): ${unknown.length}`);
+  if (unknown.length > 0) {
+    log.warn(`Scanner data-quality: ${unknown.length} job(s) had no parseable postedAt: ${unknown.slice(0, 5).map((j) => `${j.company}/${j.id}`).join(', ')}${unknown.length > 5 ? '...' : ''}`);
+  }
 
   // Skip jobs already tracked
   const existingIds = loadExistingJobIds();

@@ -29,6 +29,9 @@ export interface Answer {
   confidence: 'high' | 'medium' | 'low';
   needsReview: boolean;
   reason?: string;
+  /** True only for answers a human authored (AnswerKB). The only kind
+   *  allowed to fill legal/EEO/attestation fields (AGENTS.md invariant 7). */
+  humanApproved?: boolean;
 }
 
 // ── Answer constructors (kept at module level for readability) ────────────

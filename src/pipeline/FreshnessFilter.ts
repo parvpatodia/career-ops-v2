@@ -1,58 +1,45 @@
 /**
- * Filters jobs by posting age.
- * WHY: Applying to 2-month-old listings wastes applications — most are filled.
- * MAANG/big AI exception: these firms post long cycles and are always worth applying.
+ * Hard freshness gate: no application to postings older than maxDays
+ * (default 14). Parv's rule, 2026-06-12: "no older applications than 2
+ * weeks", no exceptions. The previous 60-day big-company exception is
+ * deliberately removed.
+ *
+ * WHY an `unknown` bucket: a date the system cannot parse must surface as
+ * a data-quality problem, not silently pass or silently vanish. Scanners
+ * that fake postedAt get caught here.
  */
 
 import type { Job } from '../types.js';
 
 const DEFAULT_MAX_DAYS = 14;
-const MAANG_MAX_DAYS = 60;
+const MS_PER_DAY = 86_400_000;
 
-// Companies where we apply regardless of posting age
-const PRIORITY_COMPANIES = new Set([
-  // MAANG
-  'google', 'alphabet', 'apple', 'amazon', 'aws', 'meta', 'facebook',
-  'netflix', 'microsoft',
-  // Big AI labs
-  'openai', 'anthropic', 'deepmind', 'google deepmind', 'xai', 'x.ai',
-  'nvidia', 'databricks', 'scale ai', 'hugging face', 'cohere', 'mistral',
-  'character.ai', 'perplexity', 'inflection', 'together ai',
-  // Big robotics / AV
-  'waymo', 'tesla', 'figure', 'figure ai', 'boston dynamics', 'isomorphic',
-  'physical intelligence', '1x technologies', 'agility robotics',
-  // Big tech / cloud
-  'apple', 'salesforce', 'adobe', 'oracle', 'intel', 'qualcomm', 'amd',
-  'ibm', 'palantir', 'stripe', 'airbnb', 'uber', 'lyft', 'snapchat', 'snap',
-  'twitter', 'x corp', 'linkedin', 'pinterest', 'reddit', 'coinbase',
-]);
+export interface FreshnessResult {
+  fresh: Job[];
+  stale: Job[];
+  /** postedAt missing or unparseable: treated as not fresh, reported separately. */
+  unknown: Job[];
+}
 
 export class FreshnessFilter {
-  filter(jobs: Job[]): { fresh: Job[]; stale: Job[] } {
-    const now = Date.now();
+  constructor(private readonly maxDays: number = DEFAULT_MAX_DAYS) {}
+
+  filter(jobs: Job[], nowMs: number = Date.now()): FreshnessResult {
     const fresh: Job[] = [];
     const stale: Job[] = [];
+    const unknown: Job[] = [];
 
     for (const job of jobs) {
-      const postedMs = new Date(job.postedAt).getTime();
-      const ageDays = (now - postedMs) / 86_400_000;
-
-      const isPriority = this.isPriorityCompany(job.company);
-      const maxDays = isPriority ? MAANG_MAX_DAYS : DEFAULT_MAX_DAYS;
-
-      if (ageDays <= maxDays) {
-        fresh.push(job);
-      } else {
-        stale.push(job);
+      const postedMs = Date.parse(job.postedAt ?? '');
+      if (Number.isNaN(postedMs)) {
+        unknown.push(job);
+        continue;
       }
+      const ageDays = (nowMs - postedMs) / MS_PER_DAY;
+      if (ageDays <= this.maxDays) fresh.push(job);
+      else stale.push(job);
     }
 
-    return { fresh, stale };
-  }
-
-  private isPriorityCompany(company: string): boolean {
-    const normalized = company.toLowerCase().trim();
-    return PRIORITY_COMPANIES.has(normalized) ||
-      [...PRIORITY_COMPANIES].some((name) => normalized.includes(name));
+    return { fresh, stale, unknown };
   }
 }
