@@ -33,4 +33,4 @@ Every defect found in review, testing, or production gets one line in LESSONS.md
 - `npm run demo`: fixture-form fill demo
 
 ## Plan of record
-M0 hygiene (done 2026-06-11) -> M1 event-log data layer -> M2 Greenhouse adapter end-to-end with receipts -> M3 AnswerKB + batch autopilot + Lever/Ashby -> M4 generic browser agent + ActionCache + Workday -> M5 Obsidian/GitHub context ingestion + weekly eval loop. Each milestone has an exit gate; no milestone starts before the previous gate is green.
+M0 hygiene (done 2026-06-11) -> M1 event-log data layer (done 2026-06-11, gate green) -> M2 Greenhouse adapter end-to-end with receipts (spec: docs/specs/M2-greenhouse-adapter.md) -> M3 AnswerKB + batch autopilot + Lever/Ashby -> M4 generic browser agent + ActionCache + Workday -> M5 Obsidian/GitHub context ingestion + weekly eval loop. Each milestone has an exit gate; no milestone starts before the previous gate is green.
