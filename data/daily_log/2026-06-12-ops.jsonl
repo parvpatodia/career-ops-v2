@@ -563,3 +563,229 @@
 {"ts":"2026-06-12T06:59:30.376Z","level":"info","module":"ApplicationStore","msg":"Updated application: 363","data":{"status":"Closed"}}
 {"ts":"2026-06-12T06:59:30.383Z","level":"info","module":"ApplicationStore","msg":"Updated application: 364","data":{"status":"Closed"}}
 {"ts":"2026-06-12T06:59:30.389Z","level":"info","module":"ApplicationStore","msg":"Updated application: 366","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:10:13.737Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1781248213736"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:10:13.738Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.738Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-12T07:10:13.739Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1781248213736"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:10:13.739Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.739Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-12T07:10:13.739Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.740Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.740Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1781248213736"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:10:13.740Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-12T07:10:13.740Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-12T07:10:13.742Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.742Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:10:13.759Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.761Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.761Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-06-12T07:10:13.767Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.767Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.767Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.768Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.768Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.768Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.768Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.769Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:10:13.790Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.802Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.812Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.817Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:10:13.824Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.830Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.842Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.851Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.857Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Interview"}}
+{"ts":"2026-06-12T07:10:13.857Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:10:13.858Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:10:13.859Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:10:13.860Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:10:13.861Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-06-12T07:10:13.864Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.870Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:10:13.871Z","level":"warn","module":"ApplicationStore","msg":"Already submitted, ignoring repeat: TestCo - ML Engineer Intern"}
+{"ts":"2026-06-12T07:10:13.879Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.883Z","level":"info","module":"ApplicationStore","msg":"Added application: OldCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.890Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.894Z","level":"info","module":"ApplicationStore","msg":"Added application: FreshCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-12T07:10:13.899Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.903Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"003"}}
+{"ts":"2026-06-12T07:10:13.908Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:10:13.914Z","level":"info","module":"ApplicationStore","msg":"Added application: MysteryCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:10:13.919Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:11:10.842Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.846Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.847Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.847Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.846Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.850Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.851Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.851Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:10.852Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-06-12T07:11:10.852Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.852Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.852Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.853Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.853Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.857Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.857Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.858Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:10.871Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.885Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.891Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.895Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:11:10.901Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.907Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.918Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.925Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.931Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Interview"}}
+{"ts":"2026-06-12T07:11:10.931Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1781248270928"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:10.931Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-12T07:11:10.932Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1781248270928"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:10.932Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-12T07:11:10.932Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1781248270928"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:10.936Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-12T07:11:10.936Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.936Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-12T07:11:10.942Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:11:10.943Z","level":"warn","module":"ApplicationStore","msg":"Already submitted, ignoring repeat: TestCo - ML Engineer Intern"}
+{"ts":"2026-06-12T07:11:10.949Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.949Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:10.950Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:10.950Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:10.951Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:10.951Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-06-12T07:11:10.958Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.963Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.977Z","level":"info","module":"ApplicationStore","msg":"Added application: OldCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:10.983Z","level":"info","module":"ApplicationStore","msg":"Added application: FreshCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-12T07:11:10.988Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"003"}}
+{"ts":"2026-06-12T07:11:10.993Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:11:10.999Z","level":"info","module":"ApplicationStore","msg":"Added application: MysteryCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:11.004Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:11:17.814Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.816Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.817Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.819Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.819Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.819Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-06-12T07:11:17.820Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:11:17.820Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.821Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.821Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.821Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.825Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.825Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.829Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.829Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:17.837Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.848Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.857Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.862Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:11:17.869Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.874Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.885Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.895Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.898Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-1-1781248277896"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:17.901Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-12T07:11:17.901Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Interview"}}
+{"ts":"2026-06-12T07:11:17.901Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-2-1781248277896"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:17.902Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-12T07:11:17.902Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer test-cache-1781248277896"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:11:17.902Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-12T07:11:17.902Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-12T07:11:17.907Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.907Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:17.908Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:17.912Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:17.913Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:11:17.914Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:11:17.914Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-06-12T07:11:17.914Z","level":"warn","module":"ApplicationStore","msg":"Already submitted, ignoring repeat: TestCo - ML Engineer Intern"}
+{"ts":"2026-06-12T07:11:17.921Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.929Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.935Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.949Z","level":"info","module":"ApplicationStore","msg":"Added application: OldCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.955Z","level":"info","module":"ApplicationStore","msg":"Added application: FreshCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-12T07:11:17.961Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"003"}}
+{"ts":"2026-06-12T07:11:17.966Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:11:17.972Z","level":"info","module":"ApplicationStore","msg":"Added application: MysteryCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:11:17.977Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:11:27.022Z","level":"info","module":"GreenhouseBoardScanner","msg":"Scanning greenhouse...","data":{"keywords":["machine learning","AI engineer","computer vision","software engineer","deep learning"],"location":"San Francisco Bay Area","postedWithinDays":14,"jobTypes":["internship","co-op"]}}
+{"ts":"2026-06-12T07:11:28.379Z","level":"info","module":"GreenhouseBoardScanner","msg":"Found 6 jobs on greenhouse"}
+{"ts":"2026-06-12T07:11:28.380Z","level":"info","module":"scanner:index","msg":"Total: 6 unique jobs discovered"}
+{"ts":"2026-06-12T07:11:38.771Z","level":"info","module":"pipeline","msg":"Loaded 8 unique jobs from 28 cache file(s)"}
+{"ts":"2026-06-12T07:11:38.771Z","level":"info","module":"pipeline","msg":"Fresh (<=14d): 8 | Stale (skipped): 0 | Unknown date (skipped): 0"}
+{"ts":"2026-06-12T07:11:38.773Z","level":"info","module":"pipeline","msg":"New jobs to process: 8 (0 already tracked)"}
+{"ts":"2026-06-12T07:11:38.775Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 78/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.776Z","level":"info","module":"Evaluator","msg":"Evaluated OtherCo - ML Engineer Intern: 78/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.777Z","level":"info","module":"Evaluator","msg":"Evaluated Scale AI - AI Builder Intern: 62/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.777Z","level":"info","module":"Evaluator","msg":"Evaluated Tenstorrent University Jobs - Applied AI Intern, People Operations: 65/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.778Z","level":"info","module":"Evaluator","msg":"Evaluated Tenstorrent University Jobs - CPU/AI Workload Analysis Intern: 69/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.779Z","level":"info","module":"Evaluator","msg":"Evaluated Workato - Intern, Analytics Engineer: 67/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.780Z","level":"info","module":"Evaluator","msg":"Evaluated Workato - Intern, Product Insights Analytics: 69/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:11:38.780Z","level":"info","module":"Evaluator","msg":"Evaluated Workato - Intern, Regional Marketing: 39/100","data":{"shouldApply":false}}
+{"ts":"2026-06-12T07:11:38.780Z","level":"info","module":"pipeline","msg":"SKIP Workato — Intern, Regional Marketing: score 39/100 — Below threshold — do not apply. Missing 100% of required skills. Visa status unconfirmed — apply with caution. Overqualification mismatch: senior role."}
+{"ts":"2026-06-12T07:11:38.781Z","level":"info","module":"pipeline","msg":"Quality gate: 7 passed, 1 skipped (below threshold)"}
+{"ts":"2026-06-12T07:11:38.789Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"371"}}
+{"ts":"2026-06-12T07:11:38.795Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"372"}}
+{"ts":"2026-06-12T07:11:38.801Z","level":"info","module":"ApplicationStore","msg":"Added application: Scale AI - AI Builder Intern","data":{"id":"373"}}
+{"ts":"2026-06-12T07:11:38.807Z","level":"info","module":"ApplicationStore","msg":"Added application: Tenstorrent University Jobs - Applied AI Intern, People Operations","data":{"id":"374"}}
+{"ts":"2026-06-12T07:11:38.813Z","level":"info","module":"ApplicationStore","msg":"Added application: Tenstorrent University Jobs - CPU/AI Workload Analysis Intern","data":{"id":"375"}}
+{"ts":"2026-06-12T07:11:38.818Z","level":"info","module":"ApplicationStore","msg":"Added application: Workato - Intern, Analytics Engineer","data":{"id":"376"}}
+{"ts":"2026-06-12T07:11:38.823Z","level":"info","module":"ApplicationStore","msg":"Added application: Workato - Intern, Product Insights Analytics","data":{"id":"377"}}
+{"ts":"2026-06-12T07:11:38.824Z","level":"info","module":"pipeline","msg":"Added 7 applications to queue"}
+{"ts":"2026-06-12T07:17:42.561Z","level":"info","module":"ApplicationStore","msg":"Updated application: 371","data":{"status":"Discarded","notes":"test fixture pollution, never a real job"}}
+{"ts":"2026-06-12T07:17:42.569Z","level":"info","module":"ApplicationStore","msg":"Updated application: 372","data":{"status":"Discarded","notes":"test fixture pollution, never a real job"}}
+{"ts":"2026-06-12T07:18:00.515Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.515Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:18:00.516Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-12T07:18:00.517Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.517Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.517Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.517Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:18:00.517Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-12T07:18:00.517Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.518Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-12T07:18:00.518Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-12T07:18:00.518Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-12T07:18:00.518Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-12T07:18:00.524Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.526Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.526Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 0/100","data":{"shouldApply":false}}
+{"ts":"2026-06-12T07:18:00.527Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Senior ML Engineer: 68/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.527Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.531Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.531Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - ML Engineer Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.531Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Machine Learning Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.531Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - AI Research Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.532Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Robotics Software Intern: 97/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.532Z","level":"info","module":"Evaluator","msg":"Evaluated TestCo - Software Engineer: 92/100","data":{"shouldApply":true}}
+{"ts":"2026-06-12T07:18:00.547Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.557Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.567Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.577Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:18:00.592Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.598Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.608Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.614Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-001-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:18:00.616Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-002-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:18:00.617Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-003-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:18:00.617Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-004-ml.md","data":{"variant":"ml","injections":0}}
+{"ts":"2026-06-12T07:18:00.618Z","level":"info","module":"ResumeBuilder","msg":"Built tailored resume: output/resumes/test-006-master.md","data":{"variant":"master","injections":0}}
+{"ts":"2026-06-12T07:18:00.618Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.624Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Interview"}}
+{"ts":"2026-06-12T07:18:00.631Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.636Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-12T07:18:00.637Z","level":"warn","module":"ApplicationStore","msg":"Already submitted, ignoring repeat: TestCo - ML Engineer Intern"}
+{"ts":"2026-06-12T07:18:00.644Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.650Z","level":"info","module":"ApplicationStore","msg":"Added application: OldCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.654Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.660Z","level":"info","module":"ApplicationStore","msg":"Added application: FreshCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-12T07:18:00.664Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.669Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"003"}}
+{"ts":"2026-06-12T07:18:00.674Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-12T07:18:00.680Z","level":"info","module":"ApplicationStore","msg":"Added application: MysteryCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-12T07:18:00.685Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}

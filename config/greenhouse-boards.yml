@@ -1,0 +1,34 @@
+# Greenhouse boards scanned via the public boards API (no auth, no browser).
+# Tokens seeded from boards already in the tracker plus curated targets.
+# A dead/renamed token costs one warning and is skipped.
+boards:
+  - anthropic
+  - scaleai
+  - twitch
+  - astranis
+  - snorkelai
+  - smartsheet
+  - tenstorrentuniversity
+  - klaviyocampus
+  - speechify
+  - workato
+  - alarmcom
+  - pingidentity
+  - trueanomalyinc
+  - underdogfantasy
+  - vestwell
+
+# Invariant 10: intern/co-op focus for Summer/Fall 2026.
+title_include:
+  - intern
+  - internship
+  - co-op
+  - coop
+
+title_exclude:
+  - senior
+  - staff
+  - principal
+  - director
+  - manager
+  - lead

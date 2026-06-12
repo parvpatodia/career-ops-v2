@@ -10,15 +10,20 @@ import crypto from 'crypto';
 import type { Job, Platform, ScanQuery } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
-const CACHE_DIR = 'data/daily_log';
+const DEFAULT_CACHE_DIR = 'data/daily_log';
 const TODAY = new Date().toISOString().split('T')[0];
 
 export abstract class Scanner {
   abstract readonly platform: Platform;
   protected log: Logger;
+  // WHY injectable: tests with the default path wrote fixture jobs into
+  // the real data/daily_log for a month, and on 2026-06-12 the pipeline
+  // queued TestCo as application 371. Tests must inject a temp dir.
+  protected readonly cacheDir: string;
 
-  constructor() {
+  constructor(cacheDir: string = DEFAULT_CACHE_DIR) {
     this.log = new Logger(this.constructor.name);
+    this.cacheDir = cacheDir;
   }
 
   /** Scan for jobs matching the query. Implement per platform. */
@@ -63,7 +68,7 @@ export abstract class Scanner {
   }
 
   private loadCache(key: string): Job[] | null {
-    const file = path.join(CACHE_DIR, `${key}.json`);
+    const file = path.join(this.cacheDir, `${key}.json`);
     if (!fs.existsSync(file)) return null;
     try {
       return JSON.parse(fs.readFileSync(file, 'utf8')) as Job[];
@@ -74,9 +79,9 @@ export abstract class Scanner {
 
   private saveCache(key: string, jobs: Job[]): void {
     try {
-      fs.mkdirSync(CACHE_DIR, { recursive: true });
+      fs.mkdirSync(this.cacheDir, { recursive: true });
       fs.writeFileSync(
-        path.join(CACHE_DIR, `${key}.json`),
+        path.join(this.cacheDir, `${key}.json`),
         JSON.stringify(jobs, null, 2)
       );
     } catch (err) {

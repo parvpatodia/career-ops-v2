@@ -6,6 +6,7 @@
 import 'dotenv/config';
 import { SWEListScanner } from './SWEListScanner.js';
 import { NewGradScanner } from './NewGradScanner.js';
+import { GreenhouseBoardScanner } from './GreenhouseBoardScanner.js';
 import { LinkedInScanner } from './LinkedInScanner.js';
 import { HandshakeScanner } from './HandshakeScanner.js';
 import { WellfoundScanner } from './WellfoundScanner.js';
@@ -20,6 +21,8 @@ import yaml from 'js-yaml';
 const log = new Logger('scanner:index');
 
 const SCANNERS: Record<string, () => Scanner> = {
+  // Primary: free, no auth, real posting dates (first_published), full JDs
+  greenhouse: () => GreenhouseBoardScanner.fromConfig(),
   // Primary: free, no auth, high volume
   swelist: () => new SWEListScanner(),       // Summer 2026 internships (GitHub)
   newgrad: () => new NewGradScanner(),        // Full-time new grad roles (GitHub)
@@ -60,8 +63,10 @@ async function main(): Promise<void> {
       'deep learning',
     ],
     location: 'San Francisco Bay Area',
-    postedWithinDays: 2,
-    jobTypes: ['internship', 'full-time'],
+    // Invariant 9: the hard freshness window. Scanners must not fetch
+    // anything they could never apply to.
+    postedWithinDays: 14,
+    jobTypes: ['internship', 'co-op'],
   };
 
   let allJobs: Job[] = [];
@@ -70,7 +75,7 @@ async function main(): Promise<void> {
     // swelist + newgrad: free, fast, no rate limits
     // linkedin: Apify-backed, requires APIFY_TOKEN
     // handshake: requires visible browser (headless blocked by Cloudflare)
-    const enabledPlatforms: string[] = ['swelist', 'newgrad', 'linkedin', 'handshake'];
+    const enabledPlatforms: string[] = ['greenhouse', 'swelist', 'newgrad', 'linkedin', 'handshake'];
     for (const platform of enabledPlatforms) {
       try {
         const scanner = SCANNERS[platform]();

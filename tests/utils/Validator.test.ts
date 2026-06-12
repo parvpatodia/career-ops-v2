@@ -28,7 +28,27 @@ describe('Validator.validateProfile', () => {
     expect(result.errors.length).toBeGreaterThan(0);
   });
 
-  it('returns valid for a complete profile', () => {
+  it('returns valid for a complete profile (real schema: visa under work_authorization)', () => {
+    const yaml = `
+identity:
+  name: Parv Patodia
+  email: test@example.com
+work_authorization:
+  visa_type: F-1
+target_roles:
+  types: [ML Engineer]
+skills:
+  core: [Python]
+daily_limits:
+  linkedin: 25
+`;
+    const p = writeTmp('good-profile.yml', yaml);
+    const result = Validator.validateProfile(p);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('flags a profile missing work_authorization.visa_type (the bug that killed the scan CLI)', () => {
     const yaml = `
 identity:
   name: Parv Patodia
@@ -41,10 +61,10 @@ skills:
 daily_limits:
   linkedin: 25
 `;
-    const p = writeTmp('good-profile.yml', yaml);
+    const p = writeTmp('old-schema-profile.yml', yaml);
     const result = Validator.validateProfile(p);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Missing work_authorization.visa_type');
   });
 });
 
