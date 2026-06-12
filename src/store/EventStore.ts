@@ -33,9 +33,22 @@ export interface AppendInput {
 const LOCK_STALE_MS = 30_000;
 const LOCK_TIMEOUT_MS = 45_000;
 
+interface ReadCache {
+  /** Bytes consumed up to (and including) the last complete line's newline. */
+  offset: number;
+  events: AppEvent[];
+  corruptLines: number;
+}
+
 export class EventStore {
   private readonly filePath: string;
   private readonly lockPath: string;
+  // WHY a parsed-event cache: every operation used to re-read and re-parse
+  // the whole log (M1 review finding). Caching parsed events keyed on byte
+  // offset makes reads O(new bytes). Only complete lines advance the
+  // offset, so a partial tail from a crashed writer is re-examined on the
+  // next read instead of being half-consumed.
+  private cache: ReadCache | null = null;
 
   constructor(filePath = 'data/events.jsonl') {
     this.filePath = filePath;
@@ -43,28 +56,16 @@ export class EventStore {
   }
 
   readAll(): { events: AppEvent[]; corruptLines: number } {
-    if (!fs.existsSync(this.filePath)) return { events: [], corruptLines: 0 };
-    const events: AppEvent[] = [];
-    let corruptLines = 0;
-    for (const line of fs.readFileSync(this.filePath, 'utf8').split('\n')) {
-      if (line.trim() === '') continue;
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(line);
-      } catch {
-        corruptLines++;
-        continue;
-      }
-      const event = validateEvent(parsed);
-      if (event) events.push(event);
-      else corruptLines++;
-    }
-    return { events, corruptLines };
+    const c = this.ensureFresh();
+    return { events: [...c.events], corruptLines: c.corruptLines };
   }
 
   projection(): Projection {
+    // WHY fold per call: callers get snapshot semantics (a handed-out
+    // projection never mutates when new events land). The expensive part,
+    // file IO and JSON parsing, is what the cache removes.
     const proj = new Projection();
-    for (const e of this.readAll().events) proj.apply(e);
+    for (const e of this.ensureFresh().events) proj.apply(e);
     return proj;
   }
 
@@ -75,39 +76,123 @@ export class EventStore {
    * race without it, exactly the v1 bug class this layer exists to kill.
    */
   append(input: AppendInput): AppEvent {
-    if (!(EVENT_TYPES as readonly string[]).includes(input.type)) {
-      throw new Error(`Unknown event type: ${input.type}`);
+    return this.appendGroup([input])[0]!;
+  }
+
+  /** append() that reports an expected rejection as a value instead of an exception. */
+  tryAppend(input: AppendInput): { ok: true; event: AppEvent } | { ok: false; reason: string } {
+    try {
+      return { ok: true, event: this.append(input) };
+    } catch (err) {
+      if (err instanceof TransitionError) return { ok: false, reason: err.message };
+      throw err;
     }
-    if (!isValidAppId(input.appId)) {
-      throw new Error(`Invalid appId (want 12 hex chars): ${input.appId}`);
+  }
+
+  /**
+   * All-or-nothing append of correlated events under one lock. Later
+   * events are validated against a rolling projection that already
+   * includes the earlier ones, so submitted+confirmed can land as a pair.
+   *
+   * Honesty note on atomicity: the group goes to disk as ONE write
+   * syscall, which makes a half-landed group extremely unlikely, not
+   * impossible (a truncated tail line is quarantined as corrupt on the
+   * next read). Consumers needing hard completeness check cid + size.
+   */
+  appendGroup(inputs: AppendInput[], cid?: string): AppEvent[] {
+    if (inputs.length === 0) throw new Error('appendGroup: empty group');
+    for (const input of inputs) {
+      if (!(EVENT_TYPES as readonly string[]).includes(input.type)) {
+        throw new Error(`Unknown event type: ${input.type}`);
+      }
+      if (!isValidAppId(input.appId)) {
+        throw new Error(`Invalid appId (want 12 hex chars): ${input.appId}`);
+      }
     }
-    const payload = input.payload ?? {};
 
     return this.withLock(() => {
-      const { events } = this.readAll();
+      const c = this.ensureFresh();
       const proj = new Projection();
-      for (const e of events) proj.apply(e);
+      for (const e of c.events) proj.apply(e);
 
-      const event: AppEvent = {
-        seq: (events[events.length - 1]?.seq ?? 0) + 1,
-        ts: new Date().toISOString(),
-        type: input.type,
-        appId: input.appId,
-        payload,
-      };
-      const verdict = proj.canApply(event);
-      if (!verdict.ok) throw new TransitionError(verdict.reason);
+      let seq = c.events[c.events.length - 1]?.seq ?? 0;
+      const ts = new Date().toISOString();
+      const events: AppEvent[] = [];
+      for (const input of inputs) {
+        const event: AppEvent = {
+          seq: ++seq,
+          ts,
+          type: input.type,
+          appId: input.appId,
+          payload: input.payload ?? {},
+          ...(cid !== undefined ? { cid } : {}),
+        };
+        const verdict = proj.canApply(event);
+        if (!verdict.ok) throw new TransitionError(verdict.reason);
+        proj.apply(event);
+        events.push(event);
+      }
 
-      this.appendLine(JSON.stringify(event));
-      return event;
+      this.appendLines(events.map((e) => JSON.stringify(e)));
+      return events;
     });
   }
 
-  private appendLine(line: string): void {
+  private ensureFresh(): ReadCache {
+    if (!fs.existsSync(this.filePath)) {
+      this.cache = null;
+      return { offset: 0, events: [], corruptLines: 0 };
+    }
+    const size = fs.statSync(this.filePath).size;
+    let c = this.cache;
+    // size < offset means the file was replaced or truncated underneath
+    // us, which append-only writers never do: rebuild from scratch.
+    if (!c || size < c.offset) c = { offset: 0, events: [], corruptLines: 0 };
+    if (size === c.offset) {
+      this.cache = c;
+      return c;
+    }
+
+    const fd = fs.openSync(this.filePath, 'r');
+    let chunk: string;
+    try {
+      const buf = Buffer.alloc(size - c.offset);
+      fs.readSync(fd, buf, 0, buf.length, c.offset);
+      chunk = buf.toString('utf8');
+    } finally {
+      fs.closeSync(fd);
+    }
+
+    const lastNewline = chunk.lastIndexOf('\n');
+    if (lastNewline === -1) {
+      // Only a partial tail so far; consume nothing.
+      this.cache = c;
+      return c;
+    }
+    const complete = chunk.slice(0, lastNewline);
+    for (const line of complete.split('\n')) {
+      if (line.trim() === '') continue;
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(line);
+      } catch {
+        c.corruptLines++;
+        continue;
+      }
+      const event = validateEvent(parsed);
+      if (event) c.events.push(event);
+      else c.corruptLines++;
+    }
+    c.offset += Buffer.byteLength(complete, 'utf8') + 1;
+    this.cache = c;
+    return c;
+  }
+
+  private appendLines(lines: string[]): void {
     fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
     // WHY the newline probe: a crashed writer can leave a partial line with
-    // no trailing newline; appending straight onto it would swallow this
-    // event into the corrupt line. A leading newline quarantines the damage.
+    // no trailing newline; appending straight onto it would swallow these
+    // events into the corrupt line. A leading newline quarantines the damage.
     let prefix = '';
     if (fs.existsSync(this.filePath)) {
       const stat = fs.statSync(this.filePath);
@@ -122,7 +207,7 @@ export class EventStore {
         }
       }
     }
-    fs.appendFileSync(this.filePath, prefix + line + '\n');
+    fs.appendFileSync(this.filePath, prefix + lines.join('\n') + '\n');
   }
 
   // WHY an owner token: release must only remove a lock this instance

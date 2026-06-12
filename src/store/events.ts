@@ -53,6 +53,8 @@ export interface AppEvent {
   type: EventType;
   appId: string;
   payload: Record<string, unknown>;
+  /** Correlation id: present when the event landed as part of an atomic group (e.g. a submit receipt). */
+  cid?: string;
 }
 
 const APP_ID_RE = /^[0-9a-f]{12}$/;
@@ -80,5 +82,6 @@ export function validateEvent(raw: unknown): AppEvent | null {
   if (typeof e.type !== 'string' || !(EVENT_TYPES as readonly string[]).includes(e.type)) return null;
   if (typeof e.appId !== 'string' || !APP_ID_RE.test(e.appId)) return null;
   if (typeof e.payload !== 'object' || e.payload === null) return null;
+  if (e.cid !== undefined && typeof e.cid !== 'string') return null;
   return e as unknown as AppEvent;
 }
