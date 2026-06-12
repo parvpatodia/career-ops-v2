@@ -122,6 +122,20 @@ describe('IntentPayloadBuilder', () => {
     expect(result.intents).toHaveLength(0);
   });
 
+  it('accepts a human-approved answer on a legal/EEO question (the AnswerKB path)', () => {
+    const approved: Answer = {
+      value: 'I do not wish to answer',
+      confidence: 'high',
+      needsReview: false,
+      humanApproved: true,
+    };
+    const builder = new IntentPayloadBuilder(stub({ 'Do you have a disability?': approved }));
+    const result = builder.build([text('f1', 'Do you have a disability?')], CTX);
+
+    expect(result.kind).toBe('ready');
+    expect(result.intents[0]!.value).toBe('I do not wish to answer');
+  });
+
   it('skips optional legal/EEO questions silently (blank is the safe answer)', () => {
     const builder = new IntentPayloadBuilder(
       stub({ 'Veteran status': hi('I am not a protected veteran') })

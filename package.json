@@ -12,6 +12,7 @@
     "apply": "tsx src/applier/index.ts",
     "demo": "tsx scripts/demo.ts",
     "migrate": "tsx scripts/migrate-legacy.ts",
+    "expire": "tsx scripts/expire-stale.ts",
     "login": "tsx scripts/login.ts",
     "pdf": "node generate-pdf.mjs"
   },

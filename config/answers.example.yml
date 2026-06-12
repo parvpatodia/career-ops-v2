@@ -1,0 +1,72 @@
+# answers.yml — Parv's human-approved application answers.
+# Copy to config/answers.yml (gitignored) and fill every FILL_ME.
+#
+# Rules:
+# - First matching entry wins: put specific patterns before generic ones.
+# - "match" patterns are case-insensitive substrings of the question label.
+# - "value" must be non-empty; for dropdowns it must EXACTLY equal one of
+#   the form's options (the system abstains and flags you otherwise).
+# - These are the ONLY answers allowed on legal/EEO/attestation questions.
+
+answers:
+  # ── Work authorization (asked on nearly every application) ──────────────
+  - match: ["authorized to work in the united states", "legally authorized to work", "authorized to work"]
+    value: "Yes"
+  - match: ["require sponsorship in the future", "future sponsorship"]
+    value: "Yes"
+  - match: ["require sponsorship", "require visa sponsorship", "need sponsorship"]
+    value: "No"   # F-1 CPT/OPT: no sponsorship needed NOW. Review per company if asked differently.
+  - match: ["visa status", "immigration status"]
+    value: "F-1 student visa (CPT/OPT eligible)"
+
+  # ── Logistics ────────────────────────────────────────────────────────────
+  - match: ["how did you hear"]
+    value: "FILL_ME (e.g. Company careers page)"
+  - match: ["earliest start date", "available to start", "start date"]
+    value: "FILL_ME (e.g. May 2026)"
+  - match: ["willing to relocate", "open to relocation"]
+    value: "Yes"
+  - match: ["work onsite", "in-person", "hybrid"]
+    value: "Yes"
+  - match: ["desired salary", "salary expectation", "compensation expectation", "hourly rate"]
+    value: "FILL_ME (e.g. Open / market rate)"
+
+  # ── Profile facts beyond profile.yml ─────────────────────────────────────
+  - match: ["years of experience", "years of relevant experience"]
+    value: "FILL_ME (pick ONE truth: 1 or 2 - v1 had both)"
+  - match: ["graduation date", "expected graduation"]
+    value: "May 2027"
+  - match: ["currently enrolled"]
+    value: "Yes"
+  - match: ["previously worked for", "previously employed by", "ever worked at"]
+    value: "No"
+  - match: ["referred by", "referral name", "know anyone"]
+    value: "No"
+
+  # ── Legal / EEO / attestations: ONLY filled because YOU wrote these ─────
+  # Common safe choice is the decline option; change to your preference.
+  # Dropdown text must match the form's option exactly.
+  - match: ["do you have a disability", "disability status"]
+    value: "FILL_ME (e.g. I do not wish to answer)"
+  - match: ["veteran status", "protected veteran"]
+    value: "FILL_ME (e.g. I am not a protected veteran)"
+  - match: ["gender identity"]
+    value: "FILL_ME (e.g. Decline to self-identify)"
+  - match: ["gender"]
+    value: "FILL_ME (e.g. Male / Decline to self-identify)"
+  - match: ["hispanic or latino"]
+    value: "FILL_ME (e.g. No)"
+  - match: ["race", "ethnicity"]
+    value: "FILL_ME (e.g. Asian / Decline to self-identify)"
+  - match: ["sexual orientation"]
+    value: "FILL_ME (e.g. Decline to self-identify)"
+  - match: ["transgender"]
+    value: "FILL_ME (e.g. Decline to self-identify)"
+  - match: ["been convicted", "criminal", "felony"]
+    value: "FILL_ME (e.g. No)"
+  - match: ["background check"]
+    value: "FILL_ME (e.g. Yes)"
+  - match: ["drug test", "drug screening"]
+    value: "FILL_ME (e.g. Yes)"
+  - match: ["i certify", "certify that", "i agree", "attest"]
+    value: "FILL_ME (e.g. I agree)"
