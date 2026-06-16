@@ -19,13 +19,17 @@ describe('PortalRouter', () => {
     expect(router.support(' Greenhouse ')).toEqual({ supported: true, kind: 'greenhouse' });
   });
 
-  it.each(['lever', 'ashby', 'linkedin', 'handshake', 'generic', 'unknown'])(
-    'abstains on %s (no verified filler — never guesses)',
+  it.each(['lever', 'ashby', 'handshake', 'generic', 'unknown'])(
+    'routes %s to the generic vendor-neutral fallback (breadth, still verify-or-abstain)',
     (ats) => {
-      const s = router.support(ats);
-      expect(s.supported).toBe(false);
-      if (!s.supported) expect(s.ats).toBe(ats);
-      expect(router.isSupported(ats)).toBe(false);
+      expect(router.support(ats)).toEqual({ supported: true, kind: 'generic' });
+      expect(router.isSupported(ats)).toBe(true);
     }
   );
+
+  it('excludes LinkedIn entirely (policy: Easy Apply automation causes bans)', () => {
+    const s = router.support('linkedin');
+    expect(s.supported).toBe(false);
+    if (!s.supported) expect(s.ats).toBe('linkedin');
+  });
 });

@@ -41,14 +41,14 @@ class SpyBrowser {
 }
 
 describe('PlaywrightApplySessionFactory (abstain before browser)', () => {
-  it('unsupported ATS: returns unsupported, never opens the browser', async () => {
+  it('excluded ATS (LinkedIn): returns unsupported, never opens the browser', async () => {
     const spy = new SpyBrowser();
     const factory = new PlaywrightApplySessionFactory({ browser: spy as unknown as Browser });
 
-    const r = await factory.open(app('https://jobs.lever.co/globex/123'), noAnswers);
+    const r = await factory.open(app('https://www.linkedin.com/jobs/view/123'), noAnswers);
 
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.ats).toBe('lever');
+    if (!r.ok) expect(r.ats).toBe('linkedin');
     expect(spy.contexts).toBe(0);
   });
 
