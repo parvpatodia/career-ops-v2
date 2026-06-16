@@ -32,6 +32,7 @@ import { AnswerInbox } from '../applier/AnswerInbox.js';
 import { AnswerKB, CompositeAnswerSource } from '../applier/AnswerKB.js';
 import { AnswerGenerator } from '../applier/AnswerGenerator.js';
 import { EssayAnswerSource } from '../applier/EssayAnswerSource.js';
+import { GeminiClient } from '../applier/GeminiClient.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Orchestrator } from './Orchestrator.js';
@@ -133,15 +134,17 @@ async function main(): Promise<void> {
 
   const inbox = new AnswerInbox();
   const notifier = new Notifier();
-  // Order: human-approved KB, then learned answers, then company-specific essay
-  // generation, then the standard generator. Essays come before the generator
-  // so a "why this company" question gets a grounded tailored answer instead of
-  // the generator's needsReview template.
+  // One shared essay source (its LLM cache persists across passes). Order:
+  // human-approved KB, learned answers, company-specific essay (LLM-prewarmed,
+  // deterministic fallback), then the standard generator.
+  const gemini = new GeminiClient();
+  const essaySource = new EssayAnswerSource(profileLoader!, gemini);
+  if (gemini.enabled) log.info('Gemini essay generation enabled (gemini-2.5-flash)');
   const answers = (): AnswerSource =>
     new CompositeAnswerSource([
       new AnswerKB(),
       inbox.learnedSource(),
-      new EssayAnswerSource(profileLoader!),
+      essaySource,
       new AnswerGenerator(profileLoader!),
     ]);
 
@@ -160,6 +163,7 @@ async function main(): Promise<void> {
     inbox,
     answers,
     sessions,
+    essays: essaySource, // async LLM essay pre-warm before each fill
   });
 
   const approval: BatchApproval | undefined = useApprove

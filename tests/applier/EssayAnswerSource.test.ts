@@ -13,6 +13,12 @@ import { EssayAnswerSource } from '../../src/applier/EssayAnswerSource.js';
 import { FORBIDDEN_PHRASES } from '../../src/tailor/CoverLetterVerifier.js';
 import { containsTerm } from '../../src/tailor/text.js';
 import type { AnswerContext } from '../../src/applier/AnswerGenerator.js';
+import type { LlmClient } from '../../src/applier/GeminiClient.js';
+
+const fakeLlm = (text: string | null, throws = false): LlmClient => ({
+  enabled: true,
+  generate: async () => { if (throws) throw new Error('boom'); return text; },
+});
 
 const PROFILE = `identity:
   name: "Demo Candidate"
@@ -84,5 +90,37 @@ describe('EssayAnswerSource', () => {
 
   it('abstains when it cannot make the answer company-specific', () => {
     expect(essay.generate('Why do you want to work here?', ctx({ company: '' }))).toBeNull();
+  });
+
+  // ── LLM path (fake client; no network) ──────────────────────────────────
+  it('after prewarm, serves the verified LLM essay', async () => {
+    const llmText =
+      'Globex builds recommendation systems and I want to help ship them with your platform team. ' +
+      'At Laksh.ai I built a markerless pose estimation pipeline with vector search, end to end. ' +
+      'That hands-on computer vision is the work I want to keep doing at Globex.';
+    const e = new EssayAnswerSource(profile, fakeLlm(llmText));
+    await e.prewarm(ctx());
+    const a = e.generate('Why do you want to work at Globex?', ctx());
+    expect(a?.value).toContain('recommendation systems'); // the LLM text, not the deterministic skeleton
+    expect(a?.value).not.toContain('—');
+    expect(a?.value).not.toContain(':');
+  });
+
+  it('falls back to deterministic when the LLM essay fails the gate (forbidden phrase)', async () => {
+    const e = new EssayAnswerSource(profile, fakeLlm('I am passionate about Globex and innovative solutions.'));
+    await e.prewarm(ctx());
+    const a = e.generate('Why do you want to work at Globex?', ctx());
+    expect(a).not.toBeNull();
+    for (const p of FORBIDDEN_PHRASES) expect(containsTerm(a!.value, p)).toBe(false);
+    expect(a!.value).not.toContain('passionate');               // not the bad LLM text
+    expect(/Laksh\.ai|ViT Change Detection/.test(a!.value)).toBe(true); // deterministic, grounded
+  });
+
+  it('falls back to deterministic when the LLM throws (never errors the run)', async () => {
+    const e = new EssayAnswerSource(profile, fakeLlm(null, true));
+    await expect(e.prewarm(ctx())).resolves.toBeUndefined(); // prewarm never throws
+    const a = e.generate('Why are you interested in this role?', ctx());
+    expect(a).not.toBeNull();
+    expect(a!.value.toLowerCase()).toContain('globex');
   });
 });
