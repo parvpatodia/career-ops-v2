@@ -155,6 +155,17 @@ export class IntentPayloadBuilder {
     reasons: AbstainReason[]
   ): void {
     const options = field.options ?? [];
+
+    // A free-search control (e.g. a react-select Country with ~200 options not
+    // enumerated in the schema) has no option list to match against. Fill the
+    // exact answer value and let the read-back Verifier confirm it took. This is
+    // NOT a first-option guess: the typed value is the answer, and a mismatch is
+    // caught by the independent read-back (verify-or-abstain holds).
+    if (options.length === 0) {
+      intents.push({ field, value: answer.value, source: 'answer-source', confidence: answer.confidence });
+      return;
+    }
+
     const matches = options.filter((o) => norm(o) === norm(answer.value));
 
     if (matches.length === 1) {
