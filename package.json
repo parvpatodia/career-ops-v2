@@ -14,6 +14,7 @@
     "demo:workday": "tsx scripts/demo-workday.ts",
     "demo:autopilot": "tsx scripts/demo-autopilot.ts",
     "demo:tailor": "tsx scripts/demo-tailor.ts",
+    "demo:integration": "tsx scripts/demo-integration.ts",
     "migrate": "tsx scripts/migrate-legacy.ts",
     "expire": "tsx scripts/expire-stale.ts",
     "dashboard": "tsx scripts/dashboard.ts",
