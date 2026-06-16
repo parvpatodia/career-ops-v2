@@ -43,8 +43,11 @@ export class WorkdayDriver implements WorkdayPageDriver {
   }
 
   async scan(): Promise<WorkdayRawField[]> {
+    // WHY no named inner functions in here: tsx/esbuild's keepNames wraps any
+    // `const fn = () => {}` with a `__name(...)` helper that does not exist in
+    // the browser context, throwing "__name is not defined". Normalization is
+    // inlined for that reason.
     const rows = await this.page.evaluate(() => {
-      const norm = (s: string): string => s.replace(/\s+/g, ' ').trim();
       const out: Array<Record<string, unknown>> = [];
       const seen = new Set<string>();
 
@@ -77,18 +80,19 @@ export class WorkdayDriver implements WorkdayPageDriver {
         }
 
         // Label: aria-label, then aria-labelledby, then a nearby <label>/<legend>.
-        let label = norm(el.getAttribute('aria-label') ?? '');
+        let label = (el.getAttribute('aria-label') ?? '').replace(/\s+/g, ' ').trim();
         if (!label) {
           const lb = el.getAttribute('aria-labelledby');
           const t = lb ? document.getElementById(lb) : null;
-          if (t?.textContent) label = norm(t.textContent);
+          if (t?.textContent) label = t.textContent.replace(/\s+/g, ' ').trim();
         }
         if (!label) {
           let p: Element | null = el.parentElement;
           for (let i = 0; i < 5 && p; i++) {
             const lbl = p.querySelector('label, legend');
-            if (lbl?.textContent && norm(lbl.textContent)) {
-              label = norm(lbl.textContent);
+            const txt = (lbl?.textContent ?? '').replace(/\s+/g, ' ').trim();
+            if (txt) {
+              label = txt;
               break;
             }
             p = p.parentElement;
@@ -99,12 +103,12 @@ export class WorkdayDriver implements WorkdayPageDriver {
           el.hasAttribute('required') ||
           el.getAttribute('aria-required') === 'true' ||
           /\*/.test(label);
-        label = norm(label.replace(/\*/g, '')) || automationId;
+        label = label.replace(/\*/g, '').replace(/\s+/g, ' ').trim() || automationId;
 
         let options: string[] | undefined;
         if (tag === 'select') {
           options = Array.from(el.querySelectorAll('option'))
-            .map((o) => norm(o.textContent ?? ''))
+            .map((o) => (o.textContent ?? '').replace(/\s+/g, ' ').trim())
             .filter((t) => t.length > 0);
         }
 
