@@ -179,6 +179,24 @@ describe('WorkdayAdapter', () => {
     expect(driver.filled.has('Self_Identify_gender')).toBe(false);
   });
 
+  it('abstains (never "verified") when no fillable fields are detected', async () => {
+    // A form whose only field is EEO -> zero fillable fields -> verifying
+    // nothing must NOT be a vacuous pass.
+    const onlyEeo = [
+      raw({ automationId: 'Self_Identify_gender', label: 'Gender', widget: 'dropdown', options: ['Male', 'Female'], section: 'voluntaryDisclosures' }),
+    ];
+    const driver = new FakeDriver(onlyEeo);
+    const outcome = await new WorkdayAdapter(driver, KNOWN, { appId: APP_ID, recorder }).run(CTX);
+
+    expect(outcome.kind).toBe('abstained');
+    if (outcome.kind === 'abstained') {
+      expect(outcome.reasons.some((r) => r.why.includes('no fillable fields'))).toBe(true);
+      expect(outcome.eeo.map((e) => e.automationId)).toEqual(['Self_Identify_gender']);
+    }
+    expect(driver.fillCount).toBe(0);
+    expect(eventTypes()).not.toContain('submitted');
+  });
+
   it('stops at the auth wall without scanning or filling', async () => {
     const driver = new FakeDriver(PERSONAL, { authWall: true });
     const outcome = await new WorkdayAdapter(driver, KNOWN, { appId: APP_ID, recorder }).run(CTX);

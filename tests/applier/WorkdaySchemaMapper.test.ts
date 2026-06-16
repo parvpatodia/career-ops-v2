@@ -89,6 +89,22 @@ describe('WorkdaySchemaMapper', () => {
     expect(schema.eeo).toHaveLength(0);
   });
 
+  it('routes a pronouns question out of fillable fields (voluntary self-ID)', () => {
+    const schema = mapper.map([
+      raw({ automationId: 'pronouns', label: 'Preferred pronouns', widget: 'dropdown', options: ['He/Him', 'She/Her'] }),
+    ]);
+    expect(schema.fields).toHaveLength(0);
+    expect(schema.eeo.map((e) => e.automationId)).toEqual(['pronouns']);
+  });
+
+  it('routes radio widgets to unmapped (radio fill not supported, never guessed)', () => {
+    const schema = mapper.map([
+      raw({ automationId: 'commute', label: 'Commute method', widget: 'radio', required: true, options: ['Car', 'Bus'] }),
+    ]);
+    expect(schema.fields).toHaveLength(0);
+    expect(schema.unmapped.map((u) => u.automationId)).toEqual(['commute']);
+  });
+
   it('reports hasEEO false when no self-identification fields are present', () => {
     const schema = mapper.map([raw({ automationId: 'email', label: 'Email', widget: 'email' })]);
     expect(schema.hasEEO).toBe(false);
