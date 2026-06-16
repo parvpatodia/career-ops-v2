@@ -18,13 +18,23 @@ import 'dotenv/config';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { EmailTracker } from './EmailTracker.js';
 import { fetchRecentHeaders, accountsFromEnv } from './ImapClient.js';
+import { SecretVault, CredentialStore } from '../secrets/SecretVault.js';
+
+/** Email creds from the encrypted vault override .env (vault is the secure source). */
+function loadCreds(): NodeJS.ProcessEnv {
+  try {
+    return { ...process.env, ...new CredentialStore(new SecretVault()).load() };
+  } catch {
+    return process.env;
+  }
+}
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const daysIdx = args.indexOf('--days');
   const days = daysIdx !== -1 ? parseInt(args[daysIdx + 1] ?? '30', 10) : 30;
 
-  const accounts = accountsFromEnv();
+  const accounts = accountsFromEnv(loadCreds());
   if (accounts.length === 0) {
     console.log('No email accounts configured. Add to .env (gitignored):');
     console.log('  GMAIL_USER=...  GMAIL_APP_PASSWORD=...   (generate an app password with 2FA on)');

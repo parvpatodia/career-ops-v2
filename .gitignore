@@ -19,6 +19,7 @@ jds/*
 config/profile.yml
 config/answers.yml
 config/answers.learned.yml
+config/outreach-snippets.yml
 data/pending-answers.json
 portals.yml
 modes/_profile.md
@@ -49,8 +50,16 @@ career-dashboard
 .env.*
 .browser-profile/
 .playwright-mcp/
+# Encrypted secrets vault (SecretVault) + its key — NEVER commit
+config/credentials.enc
+.vault.key
 data/applications.json
 cv/
 files.zip
 files_extracted/
 *.png
+# Outreach holds third-party contact emails (other people's PII) and Parv's
+# draft content; keep all of it out of git, log included.
+data/outreach.jsonl
+data/outreach.jsonl.lock
+data/outreach/
