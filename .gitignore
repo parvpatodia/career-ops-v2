@@ -18,6 +18,8 @@ jds/*
 # User config and customization (never auto-updated)
 config/profile.yml
 config/answers.yml
+config/answers.learned.yml
+data/pending-answers.json
 portals.yml
 modes/_profile.md
 .update-dismissed
