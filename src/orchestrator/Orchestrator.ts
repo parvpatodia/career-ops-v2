@@ -94,8 +94,11 @@ export interface OrchestratorDeps {
   apps: ApplicationStore;
   notifier: Notifier;
   inbox: AnswerInbox;
-  /** Rebuilt per pass so a freshly-learned answer is seen (LESSONS 2026-06-16). */
-  answers: () => AnswerSource;
+  /**
+   * Required for apply (rebuilt per pass so a freshly-learned answer is seen,
+   * LESSONS 2026-06-16). A tailor-and-queue-only run (sourcing) can omit it.
+   */
+  answers?: () => AnswerSource;
   /** Present only when applying. Owns ATS support + browser lifecycle. */
   sessions?: ApplySessionFactory;
   receiptsDir?: string;
@@ -195,6 +198,9 @@ export class Orchestrator {
     }
     if (!sessions) {
       throw new Error('Orchestrator.apply called without an ApplySessionFactory');
+    }
+    if (!this.deps.answers) {
+      throw new Error('Orchestrator.apply called without an answers source');
     }
 
     const opened = await sessions.open(app, this.deps.answers());

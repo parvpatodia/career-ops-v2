@@ -47,7 +47,7 @@ export class SourcingPipeline {
 
   constructor(private readonly deps: SourcingDeps) {}
 
-  async run(jobs: Job[]): Promise<SourcingSummary> {
+  async run(jobs: Job[], opts: { dryRun?: boolean } = {}): Promise<SourcingSummary> {
     const { freshness, term, evaluate, orchestrator } = this.deps;
 
     const { fresh, stale, unknown } = freshness.filter(jobs);
@@ -67,6 +67,16 @@ export class SourcingPipeline {
 
     for (const job of matched) {
       const evaluation = evaluate(job);
+
+      // Dry run: preview the score gate without tailoring (no PDF render, no
+      // queue write). `queued` counts would-queue jobs.
+      if (opts.dryRun) {
+        const phase: TailorGateResult['phase'] = evaluation.shouldApply ? 'queued' : 'skipped_score';
+        if (evaluation.shouldApply) summary.queued++; else summary.skippedScore++;
+        summary.outcomes.push({ company: job.company, role: job.title, phase });
+        continue;
+      }
+
       const result = await orchestrator.tailorAndQueue(job, evaluation);
       summary.outcomes.push({ company: job.company, role: job.title, phase: result.phase });
 
