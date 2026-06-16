@@ -101,6 +101,8 @@ export interface OrchestratorDeps {
   answers?: () => AnswerSource;
   /** Present only when applying. Owns ATS support + browser lifecycle. */
   sessions?: ApplySessionFactory;
+  /** Optional async pre-warm (e.g. LLM essay generation) run before each fill. */
+  essays?: { prewarm(ctx: AnswerContext): Promise<void> };
   receiptsDir?: string;
 }
 
@@ -238,6 +240,10 @@ export class Orchestrator {
       resumeVariant: app.resumeVariant,
       ...(app.jd ? { jd: app.jd } : {}),
     };
+
+    // Best-effort async pre-warm (LLM essays) before the synchronous fill.
+    // Any failure is swallowed: the essay source falls back to deterministic.
+    if (this.deps.essays) await this.deps.essays.prewarm(ctx).catch(() => {});
 
     try {
       return await pilot.run(ctx, job, opts.approval);

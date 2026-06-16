@@ -23,6 +23,8 @@
 import type { ProfileLoader } from './ProfileLoader.js';
 import type { Answer, AnswerContext } from './AnswerGenerator.js';
 import type { AnswerSource } from './IntentPayload.js';
+import type { LlmClient } from './GeminiClient.js';
+import { NO_LLM } from './GeminiClient.js';
 import { FORBIDDEN_PHRASES } from '../tailor/CoverLetterVerifier.js';
 import { containsTerm } from '../tailor/text.js';
 import { Logger } from '../utils/Logger.js';
@@ -35,20 +37,82 @@ function norm(s: string): string {
 
 export class EssayAnswerSource implements AnswerSource {
   private log = new Logger('essay');
+  // Per-company verified LLM essay, populated by prewarm() before the fill.
+  // generate() is synchronous, so the async LLM call cannot happen inside it.
+  private readonly cache = new Map<string, string>();
 
-  constructor(private readonly profile: ProfileLoader) {}
+  constructor(
+    private readonly profile: ProfileLoader,
+    private readonly llm: LlmClient = NO_LLM
+  ) {}
+
+  /**
+   * Generate + verify ONE company-specific essay via the LLM and cache it, so
+   * the synchronous generate() can serve it. Fault-tolerant: any LLM failure or
+   * a draft that fails the style/grounding gate leaves the cache empty and
+   * generate() falls back to the deterministic writer. Safe to call repeatedly.
+   */
+  async prewarm(ctx: AnswerContext): Promise<void> {
+    const company = (ctx.company ?? '').trim();
+    if (!this.llm.enabled || !company || this.cache.has(norm(company))) return;
+
+    const draft = await this.llm.generate(this.prompt(ctx)).catch(() => null);
+    if (!draft) return; // LLM unavailable/failed -> deterministic fallback
+    const cleaned = this.scrub(draft);
+    if (this.verify(cleaned, company).ok) {
+      this.cache.set(norm(company), cleaned);
+      this.log.info(`Essay prewarmed (LLM) for ${company}`);
+    } else {
+      this.log.warn(`LLM essay for ${company} failed the gate; using deterministic fallback`);
+    }
+  }
 
   generate(question: string, ctx: AnswerContext): Answer | null {
     if (!this.isEssay(question)) return null;
     if (!ctx.company || !ctx.company.trim()) return null; // cannot make it specific
 
-    const draft = this.write(question, ctx);
+    // Prefer the verified LLM essay (prewarmed); else the deterministic writer.
+    const cached = this.cache.get(norm(ctx.company));
+    const draft = cached ?? this.write(question, ctx);
     const verdict = this.verify(draft, ctx.company);
     if (!verdict.ok) {
       this.log.warn(`Essay abstained for ${ctx.company}: ${verdict.why}`);
       return null; // abstain -> the apply loop notifies, Parv writes this one
     }
     return { value: draft, confidence: 'high', needsReview: false };
+  }
+
+  /** Grounded prompt for the LLM: real facts only, strict style, name the company. */
+  private prompt(ctx: AnswerContext): string {
+    const company = (ctx.company ?? '').trim();
+    const role = (ctx.role ?? '').trim();
+    const projects = this.profile.getProjects()
+      .map((p) => `- ${p.name}: ${p.summary} (stack: ${p.stack.join(', ')})`).join('\n');
+    const exp = this.profile.getExperience().map((e) => `- ${e.role} at ${e.company}`).join('\n');
+    const n = this.profile.getNarrative();
+    const jd = (ctx.jd ?? '').slice(0, 1500);
+
+    return [
+      `Write a short answer (3 to 5 sentences) to a job application question: "Why do you want to work at ${company} as a ${role}?"`,
+      `Write in the FIRST PERSON as the candidate, in a direct and conversational voice.`,
+      ``,
+      `Use ONLY these real facts about the candidate. Do not invent anything not listed here:`,
+      `Projects:\n${projects}`,
+      `Experience:\n${exp}`,
+      `What excites me: ${n.excites}`,
+      `My edge: ${n.superpower}`,
+      ``,
+      `Job description (for context, to make the answer specific to ${company}):`,
+      jd || '(none provided)',
+      ``,
+      `HARD RULES (a violation makes the answer unusable):`,
+      `- Name "${company}" explicitly.`,
+      `- Mention at least one of the candidate's real projects by name.`,
+      `- NEVER use an em dash. NEVER use a colon. Do not use bullet points.`,
+      `- Never use these words or phrases: ${FORBIDDEN_PHRASES.join(', ')}.`,
+      `- Every claim must be true given the facts above. Do not exaggerate or invent.`,
+      `Output ONLY the answer text, no preamble, no quotes.`,
+    ].join('\n');
   }
 
   // ── Detection ───────────────────────────────────────────────────────────
