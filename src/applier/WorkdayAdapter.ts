@@ -107,6 +107,19 @@ export class WorkdayAdapter {
 
     const reasons = [...payload.reasons, ...unmappedReasons];
 
+    // A form with nothing to fill cannot be "verified": verifying zero fields
+    // returns pass:true vacuously (every() over []), which would be a false
+    // green and a latent empty submission once submission is re-enabled. Treat
+    // it as an abstain — the page may not have hydrated, or every field is
+    // EEO/unknown, both of which need a human.
+    if (reasons.length === 0 && payload.intents.length === 0) {
+      reasons.push({
+        fieldId: '(form)',
+        label: 'application form',
+        why: 'no fillable fields detected to verify (page may not have loaded, or all fields are EEO/unknown)',
+      });
+    }
+
     // Abstain BEFORE the first fill: no browser mutation happens on any
     // uncertain form. EEO + unmapped fields are surfaced for the human.
     if (reasons.length > 0) {

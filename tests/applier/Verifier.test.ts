@@ -83,6 +83,22 @@ describe('Verifier', () => {
     expect(verdict.pass).toBe(false);
   });
 
+  it('checkbox: a checked box ("Yes") matches an affirmative intent ("I agree")', () => {
+    const verdict = verifier.verify(
+      [intent('f1', 'I agree to the terms', 'checkbox', 'I agree')],
+      [{ fieldId: 'f1', actual: 'Yes' }]
+    );
+    expect(verdict.pass).toBe(true);
+  });
+
+  it('checkbox: an unchecked box ("No") fails an affirmative intent', () => {
+    const verdict = verifier.verify(
+      [intent('f1', 'I agree to the terms', 'checkbox', 'I agree')],
+      [{ fieldId: 'f1', actual: 'No' }]
+    );
+    expect(verdict.pass).toBe(false);
+  });
+
   it('file fields pass when the read-back contains the uploaded basename', () => {
     const verdict = verifier.verify(
       [intent('f1', 'Resume', 'file', '/Users/x/output/resumes/parv-ai.pdf')],

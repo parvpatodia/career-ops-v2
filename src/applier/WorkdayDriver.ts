@@ -20,8 +20,7 @@ import type { Page } from 'playwright';
 import type { WorkdayPageDriver } from './WorkdayAdapter.js';
 import type { WorkdayRawField } from './WorkdaySchemaMapper.js';
 import type { FieldIntent, FormField } from './IntentPayload.js';
-
-const TRUTHY = new Set(['yes', 'true', 'on', '1', 'i agree', 'agree']);
+import { isAffirmative } from './Verifier.js';
 
 export class WorkdayDriver implements WorkdayPageDriver {
   constructor(private readonly page: Page) {}
@@ -151,12 +150,13 @@ export class WorkdayDriver implements WorkdayPageDriver {
         await this.fillSelect(intent);
         return;
       case 'checkbox':
-        await loc.setChecked(TRUTHY.has(intent.value.toLowerCase()), { timeout: 5_000 });
+        await loc.setChecked(isAffirmative(intent.value), { timeout: 5_000 });
         return;
-      case 'radio':
-        // Click the radio whose automation-id matches; value semantics vary by tenant.
-        await loc.check({ timeout: 5_000 });
-        return;
+      // NOTE: 'radio' is intentionally absent. WorkdaySchemaMapper routes radio
+      // widgets to `unmapped` (we cannot yet resolve which radio in a group an
+      // answer means), so a radio intent never reaches here. Blindly checking
+      // the id-matched radio while ignoring intent.value is exactly the v1
+      // wrong-value failure mode, so the branch is removed, not hidden.
       default:
         await loc.click({ timeout: 5_000 });
         await loc.selectText().catch(() => this.page.keyboard.press('Control+a'));
@@ -184,7 +184,7 @@ export class WorkdayDriver implements WorkdayPageDriver {
         return text.length > 0 ? text : null;
       }
 
-      if (field.type === 'checkbox' || field.type === 'radio') {
+      if (field.type === 'checkbox') {
         const checked = await loc.isChecked().catch(() => false);
         return checked ? 'Yes' : 'No';
       }

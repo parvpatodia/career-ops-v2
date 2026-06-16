@@ -65,6 +65,11 @@ export interface WorkdayMappedSchema {
 }
 
 // Workday widget kind -> FormField type. Unknown kinds become `unmapped`.
+// WHY no `radio`: a radio's answer means "pick option X within this group",
+// but the DOM scan cannot yet resolve a radio group's options, so we cannot
+// fill the RIGHT radio. Mapping it would either guess (the v1 failure) or
+// fill nothing; routing it to `unmapped` makes a required radio abstain
+// visibly and an optional one be skipped, never filled wrong.
 const WIDGET_MAP: Record<string, FormField['type']> = {
   text: 'text',
   email: 'email',
@@ -73,7 +78,6 @@ const WIDGET_MAP: Record<string, FormField['type']> = {
   textarea: 'textarea',
   file: 'file',
   checkbox: 'checkbox',
-  radio: 'radio',
   dropdown: 'select',
   select: 'select',
   multiselect: 'multiselect',
@@ -86,6 +90,10 @@ const EEO_TOKENS = [
   'selfidentif', 'voluntaryself', 'voluntarydisclosure', 'eeo', 'demographic',
   'gender', 'ethnic', 'hispanic', 'latino', 'veteran', 'disability',
   'disabilities', 'sexualorientation', 'transgender', 'lgbt',
+  // Voluntary personal identity that must be surfaced, never auto-filled:
+  // AnswerGenerator answers "Pronouns" high-confidence ("He/Him"), which
+  // would otherwise leak past both nets onto the form.
+  'pronoun', 'marital',
 ];
 
 function norm(s: string): string {

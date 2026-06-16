@@ -43,6 +43,19 @@ function norm(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+// The single affirmative vocabulary shared by the filler (decides whether to
+// check a box) and the checker (decides whether a checked box matches the
+// intent). Kept here, with the comparison, so the two can never drift apart.
+const AFFIRMATIVE: ReadonlySet<string> = new Set([
+  'yes', 'true', 'on', '1', 'checked', 'agree', 'i agree', 'accept', 'i accept',
+  'acknowledge', 'consent',
+]);
+
+/** True when a free-text answer means "checked/affirmed" for a boolean field. */
+export function isAffirmative(value: string): boolean {
+  return AFFIRMATIVE.has(norm(value));
+}
+
 export class Verifier {
   verify(intents: FieldIntent[], readBacks: ReadBackValue[]): VerifierVerdict {
     const actualById = new Map(readBacks.map((r) => [r.fieldId, r.actual]));
@@ -64,6 +77,11 @@ export class Verifier {
   private matches(intent: FieldIntent, actual: string): boolean {
     if (intent.field.type === 'file') {
       return actual.includes(path.basename(intent.value));
+    }
+    if (intent.field.type === 'checkbox') {
+      // A checkbox is boolean: the read-back ("Yes"/"No") matches the intent
+      // when both sides agree on affirmed-ness, not byte-for-byte.
+      return isAffirmative(actual) === isAffirmative(intent.value);
     }
     if (OPTION_TYPES.has(intent.field.type)) {
       return norm(actual) === norm(intent.value);
