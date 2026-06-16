@@ -20,7 +20,7 @@ import type { Page } from 'playwright';
 import type { WorkdayPageDriver } from './WorkdayAdapter.js';
 import type { WorkdayRawField } from './WorkdaySchemaMapper.js';
 import type { FieldIntent, FormField } from './IntentPayload.js';
-import { isAffirmative } from './Verifier.js';
+import { fillControl, readControl } from './DomControls.js';
 
 export class WorkdayDriver implements WorkdayPageDriver {
   constructor(private readonly page: Page) {}
@@ -137,66 +137,15 @@ export class WorkdayDriver implements WorkdayPageDriver {
     return rows as unknown as WorkdayRawField[];
   }
 
+  // NOTE on 'radio': WorkdaySchemaMapper routes radio widgets to `unmapped` (we
+  // cannot yet resolve which radio in a group an answer means), so a radio
+  // intent never reaches fill — never a v1-style guess at the wrong option.
   async fill(intent: FieldIntent): Promise<void> {
-    const loc = this.page.locator(this.sel(intent.field.id)).first();
-    await loc.scrollIntoViewIfNeeded({ timeout: 5_000 });
-
-    switch (intent.field.type) {
-      case 'file':
-        await loc.setInputFiles(intent.value);
-        return;
-      case 'select':
-      case 'multiselect':
-        await this.fillSelect(intent);
-        return;
-      case 'checkbox':
-        await loc.setChecked(isAffirmative(intent.value), { timeout: 5_000 });
-        return;
-      // NOTE: 'radio' is intentionally absent. WorkdaySchemaMapper routes radio
-      // widgets to `unmapped` (we cannot yet resolve which radio in a group an
-      // answer means), so a radio intent never reaches here. Blindly checking
-      // the id-matched radio while ignoring intent.value is exactly the v1
-      // wrong-value failure mode, so the branch is removed, not hidden.
-      default:
-        await loc.click({ timeout: 5_000 });
-        await loc.selectText().catch(() => this.page.keyboard.press('Control+a'));
-        await this.page.keyboard.press('Delete');
-        await loc.pressSequentially(intent.value, { delay: 25 });
-    }
+    await fillControl(this.page, this.page.locator(this.sel(intent.field.id)).first(), intent);
   }
 
   async readBack(field: FormField): Promise<string | null> {
-    const loc = this.page.locator(this.sel(field.id)).first();
-    try {
-      if (field.type === 'select' || field.type === 'multiselect') {
-        // Native <select>: read the selected option's text. Custom Workday
-        // dropdowns expose their choice as the control's text/value.
-        const selected = await loc
-          .evaluate((el) => {
-            const s = el as HTMLSelectElement;
-            if (s.options && typeof s.selectedIndex === 'number') {
-              return s.options[s.selectedIndex]?.text ?? '';
-            }
-            return (el as HTMLElement).innerText ?? '';
-          })
-          .catch(() => '');
-        const text = (selected ?? '').trim();
-        return text.length > 0 ? text : null;
-      }
-
-      if (field.type === 'checkbox') {
-        const checked = await loc.isChecked().catch(() => false);
-        return checked ? 'Yes' : 'No';
-      }
-
-      // text / email / phone / textarea / date / file: the input value.
-      // (file inputs report the chosen file's name, which the Verifier
-      // compares by basename.)
-      const value = await loc.inputValue({ timeout: 3_000 }).catch(() => '');
-      return value.length > 0 ? value : null;
-    } catch {
-      return null;
-    }
+    return readControl(this.page.locator(this.sel(field.id)).first(), field);
   }
 
   // ── SubmitDriver surface (used only by the Autopilot, after verify + approval) ──
@@ -225,21 +174,4 @@ export class WorkdayDriver implements WorkdayPageDriver {
     return trimmed.length > 0 ? trimmed : null;
   }
 
-  private async fillSelect(intent: FieldIntent): Promise<void> {
-    const loc = this.page.locator(this.sel(intent.field.id)).first();
-    const tag = await loc.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
-
-    if (tag === 'select') {
-      await loc.selectOption({ label: intent.value }, { timeout: 5_000 });
-      return;
-    }
-
-    // Custom Workday dropdown: open, then click the exact-text option.
-    await loc.click({ timeout: 5_000 });
-    const option = this.page
-      .locator('[role="option"]')
-      .filter({ hasText: new RegExp(`^\\s*${intent.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i') })
-      .first();
-    await option.click({ timeout: 5_000 });
-  }
 }
