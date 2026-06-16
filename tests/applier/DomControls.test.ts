@@ -34,6 +34,9 @@ class FakeLocator {
   async evaluate(): Promise<unknown> { return this.opts.evaluateReturn; }
   filter(): this { return this; }
   first(): this { return this; }
+  // react-select fill resolves the .select__control via locator(xpath); return
+  // self so control.click() records on this same fake.
+  locator(): this { return this; }
   has(name: string): boolean { return this.calls.some((c) => c[0] === name); }
   arg(name: string): unknown { return this.calls.find((c) => c[0] === name)?.[1]; }
 }
@@ -79,18 +82,28 @@ describe('fillControl routing', () => {
   });
 
   it('native <select> -> selectOption by label', async () => {
-    const loc = new FakeLocator({ evaluateReturn: 'select' });
+    const loc = new FakeLocator({ evaluateReturn: 'native' });
     await fillControl(P(new FakePage()), L(loc), intent('select', 'Yes'));
     expect(loc.arg('selectOption')).toEqual({ label: 'Yes' });
   });
 
-  it('custom (react-select) -> opens the control and clicks the matching option', async () => {
-    const loc = new FakeLocator({ evaluateReturn: 'div' }); // not a native <select>
+  it('react-select -> opens the control, types the value, presses Enter', async () => {
+    const loc = new FakeLocator({ evaluateReturn: 'react-select' });
     const page = new FakePage();
     await fillControl(P(page), L(loc), intent('select', 'Yes'));
-    expect(loc.has('click')).toBe(true);            // opened the control
-    expect(page.optionLocator.has('click')).toBe(true); // clicked the option in the listbox
-    expect(loc.has('selectOption')).toBe(false);    // did NOT use the native path
+    expect(loc.has('click')).toBe(true);              // clicked the .select__control (locator() -> self)
+    expect(loc.arg('pressSequentially')).toBe('Yes'); // typed to filter
+    expect(page.keyPresses).toContain('Enter');       // selected the highlighted option
+    expect(loc.has('selectOption')).toBe(false);      // not the native path
+  });
+
+  it('legacy custom listbox -> opens then clicks the matching [role=option]', async () => {
+    const loc = new FakeLocator({ evaluateReturn: 'custom' });
+    const page = new FakePage();
+    await fillControl(P(page), L(loc), intent('select', 'Yes'));
+    expect(loc.has('click')).toBe(true);
+    expect(page.optionLocator.has('click')).toBe(true);
+    expect(loc.has('selectOption')).toBe(false);
   });
 });
 
@@ -105,8 +118,13 @@ describe('readControl', () => {
     expect(await readControl(L(new FakeLocator({ inputValue: '' })), { id: 'f', label: 'F', type: 'text', required: true })).toBeNull();
   });
 
-  it('select -> the selected text, null when empty', async () => {
+  it('select -> the selected text (native or react-select single-value), null when empty', async () => {
     expect(await readControl(L(new FakeLocator({ evaluateReturn: 'Yes' })), { id: 'f', label: 'F', type: 'select', required: true })).toBe('Yes');
     expect(await readControl(L(new FakeLocator({ evaluateReturn: '' })), { id: 'f', label: 'F', type: 'select', required: true })).toBeNull();
+  });
+
+  it('file -> the attached file name (inputValue throws on file inputs), null when none', async () => {
+    expect(await readControl(L(new FakeLocator({ evaluateReturn: 'resume.pdf' })), { id: 'f', label: 'F', type: 'file', required: true })).toBe('resume.pdf');
+    expect(await readControl(L(new FakeLocator({ evaluateReturn: '' })), { id: 'f', label: 'F', type: 'file', required: true })).toBeNull();
   });
 });
