@@ -34,6 +34,13 @@ export interface FormField {
  *  M3's AnswerKB will too (D in SOLID: the builder depends on the interface). */
 export interface AnswerSource {
   generate(question: string, ctx: AnswerContext): Answer | null;
+  /**
+   * Re-read any file-backed state. A long-lived source reused across an
+   * autopilot resume loop MUST reload after AnswerInbox.resolve writes a
+   * learned answer, or it re-abstains on the same question forever
+   * (LESSONS.md 2026-06-16). No-op (omit) for in-memory sources.
+   */
+  reload?(): void;
 }
 
 export interface FieldIntent {

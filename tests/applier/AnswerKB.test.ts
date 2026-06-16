@@ -86,6 +86,45 @@ answers:
 `)
     ).toThrow(/non-empty/);
   });
+
+  it('reload() picks up a file change the cached constructor load missed', () => {
+    const kb = writeKb(`
+answers:
+  - match: ["start date"]
+    value: "May 2026"
+`);
+    // The new question is unknown until the file changes on disk...
+    expect(kb.generate('Favorite tensor library?', CTX)).toBeNull();
+
+    fs.writeFileSync(
+      file,
+      `
+answers:
+  - match: ["start date"]
+    value: "May 2026"
+  - match: ["tensor library"]
+    value: "PyTorch"
+`
+    );
+    // ...and stays unknown to the long-lived instance until it reloads.
+    expect(kb.generate('Favorite tensor library?', CTX)).toBeNull();
+
+    kb.reload();
+    expect(kb.generate('Favorite tensor library?', CTX)?.value).toBe('PyTorch');
+    // Pre-existing entries survive the reload.
+    expect(kb.generate('Earliest start date?', CTX)?.value).toBe('May 2026');
+  });
+
+  it('reload() over a now-missing file empties the cache without throwing', () => {
+    const kb = writeKb(`
+answers:
+  - match: ["start date"]
+    value: "May 2026"
+`);
+    fs.rmSync(file);
+    expect(() => kb.reload()).not.toThrow();
+    expect(kb.size()).toBe(0);
+  });
 });
 
 describe('CompositeAnswerSource', () => {
@@ -105,5 +144,29 @@ answers:
     expect(composite.generate('Earliest start date?', CTX)?.humanApproved).toBe(true);
     expect(composite.generate('Email', CTX)?.value).toBe('p@x.edu');
     expect(composite.generate('Quantum readiness?', CTX)).toBeNull();
+  });
+
+  it('reload() cascades to file-backed members and skips in-memory ones', () => {
+    const kb = writeKb(`
+answers:
+  - match: ["start date"]
+    value: "May 2026"
+`);
+    // A reload-less in-memory source must not break the cascade.
+    const fallback: AnswerSource = { generate: () => null };
+    const composite = new CompositeAnswerSource([kb, fallback]);
+
+    expect(composite.generate('Tensor library?', CTX)).toBeNull();
+    fs.writeFileSync(
+      file,
+      `
+answers:
+  - match: ["tensor library"]
+    value: "PyTorch"
+`
+    );
+
+    expect(() => composite.reload()).not.toThrow();
+    expect(composite.generate('Favorite tensor library?', CTX)?.value).toBe('PyTorch');
   });
 });
