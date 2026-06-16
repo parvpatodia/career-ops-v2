@@ -26,9 +26,9 @@ function norm(s: string): string {
 }
 
 export class AnswerKB implements AnswerSource {
-  private readonly entries: KbEntry[];
+  private entries: KbEntry[];
 
-  constructor(filePath = 'config/answers.yml') {
+  constructor(private readonly filePath = 'config/answers.yml') {
     this.entries = AnswerKB.load(filePath);
   }
 
@@ -41,6 +41,18 @@ export class AnswerKB implements AnswerSource {
 
   size(): number {
     return this.entries.length;
+  }
+
+  /**
+   * Re-read the YAML from disk into the cache. WHY: the constructor loads
+   * entries once, so a long-lived AnswerKB (e.g. the learned-answers source
+   * inside a CompositeAnswerSource the M4 batch loop reuses across resume
+   * iterations) never sees an answer AnswerInbox.resolve just wrote, and
+   * re-abstains on the same question forever (LESSONS.md 2026-06-16). Call this
+   * after resolve, before re-running the job.
+   */
+  reload(): void {
+    this.entries = AnswerKB.load(this.filePath);
   }
 
   private static load(filePath: string): KbEntry[] {
@@ -76,5 +88,15 @@ export class CompositeAnswerSource implements AnswerSource {
       if (answer) return answer;
     }
     return null;
+  }
+
+  /**
+   * Cascade reload to every source with file-backed state (e.g. the learned
+   * AnswerKB). In-memory sources (the generator, a stub identity) have no
+   * reload() and are skipped. This is the single call the M4 resume loop makes
+   * after AnswerInbox.resolve so the next run sees the new answer.
+   */
+  reload(): void {
+    for (const source of this.sources) source.reload?.();
   }
 }
