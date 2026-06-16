@@ -12,6 +12,7 @@
     "apply": "tsx src/applier/index.ts",
     "run": "tsx src/orchestrator/index.ts",
     "source": "tsx src/orchestrator/source.ts",
+    "audit:answers": "tsx scripts/audit-answers.ts",
     "demo": "tsx scripts/demo.ts",
     "demo:workday": "tsx scripts/demo-workday.ts",
     "demo:autopilot": "tsx scripts/demo-autopilot.ts",
