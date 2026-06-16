@@ -69,7 +69,9 @@ export class SourcingPipeline {
       const evaluation = evaluate(job);
 
       // Dry run: preview the score gate without tailoring (no PDF render, no
-      // queue write). `queued` counts would-queue jobs.
+      // queue write). `queued` counts would-queue jobs by shouldApply alone; it
+      // does NOT consult idempotency, so an already-submitted job shows as
+      // would-queue here (the real run returns already_submitted). Preview only.
       if (opts.dryRun) {
         const phase: TailorGateResult['phase'] = evaluation.shouldApply ? 'queued' : 'skipped_score';
         if (evaluation.shouldApply) summary.queued++; else summary.skippedScore++;
