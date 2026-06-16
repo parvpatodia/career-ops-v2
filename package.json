@@ -10,6 +10,7 @@
     "scan": "tsx src/scanner/index.ts",
     "pipeline": "tsx src/pipeline/index.ts",
     "apply": "tsx src/applier/index.ts",
+    "run": "tsx src/orchestrator/index.ts",
     "demo": "tsx scripts/demo.ts",
     "demo:workday": "tsx scripts/demo-workday.ts",
     "demo:autopilot": "tsx scripts/demo-autopilot.ts",
