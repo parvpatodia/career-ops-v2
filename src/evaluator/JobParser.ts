@@ -4,6 +4,8 @@
  * and test parsing independently without needing the full scoring pipeline.
  */
 
+import { SKILL_PATTERNS } from './skills.js';
+
 export interface ParsedJob {
   title: string;
   company: string;
@@ -18,18 +20,6 @@ export interface ParsedJob {
   isInternship: boolean;
   keywords: string[];  // raw keywords for ATS injection
 }
-
-// Known skills to extract from JDs
-const SKILL_PATTERNS = [
-  'Python', 'PyTorch', 'TensorFlow', 'JavaScript', 'TypeScript', 'C++', 'Java',
-  'React', 'FastAPI', 'Django', 'Node.js', 'Go', 'Rust', 'SQL', 'Postgres',
-  'MySQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'GCP', 'Azure',
-  'Git', 'Linux', 'CUDA', 'OpenCV', 'scikit-learn', 'Pandas', 'NumPy',
-  'Transformers', 'LangChain', 'RAG', 'LLM', 'RLHF', 'fine-tuning', 'MLflow',
-  'MediaPipe', 'YOLO', 'Detectron', 'ViT', 'BERT', 'GPT', 'diffusion models',
-  'computer vision', 'NLP', 'deep learning', 'machine learning', 'reinforcement learning',
-  'multi-agent', 'robotics', 'ROS', 'SLAM', 'point cloud', 'LiDAR',
-];
 
 const SENIOR_KEYWORDS = ['senior', 'staff', 'principal', 'lead', 'architect'];
 const MID_KEYWORDS = ['mid-level', 'mid level', '3+ years', '3-5 years', '4+ years'];
