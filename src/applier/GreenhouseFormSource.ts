@@ -44,8 +44,18 @@ export class GreenhouseFormSource implements AtsFormSource {
 
   async scanSchema(): Promise<NormalizedSchema> {
     const mapped = this.mapper.map(this.job);
+    const apiFields = mapped.fields.map((f) => f.field);
+    const known = new Set([
+      ...apiFields.map((f) => f.id),
+      ...this.demographicFields().map((e) => e.id), // EEO: surfaced, not filled
+    ]);
+    // The new Greenhouse React form renders REQUIRED built-in fields (location
+    // Country, etc.) that the boards questions API does NOT return, so a
+    // schema-only fill verifies green yet the form rejects submit. Discover them
+    // from the DOM and add them so the fill is complete.
+    const builtins = await this.discoverBuiltinFields(known);
     return {
-      fields: mapped.fields.map((f) => f.field),
+      fields: [...apiFields, ...builtins],
       eeo: this.demographicFields(),
       unmapped: mapped.unmapped.map((u) => ({
         id: u.label,
@@ -54,6 +64,45 @@ export class GreenhouseFormSource implements AtsFormSource {
         widget: u.type,
       })),
     };
+  }
+
+  /**
+   * DOM-discover labeled built-in fields the questions API omits. Conservative:
+   * only fields with a usable label that are required OR a known location field
+   * (Country/Location/City), excluding file inputs, EEO, captcha, and anything
+   * already in the API schema. react-select controls become 'select'.
+   */
+  private async discoverBuiltinFields(known: Set<string>): Promise<FormField[]> {
+    // No live page (unit tests with a stub) -> nothing to discover.
+    if (typeof this.page?.evaluate !== 'function') return [];
+    const raw = await this.page
+      .evaluate(() => {
+        const out: Array<{ id: string; label: string; reactSelect: boolean; required: boolean; type: string }> = [];
+        const controls = document.querySelectorAll('input[id], select[id], textarea[id]');
+        for (const el of Array.from(controls)) {
+          const e = el as HTMLInputElement;
+          if (e.type === 'hidden' || e.type === 'file') continue;
+          let label = '';
+          const forLabel = document.querySelector('label[for="' + e.id + '"]');
+          if (forLabel) label = (forLabel as HTMLElement).innerText.trim();
+          if (!label) {
+            const wrap = e.closest('[class*=field]');
+            const inner = wrap ? wrap.querySelector('label, .label') : null;
+            if (inner) label = (inner as HTMLElement).innerText.trim();
+          }
+          const reactSelect = !!e.closest('.select__control');
+          const required = e.required || e.getAttribute('aria-required') === 'true' || /\*/.test(label);
+          out.push({ id: e.id, label: label.replace(/\*/g, '').trim(), reactSelect, required, type: e.type || '' });
+        }
+        return out;
+      })
+      .catch(() => [] as Array<{ id: string; label: string; reactSelect: boolean; required: boolean; type: string }>);
+
+    return raw
+      .filter((f) => f.id && f.label && !known.has(f.id))
+      .filter((f) => !/recaptcha|search-input/i.test(f.id))
+      .filter((f) => f.required || /\b(country|location|city|state)\b/i.test(f.label))
+      .map((f) => ({ id: f.id, label: f.label, type: (f.reactSelect ? 'select' : 'text') as FormField['type'], required: true }));
   }
 
   fill(intent: FieldIntent): Promise<void> {
