@@ -22,6 +22,7 @@ import fs from 'fs';
 import path from 'path';
 import { VariantClassifier } from './VariantClassifier.js';
 import { FreshnessFilter } from './FreshnessFilter.js';
+import { TermFilter } from './TermFilter.js';
 import { CoverLetterPersonalizer } from './CoverLetterPersonalizer.js';
 import { prepareResumes } from './PrepareResumes.js';
 import { Evaluator } from '../evaluator/Evaluator.js';
@@ -89,9 +90,17 @@ async function main(): Promise<void> {
     log.warn(`Scanner data-quality: ${unknown.length} job(s) had no parseable postedAt: ${unknown.slice(0, 5).map((j) => `${j.company}/${j.id}`).join(', ')}${unknown.length > 5 ? '...' : ''}`);
   }
 
+  // Target-term gate (invariant 10): keep Summer/Fall 2026 and unstated-term
+  // roles; drop a posting that explicitly states a non-target term (e.g. a
+  // Summer 2025 or Spring 2026 internship that slipped past the title filter).
+  const { matched: onTerm, offTerm } = new TermFilter().filter(fresh);
+  if (offTerm.length > 0) {
+    log.info(`Off-term (skipped): ${offTerm.length} | On-term/unstated: ${onTerm.length}`);
+  }
+
   // Skip jobs already tracked
   const existingIds = loadExistingJobIds();
-  const toProcess = fresh.filter((j) => !existingIds.has(j.id));
+  const toProcess = onTerm.filter((j) => !existingIds.has(j.id));
   log.info(`New jobs to process: ${toProcess.length} (${fresh.length - toProcess.length} already tracked)`);
 
   if (toProcess.length === 0) {
