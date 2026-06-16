@@ -38,64 +38,13 @@ import type { ApplyGateResult } from './Orchestrator.js';
 import { PlaywrightApplySessionFactory } from './PlaywrightApplySessionFactory.js';
 import { GreenhouseBoardJobProvider } from './GreenhouseBoardJobFetcher.js';
 import { Tailor } from '../tailor/Tailor.js';
+import { isIneligible, jobFromApp } from './queuePlanning.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
 import type { BatchApproval } from '../applier/Autopilot.js';
-import type { Application, Job, EvaluationResult, Platform } from '../types.js';
+import type { Application } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('run');
-
-// F-1 visa cannot qualify for US-Person roles (ITAR, security clearances, etc.).
-// Same gate the legacy apply CLI used; applied before any browser opens.
-const INELIGIBLE_KEYWORDS = [
-  'us citizen', 'u.s. citizen', 'united states citizen',
-  'security clearance', 'secret clearance', 'top secret', 'ts/sci',
-  'itar', 'ear compliance', 'us person', 'u.s. person', 'export control',
-];
-
-function isIneligible(app: Application): boolean {
-  const haystack = `${app.role} ${app.company} ${app.notes ?? ''}`.toLowerCase();
-  return INELIGIBLE_KEYWORDS.some((kw) => haystack.includes(kw));
-}
-
-function parseNotes(notes: string): { platform: Platform; location: string } {
-  const parts = (notes ?? '').split(' | ');
-  return { platform: (parts[0]?.trim() ?? 'direct') as Platform, location: parts[1]?.trim() ?? '' };
-}
-
-/** Reconstruct the Job + EvaluationResult a re-tailor needs from a queued app. */
-function jobFromApp(app: Application): { job: Job; evaluation: EvaluationResult } {
-  const { platform, location } = parseNotes(app.notes);
-  const job: Job = {
-    id: app.jobId,
-    title: app.role,
-    company: app.company,
-    url: app.url,
-    applyUrl: app.url,
-    platform,
-    location,
-    remote: location.toLowerCase().includes('remote'),
-    postedAt: app.date,
-    discoveredAt: app.date,
-    jd: app.jd ?? '',
-    status: 'evaluated',
-  };
-  const evaluation: EvaluationResult = {
-    jobId: app.jobId,
-    score: app.score,
-    breakdown: { skillMatch: 0, experienceMatch: 0, locationMatch: 0, visaMatch: 0, companySignal: 0, timingMatch: 0 },
-    reasoning: '(re-tailor from queue)',
-    resumeVariant: app.resumeVariant,
-    topMatchingSkills: [],
-    missingSkills: [],
-    shouldApply: true,
-    // Cover-letter generation needs per-job paragraphs we do not synthesize here;
-    // the resume (the ATS-critical artifact) is always tailored + verified.
-    shouldGenerateCoverLetter: false,
-    evaluatedAt: app.date,
-  };
-  return { job, evaluation };
-}
 
 function reportApply(app: Application, result: ApplyGateResult): void {
   switch (result.phase) {
