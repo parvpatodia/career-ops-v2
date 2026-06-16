@@ -93,6 +93,12 @@ describe('ResumeVerifier (maker/checker)', () => {
     expect(v.pass).toBe(true);
   });
 
+  it('FAILS the structural floor when the resume has too few sections (no vacuous pass)', () => {
+    const v = verifier.verify(input(CLEAN_HTML, { requiredSections: [] }));
+    expect(v.pass).toBe(false);
+    expect(v.checks.find((c) => c.name === 'section-count' && !c.pass)).toBeTruthy();
+  });
+
   it('reports every failing check, not just the first', () => {
     let sabotaged = CLEAN_HTML.replace('test@example.com', 'wrong@evil.com');
     sabotaged = sabotaged.replace('<h2>Skills</h2><ul><li>Languages: Python, TypeScript, Docker, Kubernetes</li></ul>', '');

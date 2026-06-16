@@ -94,6 +94,8 @@ beforeAll(() => {
   fs.mkdirSync(cvDir, { recursive: true });
   fs.writeFileSync(path.join(cvDir, 'ml.md'), ML);
   fs.writeFileSync(path.join(cvDir, 'master.md'), MASTER);
+  // A malformed CV with no "## " section headers (its preamble must not leak).
+  fs.writeFileSync(path.join(cvDir, 'empty.md'), '# Stray Name\nstray@old.example\n\nFreeform text, no section headers.');
   profilePath = path.join(dir, 'profile.yml');
   fs.writeFileSync(profilePath, PROFILE);
 });
@@ -127,6 +129,15 @@ describe('Tailor (verify-or-abstain, browser-free path)', () => {
     const r = tailor.tailorResume(JOB, 'ml');
     expect(r.verified).toBe(false);
     expect(r.verdict.checks.find((c) => c.name === 'page-budget' && !c.pass)).toBeTruthy();
+  });
+
+  it('ABSTAINS on a header-less CV instead of leaking its raw contact preamble', () => {
+    const tailor = new Tailor({ profilePath, cvDir, outputDir });
+    const r = tailor.tailorResume(JOB, 'empty' as never);
+    expect(r.verified).toBe(false);
+    expect(r.verdict.checks.find((c) => c.name === 'section-count' && !c.pass)).toBeTruthy();
+    // The candidate name is never duplicated from the body, even on a malformed CV.
+    expect(r.html).not.toContain('Stray Name');
   });
 
   it('never claims a keyword the verifier cannot find (maker/checker agree)', () => {

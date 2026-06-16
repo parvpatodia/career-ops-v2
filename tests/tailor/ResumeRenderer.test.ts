@@ -79,6 +79,13 @@ describe('ResumeRenderer', () => {
     expect(ResumeRenderer.sectionTitles(MARKDOWN)).toEqual(SECTIONS);
   });
 
+  it('drops a stray H1 from the body (the name only ever comes from profile.yml)', () => {
+    const html = ResumeRenderer.markdownToHtml('# Stray Name\n## Summary\nText.');
+    expect(html).not.toContain('Stray Name');
+    expect(html).not.toContain('<h1>');
+    expect(html).toContain('<h2>Summary</h2>');
+  });
+
   it('produces output that the ResumeVerifier passes (maker output satisfies the checker)', () => {
     const html = renderer.renderHtml(MARKDOWN, IDENTITY);
     const verdict = new ResumeVerifier().verify({
