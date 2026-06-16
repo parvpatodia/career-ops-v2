@@ -83,6 +83,23 @@ describe('SourcingPipeline', () => {
     expect(orch.calls).not.toContain('off');
   });
 
+  it('dry run previews the score gate without tailoring or queueing', async () => {
+    const jobs: Job[] = [
+      job('ok', 'Machine Learning Intern', daysAgo(3)),
+      job('low', 'Data Intern', daysAgo(3)),
+      job('stale', 'ML Intern', daysAgo(40)),
+    ];
+    const orch = new FakeOrchestrator();
+    const s = await new SourcingPipeline({
+      freshness: new FreshnessFilter(), term: new TermFilter(), evaluate: evalFor, orchestrator: orch,
+    }).run(jobs, { dryRun: true });
+
+    expect(s.queued).toBe(1);       // "ok" would queue
+    expect(s.skippedScore).toBe(1); // "low" fails the score gate
+    expect(s.stale).toBe(1);
+    expect(orch.calls).toEqual([]); // dry run never tailors/queues
+  });
+
   it('an unparseable posting date counts as stale, never reaches tailoring', async () => {
     const jobs: Job[] = [job('nodate', 'ML Intern', 'not-a-date')];
     const orch = new FakeOrchestrator();

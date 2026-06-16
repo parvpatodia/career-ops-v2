@@ -29,6 +29,7 @@ import os from 'os';
 import path from 'path';
 import { Tailor } from '../src/tailor/Tailor.js';
 import { Orchestrator } from '../src/orchestrator/Orchestrator.js';
+import { SourcingPipeline } from '../src/orchestrator/SourcingPipeline.js';
 import { FixtureApplySessionFactory } from '../src/orchestrator/PlaywrightApplySessionFactory.js';
 import { ApplicationStore } from '../src/tracker/ApplicationStore.js';
 import { AnswerInbox } from '../src/applier/AnswerInbox.js';
@@ -121,6 +122,8 @@ Required Qualifications
 
 We value engineers who ship models to production and measure their impact.`;
 
+const daysAgo = (n: number): string => new Date(Date.now() - n * 86_400_000).toISOString().split('T')[0]!;
+
 const JOB: Job = {
   id: 'gh-demo-001',
   title: 'Machine Learning Engineer Intern',
@@ -130,11 +133,16 @@ const JOB: Job = {
   platform: 'greenhouse',
   location: 'San Jose, CA',
   remote: false,
-  postedAt: '2026-06-12', // 4 days before "today" (2026-06-16): fresh
-  discoveredAt: '2026-06-15',
+  postedAt: daysAgo(3), // fresh (<=14d), relative to now so the demo never rots
+  discoveredAt: daysAgo(1),
   jd: JD,
   status: 'evaluated',
 };
+
+// Two jobs the sourcing gates must DROP, proving the front-half filters before
+// any tailoring: one stale (>14d) and one explicitly off-term (Summer 2025).
+const STALE_JOB: Job = { ...JOB, id: 'gh-stale', company: 'OldCo', title: 'ML Intern', postedAt: daysAgo(40) };
+const OFFTERM_JOB: Job = { ...JOB, id: 'gh-offterm', company: 'PastCo', title: 'SWE Intern - Summer 2025', postedAt: daysAgo(3) };
 
 // Fixture evaluation (the Evaluator has its own tests + needs profile.yml; this
 // demo proves the integration seam, not scoring).
@@ -247,27 +255,34 @@ async function main(): Promise<void> {
   let oneLogOk = false;
 
   try {
-    // ── SOURCING gates ───────────────────────────────────────────────────────
+    // ── STAGE 1: SOURCE → filter → score → M6 tailor → queue (the real front-half) ──
     console.log(`\n${'═'.repeat(64)}`);
-    console.log(C.bold(C.cyan(`  ${JOB.company} — ${JOB.title}`)));
+    console.log(C.bold(C.cyan('  SOURCING PIPELINE — 3 sourced jobs through the v2 front-half')));
     console.log('═'.repeat(64));
-    const { fresh } = new FreshnessFilter().filter([JOB]);
-    const { matched } = new TermFilter().filter(fresh);
-    sourcingOk = matched.length === 1;
-    console.log(`  sourcing gates     : ${sourcingOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  ${C.dim('fresh (<=14d) + on-term (Summer/Fall 2026)')}`);
 
-    // ── STAGE 1: tailor + queue ───────────────────────────────────────────────
-    const t = await orch.tailorAndQueue(JOB, EVAL, COVER_DATA);
-    queuedOk = t.phase === 'queued';
-    console.log(`\n  ${C.bold('TAILOR → QUEUE')}    : ${queuedOk ? C.green(t.phase.toUpperCase()) : C.red(t.phase.toUpperCase())}`);
-    if (t.phase === 'queued') {
-      console.log(`    resume PDF       : ${C.green(t.application.pdfPath ?? '(none)')}`);
-      console.log(`    cover letter     : ${t.application.coverLetterPath ? C.green(t.application.coverLetterPath) : C.dim('(skipped)')}`);
-      console.log(`    queue status     : ${C.green(t.application.status)}  ${C.dim('(variant: ' + t.application.resumeVariant + ')')}`);
+    const sourcing = new SourcingPipeline({
+      freshness: new FreshnessFilter(),
+      term: new TermFilter(),
+      // evaluate is only called for jobs that clear freshness+term (just JOB).
+      evaluate: () => EVAL,
+      orchestrator: orch,
+    });
+    const summary = await sourcing.run([JOB, STALE_JOB, OFFTERM_JOB]);
+    sourcingOk = summary.stale === 1 && summary.offTerm === 1;
+    queuedOk = summary.queued === 1;
+    console.log(`  sourced            : ${summary.total}  →  stale ${summary.stale} (dropped), off-term ${summary.offTerm} (dropped), queued ${C.green(String(summary.queued))}`);
+    console.log(`  gates              : ${sourcingOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  ${C.dim('stale + off-term filtered BEFORE tailoring')}`);
+
+    const queued = store.findByCompanyAndRole(JOB.company, JOB.title);
+    if (queued) {
+      console.log(`  ${C.bold('TAILOR → QUEUE')}    : ${C.green('QUEUED')}  ${C.dim('(M6 verify-or-abstain, real PDF)')}`);
+      console.log(`    resume PDF       : ${C.green(queued.pdfPath ?? '(none)')}`);
+      console.log(`    queue status     : ${C.green(queued.status)}  ${C.dim('(variant: ' + queued.resumeVariant + ')')}`);
       console.log(`    event log        : ${C.dim(store.eventStore().readAll().events.map((e) => e.type).join(' → '))}`);
     }
 
-    if (t.phase === 'queued') {
+    if (queued) {
+      const t = { application: queued } as const;
       // ── STAGE 2: apply pass 1 (no approval) — abstain on the unknown ──────────
       console.log(`\n  ${C.bold('APPLY pass 1')}      ${C.dim('(autonomous, no approval)')}`);
       const a1 = await orch.apply(t.application);
@@ -313,8 +328,8 @@ async function main(): Promise<void> {
   const pass = sourcingOk && queuedOk && needsInputOk && submittedOk && oneLogOk;
   console.log(`\n${'═'.repeat(64)}`);
   console.log(C.bold('  SCORECARD'));
-  console.log(`  ${sourcingOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  SOURCING — fresh + on-term gates`);
-  console.log(`  ${queuedOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  TAILOR   — verify-or-abstain → Ready app with a real PDF`);
+  console.log(`  ${sourcingOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  SOURCING — SourcingPipeline drops stale + off-term before tailoring`);
+  console.log(`  ${queuedOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  TAILOR   — M6 verify-or-abstain → Ready app with a real PDF`);
   console.log(`  ${needsInputOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  APPLY 1  — abstain on the unknown, notify, log (human touchpoint)`);
   console.log(`  ${submittedOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  APPLY 2  — resume → verify → gated submit + receipt`);
   console.log(`  ${oneLogOk ? C.green('PASS ✓') : C.red('FAIL ✗')}  ONE LOG  — tailor + apply events, one log, joined by appId\n`);
