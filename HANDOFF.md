@@ -25,25 +25,31 @@ core runs the real entry point, not just demos.
   `appIdFor(company, role)`. `PortalRouter` = support authority; `PlaywrightApplySessionFactory`
   + `GreenhouseBoardJobProvider` = the thin IO edge (abstain before opening a browser).
 
-## The integrated entry point (NEW — use this, not legacy apply)
-- **`npm run run`** — drives the Ready queue through the Orchestrator: fill + INDEPENDENT
-  verify, STOP at ready_to_submit. **Never submits without `--approve`.**
-  - `npm run run -- --approve` — submit each job that verifies green (Parv's "button click";
-    still gated on a verified verdict + idempotency).
-  - `npm run run -- --tailor` — re-tailor with the M6 Tailor (verify-or-abstain) before applying.
-  - `--batch N` (default 5), `--job ID`, `--stats`.
-  - Needs config/profile.yml + config/answers.yml (gitignored, present on Parv's machine).
-- Legacy `npm run pipeline` (sourcing -> queue) and `npm run apply` (v1 handlers) still exist
-  as a fallback but are NOT the v2 path.
+## The coherent v2 flow (use these three commands)
+1. **`npm run scan`** — find jobs (board APIs + scrapers) into the `data/daily_log` cache.
+2. **`npm run source`** — freshness + term + score gates, then **M6 verify-or-abstain tailoring**
+   into the Ready queue (SourcingPipeline + Orchestrator). The queue is M6-quality by default.
+   - `--dry-run` previews the gates without tailoring; `--all-days`, `--limit N`.
+3. **`npm run run`** — drive the Ready queue through the Orchestrator: fill + INDEPENDENT
+   verify, STOP at ready_to_submit. **Never submits without `--approve`.**
+   - `npm run run -- --approve` — submit each job that verifies green (Parv's "button click";
+     gated on a verified verdict + idempotency).
+   - `npm run run -- --tailor` — re-tailor with M6 before applying (use if the queue was
+     populated by the legacy pipeline).
+   - `--batch N` (default 5), `--job ID`, `--stats`.
+- Needs config/profile.yml + config/answers.yml + config/scoring.yml + cv/ (gitignored,
+  present on Parv's machine).
+- Legacy `npm run pipeline` (v1 tailoring) and `npm run apply` (v1 handlers) remain as a
+  fallback but are NOT the v2 path.
 
 ## Verify the state (run these)
-- `npm run typecheck` (clean) and `npx vitest run` (306 passed / 37 skipped / 0 failed as of 2026-06-16).
-- `npm run demo:integration` — THE integration proof: one Orchestrator, sourced fixture ->
-  freshness+term -> M6 tailor (real PDF) -> queue -> apply (fixture portal) -> notify/resume ->
-  gated submit; ONE event log (queued→abstained→fill_verified→submitted→confirmed), one appId,
-  final status Applied. 5/5 green.
+- `npm run typecheck` (clean) and `npx vitest run` (328 passed / 37 skipped / 0 failed as of 2026-06-16).
+- `npm run demo:integration` — THE integration proof: one Orchestrator drives the REAL
+  SourcingPipeline over a 3-job batch (a stale + an off-term job dropped before tailoring) ->
+  M6 tailor (real PDF) -> queue -> apply (fixture portal) -> notify/resume -> gated submit;
+  ONE event log (queued→abstained→fill_verified→submitted→confirmed), one appId, status Applied. 5/5.
 - `npm run demo:autopilot` (Workday+Greenhouse fixtures), `npm run demo:tailor`, `npm run demo:workday`.
-- `npm run run -- --stats` — queue breakdown from the live event-log store.
+- `npm run run -- --stats` (live queue breakdown) and `npm run source -- --dry-run` (sourcing preview).
 - Playwright Chromium installed. Demos/tests use stubs/fixtures, no real PII.
 
 ## Hard rules (always)
@@ -53,14 +59,18 @@ core runs the real entry point, not just demos.
 - Writing style: no em dashes, no AI filler. Profile facts only from profile.yml.
 - Tests green before commit. Commit per feature. Adversarial review before done.
 
-## What's left / next candidates (no longer a "milestone gap")
-1. **Production tailor-side rewire (optional):** `npm run pipeline` still queues with v1 tailoring.
-   `npm run run -- --tailor` already re-tailors with M6 before applying, so the v2 PDF is used at
-   apply time; rewiring the pipeline itself needs a per-job cover-letter-data source decision
-   (the M6 CoverLetterBuilder needs grounded paragraphs; resume tailoring needs none).
-2. **Lever/Ashby FormSources** (~one file each) -> register in PortalRouter to widen apply coverage.
-3. **Live Greenhouse board-fetch** is wired (GreenhouseBoardJobProvider) but unexercised in-loop
-   (needs network + a real posting). Verify against one real Greenhouse posting on Parv's machine.
+## What's left / next candidates (no remaining "milestone gap")
+1. **Live verification on Parv's machine** (the only thing that can't run in-loop — needs real
+   profile/creds/network): run `npm run source -- --dry-run` then a single real `npm run run --job <id>`
+   (no --approve) against one fresh posting to confirm the live fill/read-back; then `--approve`.
+   The live Greenhouse board-fetch (GreenhouseBoardJobProvider) is wired but only exercised here.
+2. **Cover letters in the sourcing path**: `npm run source` tailors the RESUME (ATS-critical) via M6;
+   cover letters are skipped there (the M6 CoverLetterBuilder needs grounded per-job paragraphs).
+   Decide a grounded cover-data source if cover letters should be auto-generated at sourcing time.
+3. **Lever/Ashby FormSources** (~one file each) -> register in PortalRouter to widen apply coverage.
+4. **v1 legacy** (old scrape-scanners feed the cache; old handlers/pipeline are fallback) is the
+   remaining untested surface, kept deliberately for sourcing reach + fallback. Retire per-portal as
+   v2 FormSources land.
 
 ## Map (key entry points)
 - Integration: src/orchestrator/{Orchestrator,PortalRouter,PlaywrightApplySessionFactory,
