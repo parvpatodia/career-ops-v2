@@ -33,3 +33,10 @@ export function countTerm(text: string, term: string): number {
   if (!term) return 0;
   return (text.match(tokenRegex(term, 'gi')) || []).length;
 }
+
+const PLACEHOLDER_RE = /\{\{\s*[\w.]+\s*\}\}/g;
+
+/** The distinct unfilled {{placeholder}} tokens left in a rendered document. */
+export function leakedPlaceholders(s: string): string[] {
+  return [...new Set(s.match(PLACEHOLDER_RE) ?? [])];
+}

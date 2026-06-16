@@ -18,7 +18,7 @@
  * with the maker about whether a keyword "appears".
  */
 
-import { containsTerm } from './text.js';
+import { containsTerm, leakedPlaceholders } from './text.js';
 
 export interface ContactFacts {
   name: string;
@@ -54,7 +54,6 @@ export interface VerifyResumeInput {
 // render step (thin IO); this is the deterministic pure proxy that catches a
 // resume that ballooned before we ever launch a browser.
 const DEFAULT_MAX_VISIBLE_CHARS = 7000;
-const PLACEHOLDER_RE = /\{\{\s*[\w.]+\s*\}\}/g;
 
 export class ResumeVerifier {
   verify(input: VerifyResumeInput): ResumeVerdict {
@@ -103,7 +102,7 @@ export class ResumeVerifier {
     }
 
     // 4. No leaked template placeholder.
-    const leaked = [...new Set(html.match(PLACEHOLDER_RE) ?? [])];
+    const leaked = leakedPlaceholders(html);
     checks.push({
       name: 'no-placeholder',
       pass: leaked.length === 0,
