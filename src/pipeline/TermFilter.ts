@@ -79,10 +79,17 @@ export class TermFilter {
     // bigram: the bigram is the more specific signal ("Spring 2026" is off-term
     // even though 2026 is a target YEAR), so the bare 2026 must not relabel it
     // as on-target.
+    //
+    // A bare year only marks OFF when it is PAST a target year. A bare FUTURE
+    // year in a title is ambiguous ("Class of 2027", "apply by 2027" — a
+    // deadline or grad class, not a term) and must NOT exclude a good role.
+    // An explicit future TERM ("Fall 2027") is still caught by the bigram path.
+    const minYear = this.years.size > 0 ? Math.min(...this.years) : 0;
     const titleNoBigrams = title.replace(SEASON_YEAR, ' ');
     for (const m of titleNoBigrams.matchAll(YEAR)) {
-      if (this.years.has(Number(m[1]))) target = true;
-      else off = true;
+      const year = Number(m[1]);
+      if (this.years.has(year)) target = true;
+      else if (year < minYear) off = true;
     }
 
     return off && !target;

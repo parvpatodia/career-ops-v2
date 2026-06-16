@@ -17,8 +17,20 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
-import { htmlToText } from './GreenhouseBoardScanner.js';
+import { decodeEntities } from './GreenhouseBoardScanner.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
+
+/**
+ * Lever serves list content as SINGLE-escaped HTML (unlike Greenhouse's
+ * double-escaped content). Strip the real tags FIRST, then decode entities
+ * ONCE. Decoding first (the Greenhouse double-decoder) would turn a literal
+ * "&lt;" into "<" before the tag-stripper ran, and the stripper would then eat
+ * "if a < b" down to "if a" — silently dropping JD text.
+ */
+export function leverHtmlToText(html: string): string {
+  const stripped = html.replace(/<[^>]+>/g, ' ');
+  return decodeEntities(stripped).replace(/\s+/g, ' ').trim();
+}
 
 interface LeverPosting {
   id: string;
@@ -134,7 +146,7 @@ export class LeverBoardScanner extends Scanner {
     if (p.descriptionPlain) parts.push(p.descriptionPlain.trim());
     for (const l of p.lists ?? []) {
       const heading = (l.text ?? '').trim();
-      const body = htmlToText(l.content ?? '');
+      const body = leverHtmlToText(l.content ?? '');
       if (body) parts.push(heading ? `${heading}: ${body}` : body);
     }
     return parts.join('\n').replace(/\s+\n/g, '\n').trim();
