@@ -153,6 +153,46 @@ export class ProfileLoader {
     };
   }
 
+  // ── Grounding material for the essay writer (real facts, never fabricated) ──
+
+  getNarrative(): { superpower: string; excites: string; bestAchievement: string } {
+    const n = (this.raw['narrative'] ?? {}) as Record<string, unknown>;
+    return {
+      superpower: String(n['superpower'] ?? ''),
+      excites: String(n['excites'] ?? ''),
+      bestAchievement: String(n['best_achievement'] ?? ''),
+    };
+  }
+
+  getProjects(): Array<{ name: string; summary: string; stack: string[] }> {
+    const p = (this.raw['projects'] ?? {}) as Record<string, unknown>;
+    return Object.values(p).map((v) => {
+      const proj = (v ?? {}) as Record<string, unknown>;
+      return {
+        name: String(proj['name'] ?? ''),
+        summary: String(proj['summary'] ?? ''),
+        stack: Array.isArray(proj['stack']) ? (proj['stack'] as unknown[]).map(String) : [],
+      };
+    }).filter((p) => p.name);
+  }
+
+  getExperience(): Array<{ role: string; company: string }> {
+    const e = this.raw['experience'];
+    if (!Array.isArray(e)) return [];
+    return e.map((v) => {
+      const x = (v ?? {}) as Record<string, unknown>;
+      return { role: String(x['role'] ?? ''), company: String(x['company'] ?? '') };
+    }).filter((x) => x.role);
+  }
+
+  /** Flat list of the candidate's real skills/domains, for JD keyword matching. */
+  getSkills(): string[] {
+    const s = (this.raw['skills'] ?? {}) as Record<string, unknown>;
+    const out: string[] = [];
+    for (const v of Object.values(s)) if (Array.isArray(v)) out.push(...(v as unknown[]).map(String));
+    return out;
+  }
+
   getApplicationDefaults(): ApplicationDefaults {
     const d = (this.raw['application_defaults'] ?? {}) as Record<string, unknown>;
     const tr = (this.raw['target_roles'] ?? {}) as Record<string, unknown>;
