@@ -1,16 +1,45 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-16.
+> Read at session start (CLAUDE.md load order). Last updated 2026-06-16 (M6 done).
 > Branch: feat/v2-foundation. MODE: BUILD.
 
 ## Next milestone (start here)
-**M6: resume + cover-letter tailoring.** Full brief: `docs/specs/M6-tailoring.md`.
-This is the only remaining major subsystem. Start by reading that spec, then
-`LESSONS.md`, then the existing tailor code (`src/tailor/*`, `src/pdf/PdfGenerator.ts`).
-Apply the same discipline that built M3-M5: maker/checker split, verify-or-abstain,
+**M6 tailoring is DONE and green** (this session, see below). All major subsystems
+(M3 apply engine, M4 multi-portal, M5 sourcing, M6 tailoring) now exist. Remaining
+work is integration + going live, not a new subsystem:
+- Drop Parv's REAL cv/ files (master.md + variants) and config/profile.yml on the
+  dev machine; run `npm run prep` to pre-render variant PDFs. The tailor + apply
+  engine then run against real data (tests/demos stay on fixtures, no PII).
+- Wire `Tailor.tailor()` output (pdfPath/coverLetterPath, gated on `verified`)
+  into the batch/apply flow so a tailored, verified resume feeds Autopilot.
+- Then a small end-to-end: scan -> evaluate -> tailor (verify) -> apply (verify).
+Apply the same discipline throughout: maker/checker split, verify-or-abstain,
 pure core + thin IO, one feature at a time gated on typecheck + vitest, adversarial
 review before "done", honest evidence (command + output), append LESSONS.
 
-## What is DONE and working (M3-M5, this session 2026-06-16)
+## What is DONE and working (M6 tailoring, this session 2026-06-16)
+- **Pipeline:** `Tailor.tailor(job, evaluation, coverLetterData?)` runs
+  extract -> no-fabrication inject -> render -> VERIFY -> PDF (only if green,
+  2-page budget). `Tailor.tailorResume` is the pure, browser-free stage.
+- **Pure core (unit-tested, src/tailor/):** `KeywordExtractor` (full JD ->
+  ranked/deduped keywords, abstains on a stub), `InjectionPlanner` (injects a
+  keyword ONLY if attested in master.md and missing from the variant, into the
+  skills enumeration; never alters a claim; skips + surfaces the rest), `text.ts`
+  (one whole-token matcher shared so extractor/planner/verifier can't drift).
+- **Maker/checker:** `ResumeRenderer` (markdown + ContactFacts -> HTML, fills
+  every placeholder; contact from profile.yml only) vs `ResumeVerifier` (parses
+  output back: structural floor >= 3 sections, contact matches profile, claimed
+  keywords appear, no leaked {{placeholder}}, page budget; mutation-tested).
+  `CoverLetterBuilder` vs `CoverLetterVerifier` (extended FORBIDDEN_PHRASES, em
+  dash, names company+role, grounded, no placeholder) -> build ABSTAINS (writes
+  nothing) on any failure.
+- **Thin IO:** `PdfGenerator.htmlToPdf` (Playwright, returns pageCount+bytes,
+  absolute font paths + ATS Unicode normalization). Template `cv-template.html`
+  reworked to a {{BODY}} slot + {{CONTACT_ROW}} (the pre-M6 template leaked
+  placeholders into every PDF). `npm run prep` (PrepareResumes) rewired onto it.
+- **Demo:** `npm run demo:tailor` — fixture profile/CV, GREEN (verify->PDF+cover)
+  and ABSTAIN (over-budget rejected) both PASS, exit 0.
+
+## What is DONE and working (M3-M5, prior session 2026-06-16)
 - **Apply engine (M3, M3.5):** verify-or-abstain form filling. Build an exact
   IntentPayload before any browser mutation, fill, then an INDEPENDENT read-back
   is diffed by the Verifier; unknown/legal/EEO/unmatched -> abstain. Autopilot
@@ -29,7 +58,8 @@ review before "done", honest evidence (command + output), append LESSONS.
   excludes only provably off-term) gate the pipeline before queueing.
 
 ## Verify the state (run these)
-- `npm run typecheck` (clean) and `npx vitest run` (226 passed / 43 skipped / 0 failed as of 2026-06-16).
+- `npm run typecheck` (clean) and `npx vitest run` (280 passed / 37 skipped / 0 failed as of 2026-06-16, M6 done).
+- `npm run demo:tailor` — fixture profile/CV: tailor->verify->PDF+cover (GREEN) and over-budget rejection (ABSTAIN), both PASS.
 - `npm run demo:autopilot` — Workday + Greenhouse fixtures: abstain->notify->resume->verify->submit (fixture), 2/2.
 - `npm run demo:workday` — single-portal verify demo.
 - Playwright Chromium is installed. config/profile.yml + config/answers.yml are
