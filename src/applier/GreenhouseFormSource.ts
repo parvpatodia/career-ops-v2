@@ -60,7 +60,18 @@ export class GreenhouseFormSource implements AtsFormSource {
     return fillControl(this.page, this.locate(intent.field.id), intent);
   }
 
-  readBack(field: FormField): Promise<string | null> {
+  async readBack(field: FormField): Promise<string | null> {
+    if (field.type === 'file') {
+      // The react uploader REMOVES the <input> after attach and renders the
+      // chosen filename in a .body__secondary element. Read that text so the
+      // Verifier's basename check can confirm the upload (the input is gone).
+      const texts = await this.page
+        .locator('[class*="body__secondary"]')
+        .allInnerTexts()
+        .catch(() => [] as string[]);
+      const joined = texts.join(' ').trim();
+      return joined.length > 0 ? joined : null;
+    }
     return readControl(this.locate(field.id), field);
   }
 

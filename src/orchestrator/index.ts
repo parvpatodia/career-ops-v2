@@ -61,9 +61,13 @@ function reportApply(app: Application, result: ApplyGateResult): void {
       for (const p of result.pending) console.log(`       • "${p.label}"`);
       console.log(`     Answer them (config/answers.learned.yml is written on resolve), then re-run.`);
       break;
-    case 'verify_failed':
-      console.log(`  ❌ VERIFY FAILED — read-back did not match; NOT submitted. Review the form.`);
+    case 'verify_failed': {
+      console.log(`  ❌ VERIFY FAILED — read-back did not match; NOT submitted. Mismatches:`);
+      for (const c of result.verdict.checks.filter((c) => !c.pass)) {
+        console.log(`       • ${c.label}: wanted "${String(c.expected).slice(0, 50)}" got "${String(c.actual).slice(0, 50)}"`);
+      }
       break;
+    }
     case 'auth_required':
       console.log(`  🔒 AUTH REQUIRED — log in / solve the captcha, then re-run (it resumes).`);
       break;

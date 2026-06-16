@@ -178,15 +178,35 @@ export class IntentPayloadBuilder {
     skipped: FormField[],
     reasons: AbstainReason[]
   ): void {
-    if (resumePdfPath && fs.existsSync(resumePdfPath)) {
-      intents.push({ field, value: resumePdfPath, source: 'resume-file', confidence: 'high' });
+    // Only the resume/CV upload gets the resume PDF. A cover-letter, transcript,
+    // or writing-sample file field must NOT receive the resume (that was filling
+    // the wrong document); skip it when optional, abstain when required.
+    const tag = norm(`${field.label} ${field.id}`);
+    const isResume = /\b(resume|cv|curriculum)\b/.test(tag) && !tag.includes('cover');
+
+    if (isResume) {
+      if (resumePdfPath && fs.existsSync(resumePdfPath)) {
+        intents.push({ field, value: resumePdfPath, source: 'resume-file', confidence: 'high' });
+        return;
+      }
+      if (field.required) {
+        reasons.push({
+          fieldId: field.id,
+          label: field.label,
+          why: resumePdfPath ? `resume PDF missing on disk: ${resumePdfPath}` : 'resume PDF missing (no path provided)',
+        });
+      } else {
+        skipped.push(field);
+      }
       return;
     }
+
+    // Non-resume document upload: not auto-attached.
     if (field.required) {
       reasons.push({
         fieldId: field.id,
         label: field.label,
-        why: resumePdfPath ? `resume PDF missing on disk: ${resumePdfPath}` : 'resume PDF missing (no path provided)',
+        why: `file upload "${field.label}" required but no matching document is wired (only the resume is auto-attached)`,
       });
     } else {
       skipped.push(field);

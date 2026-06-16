@@ -78,6 +78,14 @@ export class Verifier {
     if (intent.field.type === 'file') {
       return actual.includes(path.basename(intent.value));
     }
+    if (intent.field.type === 'phone' || /\b(phone|mobile|telephone|cell)\b/i.test(intent.field.label)) {
+      // Forms reformat phone numbers (strip dashes, add +1). Compare by digits:
+      // "408-401-9856" filled, read back "4084019856" is the SAME number.
+      const digits = (s: string) => s.replace(/\D/g, '');
+      const a = digits(actual);
+      const e = digits(intent.value);
+      return a === e || a.endsWith(e) || e.endsWith(a);
+    }
     if (intent.field.type === 'checkbox') {
       // A checkbox is boolean: the read-back ("Yes"/"No") matches the intent
       // when both sides agree on affirmed-ness, not byte-for-byte.
