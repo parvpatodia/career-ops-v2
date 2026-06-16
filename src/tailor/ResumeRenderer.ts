@@ -89,8 +89,9 @@ export class ResumeRenderer {
         closeList();
         out.push(`<h2>${renderer.escapeHtml(line.slice(3))}</h2>`);
       } else if (line.startsWith('# ')) {
+        // Drop a top-level H1: the candidate name comes from profile.yml in the
+        // header, never from the body, so a stray "# Name" must not duplicate it.
         closeList();
-        out.push(`<h1>${renderer.escapeHtml(line.slice(2))}</h1>`);
       } else if (line.startsWith('- ')) {
         if (!inList) { out.push('<ul>'); inList = true; }
         out.push(`<li>${renderer.renderInline(line.slice(2))}</li>`);

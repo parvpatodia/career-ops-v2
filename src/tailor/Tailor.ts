@@ -157,7 +157,10 @@ export class Tailor {
       tailoredResumePath: resume.tailoredResumePath,
       pdfPath,
       coverLetterPath,
-      verified: resume.verified,
+      // "verified" means end-to-end shippable: the ResumeVerifier passed AND a
+      // PDF was rendered within budget. A PDF-render failure abstains too, so we
+      // never report verified:true alongside an abstainReason.
+      verified: resume.verified && !!pdfPath,
       abstainReason,
       tailoredAt: new Date().toISOString(),
     };

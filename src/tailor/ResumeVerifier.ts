@@ -55,13 +55,29 @@ export interface VerifyResumeInput {
 // resume that ballooned before we ever launch a browser.
 const DEFAULT_MAX_VISIBLE_CHARS = 7000;
 
+// A real resume has at least a summary, experience, education, and skills. The
+// per-section presence check below is true-by-construction for sections that
+// came from the same markdown (a regression guard), so this independent
+// structural floor is what actually catches a near-empty / malformed CV (e.g.
+// one with no "## " headers, which would otherwise leak its raw preamble).
+const MIN_SECTIONS = 3;
+
 export class ResumeVerifier {
   verify(input: VerifyResumeInput): ResumeVerdict {
     const { renderedHtml, identity, requiredSections, claimedKeywords } = input;
     const html = renderedHtml ?? '';
     const checks: ResumeCheck[] = [];
 
-    // 1. Required sections present.
+    // 1a. Structural floor: the resume must have real section structure. This
+    // is independent of the rendered markdown, so it genuinely fails on an
+    // empty / header-less CV instead of passing vacuously.
+    checks.push({
+      name: 'section-count',
+      pass: requiredSections.length >= MIN_SECTIONS,
+      detail: `${requiredSections.length} sections (need >= ${MIN_SECTIONS})`,
+    });
+
+    // 1b. Each declared section survived into the output (render regression guard).
     for (const section of requiredSections) {
       const present = this.htmlIncludes(html, section);
       checks.push({
