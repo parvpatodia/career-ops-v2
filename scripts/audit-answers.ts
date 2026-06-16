@@ -13,6 +13,7 @@ import 'dotenv/config';
 import { ProfileLoader } from '../src/applier/ProfileLoader.js';
 import { AnswerGenerator } from '../src/applier/AnswerGenerator.js';
 import { AnswerKB, CompositeAnswerSource } from '../src/applier/AnswerKB.js';
+import { EssayAnswerSource } from '../src/applier/EssayAnswerSource.js';
 import { IntentPayloadBuilder } from '../src/applier/IntentPayload.js';
 import type { FormField } from '../src/applier/IntentPayload.js';
 import type { AnswerContext } from '../src/applier/AnswerGenerator.js';
@@ -64,7 +65,11 @@ const QUESTIONS: FormField[] = [
 
 function main(): void {
   const profile = new ProfileLoader();
-  const answers = new CompositeAnswerSource([new AnswerKB(), new AnswerGenerator(profile)]);
+  const answers = new CompositeAnswerSource([
+    new AnswerKB(),
+    new EssayAnswerSource(profile),
+    new AnswerGenerator(profile),
+  ]);
   const builder = new IntentPayloadBuilder(answers);
   const ctx: AnswerContext = { company: 'Acme Robotics', role: 'Machine Learning Engineer Intern' };
 

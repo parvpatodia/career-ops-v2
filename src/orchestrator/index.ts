@@ -31,6 +31,7 @@ import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
 import { AnswerKB, CompositeAnswerSource } from '../applier/AnswerKB.js';
 import { AnswerGenerator } from '../applier/AnswerGenerator.js';
+import { EssayAnswerSource } from '../applier/EssayAnswerSource.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Orchestrator } from './Orchestrator.js';
@@ -132,8 +133,17 @@ async function main(): Promise<void> {
 
   const inbox = new AnswerInbox();
   const notifier = new Notifier();
+  // Order: human-approved KB, then learned answers, then company-specific essay
+  // generation, then the standard generator. Essays come before the generator
+  // so a "why this company" question gets a grounded tailored answer instead of
+  // the generator's needsReview template.
   const answers = (): AnswerSource =>
-    new CompositeAnswerSource([new AnswerKB(), inbox.learnedSource(), new AnswerGenerator(profileLoader!)]);
+    new CompositeAnswerSource([
+      new AnswerKB(),
+      inbox.learnedSource(),
+      new EssayAnswerSource(profileLoader!),
+      new AnswerGenerator(profileLoader!),
+    ]);
 
   const headless = process.env.CAREER_OPS_HEADLESS === '1';
   const browser = await chromium.launch({ headless });
