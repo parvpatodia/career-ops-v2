@@ -89,7 +89,8 @@ export interface AdvanceOptions {
 }
 
 export interface OrchestratorDeps {
-  tailor: TailorStep;
+  /** Required for tailorAndQueue/advance; an apply-only run can omit it. */
+  tailor?: TailorStep;
   apps: ApplicationStore;
   notifier: Notifier;
   inbox: AnswerInbox;
@@ -112,6 +113,7 @@ export class Orchestrator {
     coverData?: CoverLetterData
   ): Promise<TailorGateResult> {
     const { tailor, apps, notifier } = this.deps;
+    if (!tailor) throw new Error('Orchestrator.tailorAndQueue requires a TailorStep dep');
     const appId = appIdFor(job.company, job.title);
 
     if (apps.eventStore().projection().isSubmitted(appId)) {
