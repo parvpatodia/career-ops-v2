@@ -1,72 +1,69 @@
 /**
- * WorkdayAdapter: the verify-or-abstain orchestrator for Workday. This is the
- * "browser glue" M2 deferred, built behind a driver interface so the wiring
- * (scan -> map -> build intent -> fill -> read back -> verify -> record) is
- * unit-testable without a real browser.
+ * Workday binding for the ATS-agnostic verify-or-abstain core
+ * (ApplicationAdapter). The orchestration lives in ApplicationAdapter; this
+ * file only adapts Workday's DOM scan + mapper to the shared AtsFormSource.
  *
- * Order of trust (AGENTS.md invariants 1 and 2):
- * 1. Build the exact IntentPayload BEFORE any fill mutation. If anything is
- *    unknown, low-confidence, legal/EEO without a human-approved answer, or a
- *    required field has an unknown widget -> ABSTAIN, and no field is ever
- *    filled (we stop before the first browser mutation).
- * 2. After filling, an INDEPENDENT read-back of every field is diffed against
- *    the payload by the Verifier (which never saw the fill). One mismatch =
- *    verify_failed.
+ * WHY the split: the fill+verify logic is identical for every portal; only
+ * schema discovery and selectors differ. Workday and Greenhouse share one
+ * tested core, differing only in their FormSource.
  *
- * NEVER SUBMITS. There is no submit method on WorkdayPageDriver, so submission
- * is structurally impossible here, not merely skipped (this session's hard
- * constraint). A green verify yields outcome `verified` = "human must review
- * and click Submit". Re-enabling submission (under AGENTS.md batch-approval +
- * verifier-green + receipt) is a deliberate future increment.
+ * NEVER SUBMITS: WorkdayPageDriver (and AtsFormSource) have no submit method,
+ * so the filler is structurally unable to submit. Submission is the Autopilot's
+ * gated job.
  */
 
 import { WorkdaySchemaMapper } from './WorkdaySchemaMapper.js';
-import type { WorkdayRawField, WorkdayEeoField, WorkdayUnmappedField } from './WorkdaySchemaMapper.js';
-import { IntentPayloadBuilder } from './IntentPayload.js';
-import type { FieldIntent, FormField, AbstainReason, AnswerSource } from './IntentPayload.js';
-import type { AnswerContext } from './AnswerGenerator.js';
-import { Verifier } from './Verifier.js';
-import type { ReadBackValue, VerifierVerdict } from './Verifier.js';
+import type { WorkdayRawField } from './WorkdaySchemaMapper.js';
+import type { FieldIntent, FormField, AnswerSource } from './IntentPayload.js';
+import type { Verifier } from './Verifier.js';
 import type { SubmissionRecorder } from './SubmissionRecorder.js';
+import { ApplicationAdapter } from './ApplicationAdapter.js';
+import type { AtsFormSource, NormalizedSchema, ApplicationOutcome } from './ApplicationAdapter.js';
+
+/** Back-compat alias: the Workday outcome is the generic application outcome. */
+export type WorkdayOutcome = ApplicationOutcome;
 
 /**
- * The narrow surface the orchestrator needs from a live page. Deliberately
- * has NO submit method: the never-submit guarantee is enforced by the type,
- * not by remembering not to call it.
+ * The narrow, submit-free page surface a Workday driver exposes to the schema
+ * source. scan() returns raw DOM descriptors; interpretation is the mapper's.
  */
 export interface WorkdayPageDriver {
-  /** True when a Workday sign-in / create-account wall blocks the form. */
   isAuthWall(): Promise<boolean>;
-  /** Raw field descriptors for the current wizard step (interpretation happens in the mapper). */
   scan(): Promise<WorkdayRawField[]>;
-  /** Set one field's value on the page. */
   fill(intent: FieldIntent): Promise<void>;
-  /** Read one field's current value back, or null if unreadable / empty. */
   readBack(field: FormField): Promise<string | null>;
 }
 
-export type WorkdayOutcome =
-  | { kind: 'auth_required' }
-  | {
-      kind: 'abstained';
-      reasons: AbstainReason[];
-      eeo: WorkdayEeoField[];
-      unmapped: WorkdayUnmappedField[];
-    }
-  | {
-      kind: 'verify_failed';
-      verdict: VerifierVerdict;
-      intents: FieldIntent[];
-      eeo: WorkdayEeoField[];
-    }
-  | {
-      kind: 'verified';
-      verdict: VerifierVerdict;
-      intents: FieldIntent[];
-      skipped: FormField[];
-      eeo: WorkdayEeoField[];
-      unmapped: WorkdayUnmappedField[];
+/** Adapts a Workday page driver + the DOM mapper to the ATS-agnostic source. */
+export class WorkdayFormSource implements AtsFormSource {
+  readonly ats = 'workday';
+
+  constructor(
+    private readonly driver: WorkdayPageDriver,
+    private readonly mapper: WorkdaySchemaMapper = new WorkdaySchemaMapper()
+  ) {}
+
+  isAuthWall(): Promise<boolean> {
+    return this.driver.isAuthWall();
+  }
+
+  async scanSchema(): Promise<NormalizedSchema> {
+    const s = this.mapper.map(await this.driver.scan());
+    return {
+      fields: s.fields.map((f) => f.field),
+      eeo: s.eeo.map((e) => ({ id: e.automationId, label: e.label })),
+      unmapped: s.unmapped.map((u) => ({ id: u.automationId, label: u.label, required: u.required, widget: u.widget })),
     };
+  }
+
+  fill(intent: FieldIntent): Promise<void> {
+    return this.driver.fill(intent);
+  }
+
+  readBack(field: FormField): Promise<string | null> {
+    return this.driver.readBack(field);
+  }
+}
 
 export interface WorkdayAdapterOptions {
   /** 12-hex app id (events.appIdFor). Required for event recording to happen. */
@@ -77,82 +74,12 @@ export interface WorkdayAdapterOptions {
   verifier?: Verifier;
 }
 
-export class WorkdayAdapter {
-  constructor(
-    private readonly driver: WorkdayPageDriver,
-    private readonly answers: AnswerSource,
-    private readonly opts: WorkdayAdapterOptions = {}
-  ) {}
-
-  async run(ctx: AnswerContext, resumePdfPath?: string): Promise<WorkdayOutcome> {
-    if (await this.driver.isAuthWall()) return { kind: 'auth_required' };
-
-    const mapper = this.opts.mapper ?? new WorkdaySchemaMapper();
-    const verifier = this.opts.verifier ?? new Verifier();
-    const builder = new IntentPayloadBuilder(this.answers);
-
-    const schema = mapper.map(await this.driver.scan());
-    const payload = builder.build(schema.fields.map((f) => f.field), ctx, resumePdfPath);
-
-    // A required field whose widget the mapper does not understand cannot be
-    // filled safely; it must abstain (Greenhouse mapper's "required unmapped
-    // must abstain upstream", enforced here rather than hoped for).
-    const unmappedReasons: AbstainReason[] = schema.unmapped
-      .filter((u) => u.required)
-      .map((u) => ({
-        fieldId: u.automationId,
-        label: u.label,
-        why: `unknown field widget "${u.widget}" — cannot fill safely`,
-      }));
-
-    const reasons = [...payload.reasons, ...unmappedReasons];
-
-    // A form with nothing to fill cannot be "verified": verifying zero fields
-    // returns pass:true vacuously (every() over []), which would be a false
-    // green and a latent empty submission once submission is re-enabled. Treat
-    // it as an abstain — the page may not have hydrated, or every field is
-    // EEO/unknown, both of which need a human.
-    if (reasons.length === 0 && payload.intents.length === 0) {
-      reasons.push({
-        fieldId: '(form)',
-        label: 'application form',
-        why: 'no fillable fields detected to verify (page may not have loaded, or all fields are EEO/unknown)',
-      });
-    }
-
-    // Abstain BEFORE the first fill: no browser mutation happens on any
-    // uncertain form. EEO + unmapped fields are surfaced for the human.
-    if (reasons.length > 0) {
-      this.record((r, appId) => r.recordAbstain(appId, reasons));
-      return { kind: 'abstained', reasons, eeo: schema.eeo, unmapped: schema.unmapped };
-    }
-
-    for (const intent of payload.intents) await this.driver.fill(intent);
-
-    const readBacks: ReadBackValue[] = [];
-    for (const intent of payload.intents) {
-      readBacks.push({ fieldId: intent.field.id, actual: await this.driver.readBack(intent.field) });
-    }
-
-    const verdict = verifier.verify(payload.intents, readBacks);
-    // Recorded for both outcomes: pass=false is the honest record of a fill
-    // that failed read-back, not a submission.
-    this.record((r, appId) => r.recordFillVerified(appId, verdict));
-
-    if (!verdict.pass) {
-      return { kind: 'verify_failed', verdict, intents: payload.intents, eeo: schema.eeo };
-    }
-    return {
-      kind: 'verified',
-      verdict,
-      intents: payload.intents,
-      skipped: payload.skipped,
-      eeo: schema.eeo,
-      unmapped: schema.unmapped,
-    };
-  }
-
-  private record(fn: (r: SubmissionRecorder, appId: string) => void): void {
-    if (this.opts.recorder && this.opts.appId) fn(this.opts.recorder, this.opts.appId);
+export class WorkdayAdapter extends ApplicationAdapter {
+  constructor(driver: WorkdayPageDriver, answers: AnswerSource, opts: WorkdayAdapterOptions = {}) {
+    super(new WorkdayFormSource(driver, opts.mapper), answers, {
+      ...(opts.appId !== undefined ? { appId: opts.appId } : {}),
+      ...(opts.recorder !== undefined ? { recorder: opts.recorder } : {}),
+      ...(opts.verifier !== undefined ? { verifier: opts.verifier } : {}),
+    });
   }
 }
