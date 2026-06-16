@@ -278,6 +278,23 @@ describe('Orchestrator', () => {
     expect(sent.some((n) => n.kind === 'abstain')).toBe(true);
   });
 
+  it('re-tailor without a new cover letter keeps the queued cover-letter path (review g)', async () => {
+    // First tailoring produces a cover letter and queues it.
+    const first = await make(verifiedTailoring({ coverLetterPath: '/tmp/cover.md' })).tailorAndQueue(JOB, EVAL);
+    expect(first.phase).toBe('queued');
+    if (first.phase === 'queued') expect(first.application.coverLetterPath).toBe('/tmp/cover.md');
+
+    // Re-tailor the SAME job with NO cover letter (the --tailor CLI path): the
+    // duplicate-queue branch must not drop the cover path already in the store.
+    const second = await make(verifiedTailoring()).tailorAndQueue(JOB, EVAL);
+    expect(second.phase).toBe('queued');
+    if (second.phase === 'queued') {
+      expect(second.application.pdfPath).toBe(resumePdf);
+      expect(second.application.coverLetterPath).toBe('/tmp/cover.md');
+    }
+    expect(apps.findByCompanyAndRole('Globex', 'ML Engineer Intern')?.coverLetterPath).toBe('/tmp/cover.md');
+  });
+
   it('idempotency: once submitted, a re-run short-circuits before re-tailoring', async () => {
     const sessions = new FakeSessionFactory(VERIFIED);
     const tailor = new FakeTailor(verifiedTailoring());
