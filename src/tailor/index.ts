@@ -56,17 +56,22 @@ async function main(): Promise<void> {
   }
 
   const tailor = new Tailor();
-  const result = tailor.tailor(job, evaluation);
+  const result = await tailor.tailor(job, evaluation);
 
   console.log('\n=== TAILORING RESULT ===');
   console.log(`Resume: ${result.tailoredResumePath}`);
   console.log(`Variant: ${result.resumeVariant}`);
+  console.log(`Verified: ${result.verified}  PDF: ${result.pdfPath ?? '(abstained)'}`);
+  if (result.abstainReason) console.log(`Abstain reason: ${result.abstainReason}`);
   if (result.injectedKeywords.length > 0) {
     console.log('\nKeywords injected:');
     for (const inj of result.injectedKeywords) {
       console.log(`  - "${inj.keyword}" at ${inj.location}`);
       console.log(`    WHY: ${inj.reason}`);
     }
+  }
+  if (result.skippedKeywords && result.skippedKeywords.length > 0) {
+    console.log(`\nKeywords skipped (no honest home): ${result.skippedKeywords.join(', ')}`);
   }
   if (result.coverLetterPath) {
     console.log(`\nCover letter: ${result.coverLetterPath}`);

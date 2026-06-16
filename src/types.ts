@@ -73,9 +73,12 @@ export interface TailoringResult {
   jobId: string;
   resumeVariant: ResumeVariant;
   injectedKeywords: KeywordInjection[];
+  skippedKeywords?: string[];   // JD keywords with no honest home (surfaced, not forced)
   tailoredResumePath: string;   // path to the .md file
-  pdfPath?: string;
+  pdfPath?: string;             // set ONLY when the resume verified and rendered
   coverLetterPath?: string;
+  verified?: boolean;           // resume passed the ResumeVerifier
+  abstainReason?: string;       // why a damaged/dishonest resume was not shipped
   tailoredAt: string;
 }
 
