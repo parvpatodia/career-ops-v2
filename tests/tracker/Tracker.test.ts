@@ -96,6 +96,19 @@ describe('ApplicationStore', () => {
     const md = fs.readFileSync(mdPath, 'utf8');
     expect(md).toContain('TestCo');
   });
+
+  it('exposes the SAME event log the queue view reads (single writer, M7)', () => {
+    const store = new ApplicationStore(jsonPath, mdPath);
+    store.add(makeApp());
+
+    // The apply engine writes a submit straight to the exposed log...
+    const appId = appIdFor('TestCo', 'ML Engineer Intern');
+    store.eventStore().append({ type: 'submitted', appId, payload: { appliedAt: '2026-06-16T00:00:00Z' } });
+
+    // ...and the queue view reflects it: one shared log, joined by appId.
+    expect(store.getById('001')?.status).toBe('Applied');
+    expect(store.eventStore().projection().isSubmitted(appId)).toBe(true);
+  });
 });
 
 describe('StatsEngine', () => {

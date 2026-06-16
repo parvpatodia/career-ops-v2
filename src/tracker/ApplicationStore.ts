@@ -45,6 +45,19 @@ export class ApplicationStore {
     this.events = new EventStore(path.join(path.dirname(jsonPath), 'events.jsonl'));
   }
 
+  /**
+   * The single locked event log behind this store. WHY exposed: the apply
+   * engine's SubmissionRecorder and idempotency check (M7 integration) must
+   * write the SAME log as the queue view, through ONE instance and ONE lock,
+   * so "single writer" (invariant 4) holds across tailoring and applying. Two
+   * EventStore instances on one path would each take the lock correctly, but
+   * sharing the instance keeps the parsed-event cache warm and the wiring
+   * provably single-source.
+   */
+  eventStore(): EventStore {
+    return this.events;
+  }
+
   /** Kept for API compatibility: regenerates both views from the log. */
   load(): void {
     this.persist(this.projection());
