@@ -14,6 +14,9 @@
     "source": "tsx src/orchestrator/source.ts",
     "audit:answers": "tsx scripts/audit-answers.ts",
     "inbox": "tsx src/inbox/index.ts",
+    "outreach:account": "tsx src/outreach/cli/account.ts",
+    "outreach:send": "tsx src/outreach/cli/send.ts",
+    "outreach:canary": "tsx src/outreach/cli/canary.ts",
     "mcp": "tsx src/mcp/server.ts",
     "demo": "tsx scripts/demo.ts",
     "demo:workday": "tsx scripts/demo-workday.ts",
@@ -24,7 +27,8 @@
     "expire": "tsx scripts/expire-stale.ts",
     "dashboard": "tsx scripts/dashboard.ts",
     "login": "tsx scripts/login.ts",
-    "pdf": "node generate-pdf.mjs"
+    "pdf": "node generate-pdf.mjs",
+    "secrets": "tsx src/secrets/index.ts"
   },
   "keywords": [
     "ai",
@@ -45,12 +49,14 @@
     "dotenv": "^16.4.5",
     "imapflow": "^1.4.1",
     "js-yaml": "^4.1.1",
+    "nodemailer": "^9.0.0",
     "playwright": "^1.58.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.19.43",
+    "@types/nodemailer": "^8.0.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^1.6.1"

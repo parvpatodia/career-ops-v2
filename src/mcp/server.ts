@@ -22,7 +22,17 @@ import type { ToolContext } from './tools.js';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
 import { fetchRecentHeaders, accountsFromEnv } from '../inbox/ImapClient.js';
+import { SecretVault, CredentialStore } from '../secrets/SecretVault.js';
 import { Tailor } from '../tailor/Tailor.js';
+
+// Email creds from the encrypted vault override .env (vault is the secure source).
+function loadCreds(): NodeJS.ProcessEnv {
+  try {
+    return { ...process.env, ...new CredentialStore(new SecretVault()).load() };
+  } catch {
+    return process.env;
+  }
+}
 
 // ── Build capabilities, guarding the ones that need profile/cv/creds ─────────
 function buildContext(): ToolContext {
@@ -30,7 +40,7 @@ function buildContext(): ToolContext {
     store: new ApplicationStore(),
     inbox: new AnswerInbox(),
     emailFetch: (acct) => fetchRecentHeaders(acct, 30),
-    accounts: accountsFromEnv(),
+    accounts: accountsFromEnv(loadCreds()),
   };
   // Tailoring needs config/profile.yml + cv/; only offer it if it constructs.
   try {
