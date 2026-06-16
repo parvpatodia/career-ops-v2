@@ -35,8 +35,13 @@ import type { ApplySession, ApplySessionFactory, OpenResult } from './Orchestrat
 
 const DEFAULT_GOTO_TIMEOUT_MS = 30_000;
 
-/** Supplies the Greenhouse boards-api job JSON (questions=true) for an application. */
-export type GreenhouseJobProvider = (app: Application) => Promise<Record<string, unknown>>;
+/**
+ * Supplies the Greenhouse boards-api job JSON (questions=true) for an
+ * application. Returns null when the schema cannot be obtained (URL unparseable,
+ * HTTP error, network down): the factory then abstains rather than open a page
+ * it cannot fill safely.
+ */
+export type GreenhouseJobProvider = (app: Application) => Promise<Record<string, unknown> | null>;
 
 /**
  * Shared session builder. Opens an isolated context+page, navigates, binds the
@@ -101,7 +106,12 @@ export class PlaywrightApplySessionFactory implements ApplySessionFactory {
         // No way to learn the field schema -> cannot fill safely -> abstain.
         return { ok: false, unsupported: true, ats: 'greenhouse (no board-job provider)' };
       }
-      greenhouseJob = await this.opts.greenhouseJob(app);
+      const fetched = await this.opts.greenhouseJob(app);
+      if (!fetched) {
+        // Schema fetch failed (bad URL / HTTP / network) -> abstain, no guess.
+        return { ok: false, unsupported: true, ats: 'greenhouse (board schema unavailable)' };
+      }
+      greenhouseJob = fetched;
     }
 
     const session = await buildSession(
