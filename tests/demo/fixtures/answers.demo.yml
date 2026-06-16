@@ -1,0 +1,9 @@
+# Demo AnswerKB for scripts/demo-autopilot.ts. NON-PII placeholders only.
+# Covers the answerable screening questions; the free-text GPU-kernel question
+# is intentionally absent so the demo abstains, notifies, and resumes once
+# answered. Personal identity fields are supplied by the demo's stub source.
+answers:
+  - match: ["authorized to work in the united states", "authorized to work"]
+    value: "Yes"
+  - match: ["earliest start date", "start date"]
+    value: "May 2026"
