@@ -15,10 +15,24 @@ interface LogEntry {
 
 export class Logger {
   private readonly module: string;
-  private static logDir = 'data/daily_log';
+  private static readonly DEFAULT_LOG_DIR = 'data/daily_log';
 
   constructor(module: string) {
     this.module = module;
+  }
+
+  // WHY env-resolved instead of a constructor path: Logger is instantiated at
+  // ~15 call sites as `new Logger('Name')`. Resolving the output dir (and a
+  // hard off switch) from the environment lets tests and sandboxes redirect or
+  // disable file logging process-wide without threading a path through every
+  // caller. LESSONS 2026-06-12: side-effecting classes must never write into
+  // the real data/ tree under test. tests/setup.ts sets CAREER_OPS_LOG_DISABLE.
+  private static fileLoggingDisabled(): boolean {
+    return process.env.CAREER_OPS_LOG_DISABLE === '1';
+  }
+
+  private static logDir(): string {
+    return process.env.CAREER_OPS_LOG_DIR ?? Logger.DEFAULT_LOG_DIR;
   }
 
   debug(msg: string, data?: unknown): void {
@@ -57,10 +71,12 @@ export class Logger {
     }
 
     // WHY: Append to daily log file for audit trail and efficiency reporting.
+    if (Logger.fileLoggingDisabled()) return;
     try {
+      const dir = Logger.logDir();
       const dateStr = new Date().toISOString().split('T')[0];
-      const logFile = path.join(Logger.logDir, `${dateStr}-ops.jsonl`);
-      fs.mkdirSync(Logger.logDir, { recursive: true });
+      const logFile = path.join(dir, `${dateStr}-ops.jsonl`);
+      fs.mkdirSync(dir, { recursive: true });
       fs.appendFileSync(logFile, JSON.stringify(entry) + '\n');
     } catch {
       // Non-fatal: if log directory isn't writable, skip file logging.
