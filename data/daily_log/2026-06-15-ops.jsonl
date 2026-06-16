@@ -1,0 +1,44 @@
+{"ts":"2026-06-15T23:57:52.243Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-15T23:57:52.245Z","level":"info","module":"MockScanner","msg":"Found 2 jobs on direct"}
+{"ts":"2026-06-15T23:57:52.247Z","level":"info","module":"MockScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-15T23:57:52.247Z","level":"info","module":"MockScanner","msg":"Found 0 jobs on direct"}
+{"ts":"2026-06-15T23:57:52.248Z","level":"info","module":"CountingScanner","msg":"Scanning direct...","data":{"keywords":["ML Engineer"],"location":"Bay Area"}}
+{"ts":"2026-06-15T23:57:52.248Z","level":"info","module":"CountingScanner","msg":"Found 1 jobs on direct"}
+{"ts":"2026-06-15T23:57:52.248Z","level":"info","module":"CountingScanner","msg":"Cache hit for direct, returning 1 jobs"}
+{"ts":"2026-06-15T23:57:52.255Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.257Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.258Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.258Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.258Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.258Z","level":"warn","module":"Testable","msg":"Board \"deadboard\": HTTP 404, skipping"}
+{"ts":"2026-06-15T23:57:52.367Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.374Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.386Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.393Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-15T23:57:52.402Z","level":"info","module":"ApplicationStore","msg":"Added application: ReadyCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.416Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.416Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.428Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.441Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.453Z","level":"info","module":"ApplicationStore","msg":"Added application: ReadyCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.453Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.458Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.462Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Interview"}}
+{"ts":"2026-06-15T23:57:52.468Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.473Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Applied"}}
+{"ts":"2026-06-15T23:57:52.474Z","level":"warn","module":"ApplicationStore","msg":"Already submitted, ignoring repeat: TestCo - ML Engineer Intern"}
+{"ts":"2026-06-15T23:57:52.478Z","level":"info","module":"ApplicationStore","msg":"Added application: ReadyCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.485Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.491Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.496Z","level":"info","module":"ApplicationStore","msg":"Added application: TestCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.503Z","level":"info","module":"ApplicationStore","msg":"Added application: ReadyCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.511Z","level":"info","module":"ApplicationStore","msg":"Added application: OtherCo - ML Engineer Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.511Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.536Z","level":"info","module":"ApplicationStore","msg":"Added application: OldCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.542Z","level":"info","module":"ApplicationStore","msg":"Added application: ReadyCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.547Z","level":"info","module":"ApplicationStore","msg":"Added application: FreshCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.551Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"002"}}
+{"ts":"2026-06-15T23:57:52.557Z","level":"info","module":"ApplicationStore","msg":"Added application: AppliedCo - ML Intern","data":{"id":"003"}}
+{"ts":"2026-06-15T23:57:52.562Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
+{"ts":"2026-06-15T23:57:52.571Z","level":"info","module":"ApplicationStore","msg":"Added application: MysteryCo - ML Intern","data":{"id":"001"}}
+{"ts":"2026-06-15T23:57:52.577Z","level":"info","module":"ApplicationStore","msg":"Updated application: 001","data":{"status":"Closed"}}
