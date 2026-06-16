@@ -14,7 +14,7 @@ export type ApplicationStatus =
   | 'Closed'
   | 'SKIP';
 
-export type Platform = 'linkedin' | 'wellfound' | 'handshake' | 'swelist' | 'newgrad' | 'googlejobs' | 'greenhouse' | 'direct';
+export type Platform = 'linkedin' | 'wellfound' | 'handshake' | 'swelist' | 'newgrad' | 'googlejobs' | 'greenhouse' | 'lever' | 'direct';
 
 export interface Job {
   id: string;

@@ -1,0 +1,26 @@
+# Lever boards scanned via the public postings API (no auth, no browser).
+# Each entry is the company slug in jobs.lever.co/<slug>. A dead/renamed slug
+# costs one warning and is skipped. Curate this toward companies you target;
+# verify a slug by opening https://jobs.lever.co/<slug>.
+companies:
+  - plaid
+  - ramp
+  - brex
+  - anduril
+  - mistral
+
+# Invariant 10: intern/co-op focus for Summer/Fall 2026. The scanner also keeps
+# a posting when categories.commitment is Internship even if the title omits it.
+title_include:
+  - intern
+  - internship
+  - co-op
+  - coop
+
+title_exclude:
+  - senior
+  - staff
+  - principal
+  - director
+  - manager
+  - lead
