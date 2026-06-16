@@ -1,114 +1,87 @@
 /**
- * Selects the right CV variant and injects ATS keywords from the JD.
- * WHY: Keyword injection into existing bullets is the highest-ROI tailoring
- * action — it improves ATS parse scores without changing the underlying claims,
- * which keeps everything defensible in an interview.
+ * Selects a CV variant and applies a no-fabrication injection plan to it.
+ * The risky pre-M6 logic (grafting ", leveraging X" onto the best-scoring
+ * bullet, which invented claims) is gone; injection decisions now live in the
+ * pure InjectionPlanner and only ever grow the skills enumeration with a skill
+ * Parv actually has.
+ *
+ * IO layer: reads cv/<variant>.md and the master CV (the attestation corpus),
+ * writes the tailored markdown. Paths are injectable so tests use a fixture CV
+ * dir, never real PII (LESSONS 2026-06-12).
  */
 
 import fs from 'fs';
 import path from 'path';
 import type { ResumeVariant, KeywordInjection } from '../types.js';
 import { Logger } from '../utils/Logger.js';
+import { InjectionPlanner, type SkippedKeyword } from './InjectionPlanner.js';
+import { ResumeRenderer } from './ResumeRenderer.js';
 
 const MAX_INJECTIONS = 3;
 
+export interface ResumeBuildResult {
+  content: string;            // the tailored markdown
+  injections: KeywordInjection[];
+  skipped: SkippedKeyword[];
+  sections: string[];         // section titles in the tailored markdown
+  outputPath: string;
+}
+
 export class ResumeBuilder {
   private log = new Logger('ResumeBuilder');
+  private planner = new InjectionPlanner();
+  private readonly cvDir: string;
+  private readonly outputDir: string;
+
+  constructor(opts?: { cvDir?: string; outputDir?: string }) {
+    this.cvDir = opts?.cvDir ?? 'cv';
+    this.outputDir = opts?.outputDir ?? path.join('output', 'resumes');
+  }
 
   /** Build a tailored resume markdown file for a specific job. */
   build(
     jobId: string,
-    jobTitle: string,
     variant: ResumeVariant,
-    jdKeywords: string[]
-  ): { content: string; injections: KeywordInjection[]; outputPath: string } {
-    const basePath = `cv/${variant}.md`;
+    jdKeywords: string[],
+    maxInjections = MAX_INJECTIONS
+  ): ResumeBuildResult {
+    const basePath = path.join(this.cvDir, `${variant}.md`);
     if (!fs.existsSync(basePath)) {
       throw new Error(`CV variant not found: ${basePath}`);
     }
 
-    let content = fs.readFileSync(basePath, 'utf8');
-    const existingKeywords = this.extractExistingKeywords(content);
-    const injections: KeywordInjection[] = [];
+    const content = fs.readFileSync(basePath, 'utf8');
+    // The master CV is the attestation corpus (the truth of what Parv has). If
+    // it is absent, the variant is its own corpus: then "attested" == "already
+    // present", so nothing is injected — the safe degenerate case.
+    const masterPath = path.join(this.cvDir, 'master.md');
+    const corpus = fs.existsSync(masterPath) ? fs.readFileSync(masterPath, 'utf8') : content;
 
-    // Find keywords in the JD that aren't already in the resume
-    const newKeywords = jdKeywords
-      .filter((kw) => !existingKeywords.includes(kw.toLowerCase()))
-      .slice(0, MAX_INJECTIONS);
+    const plan = this.planner.plan(content, corpus, jdKeywords, maxInjections);
+    const tailored = this.planner.apply(content, plan);
 
-    for (const keyword of newKeywords) {
-      const injection = this.injectKeyword(content, keyword, variant);
-      if (injection) {
-        content = injection.newContent;
-        injections.push({ keyword, location: injection.location, reason: injection.reason });
-      }
-    }
+    const injections: KeywordInjection[] = plan.injections.map((i) => ({
+      keyword: i.keyword,
+      location: `skills line ${i.lineIndex + 1}`,
+      reason: i.reason,
+    }));
 
-    // Write tailored resume to output
-    const outputPath = path.join('output', 'resumes', `${jobId}-${variant}.md`);
+    const outputPath = path.join(this.outputDir, `${jobId}-${variant}.md`);
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-    fs.writeFileSync(outputPath, content);
+    fs.writeFileSync(outputPath, tailored);
 
     this.log.info(`Built tailored resume: ${outputPath}`, {
       variant,
-      injections: injections.length,
+      injected: injections.length,
+      skipped: plan.skipped.length,
     });
 
-    return { content, injections, outputPath };
-  }
-
-  private extractExistingKeywords(content: string): string[] {
-    return content.toLowerCase().split(/\W+/).filter((w) => w.length > 3);
-  }
-
-  private injectKeyword(
-    content: string,
-    keyword: string,
-    _variant: ResumeVariant
-  ): { newContent: string; location: string; reason: string } | null {
-    const lines = content.split('\n');
-    const kwLC = keyword.toLowerCase();
-
-    // Find the best bullet to inject into — prefer project bullets
-    let bestLineIdx = -1;
-    let bestScore = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.startsWith('- ')) continue;
-
-      const score = this.relevanceScore(line, keyword);
-      if (score > bestScore) {
-        bestScore = score;
-        bestLineIdx = i;
-      }
-    }
-
-    if (bestLineIdx === -1 || bestScore < 0.1) return null;
-
-    const originalLine = lines[bestLineIdx];
-
-    // Only inject if the keyword isn't already present (case-insensitive)
-    if (originalLine.toLowerCase().includes(kwLC)) return null;
-
-    // Append keyword naturally to the end of the bullet
-    lines[bestLineIdx] = originalLine.endsWith('.')
-      ? `${originalLine.slice(0, -1)}, leveraging ${keyword}.`
-      : `${originalLine} (${keyword})`;
-
     return {
-      newContent: lines.join('\n'),
-      location: `line ${bestLineIdx + 1}`,
-      reason: `ATS keyword from JD; increases parse hit rate for ${keyword} requirement`,
+      content: tailored,
+      injections,
+      skipped: plan.skipped,
+      sections: ResumeRenderer.sectionTitles(tailored),
+      outputPath,
     };
-  }
-
-  private relevanceScore(bullet: string, keyword: string): number {
-    const bulletLC = bullet.toLowerCase();
-    const kwWords = keyword.toLowerCase().split(' ');
-
-    // Partial word match gives some score
-    const matchCount = kwWords.filter((w) => bulletLC.includes(w)).length;
-    return matchCount / kwWords.length;
   }
 }
