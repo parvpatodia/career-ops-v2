@@ -77,17 +77,34 @@ export class GreenhouseFormSource implements AtsFormSource {
 
   async clickSubmit(): Promise<void> {
     const btn = this.page
-      .locator('#submit_app, button[type="submit"], button:has-text("Submit Application")')
+      .locator('#submit_app, button[type="submit"], button:has-text("Submit application")')
       .first();
     await btn.scrollIntoViewIfNeeded({ timeout: 5_000 });
-    await btn.click({ timeout: 5_000 });
+    await btn.click({ timeout: 10_000 });
+    // Wait for the submit POST + the confirmation/redirect to render before
+    // reading it, so a "submitted" verdict reflects a completed submission.
+    await this.page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+    await this.page.waitForTimeout(1_500);
   }
 
   async readConfirmation(): Promise<string | null> {
+    // Classic boards selectors first.
     const conf = this.page.locator('#application_confirmation, [data-greenhouse-confirmation]').first();
-    const text = await conf.textContent({ timeout: 5_000 }).catch(() => null);
+    const text = await conf.textContent({ timeout: 3_000 }).catch(() => null);
     const trimmed = (text ?? '').replace(/\s+/g, ' ').trim();
-    return trimmed.length > 0 ? trimmed : null;
+    if (trimmed.length > 0) return trimmed;
+
+    // New job-boards (React) form: detect a real success message or URL. If
+    // neither is present the submit is NOT confirmed (returns null), so the
+    // Autopilot records submitted-without-confirmed rather than a false success.
+    const body = await this.page.locator('body').innerText().catch(() => '');
+    const m = body.match(
+      /(thank you for applying[^.\n]*|your application (has been )?(submitted|received)[^.\n]*|thanks for applying[^.\n]*|we('| ha)ve received your application[^.\n]*|application submitted[^.\n]*)/i
+    );
+    if (m) return m[0].replace(/\s+/g, ' ').trim().slice(0, 120);
+    const url = this.page.url();
+    if (/confirmation|thank|submitted|success/i.test(url)) return `submitted (url: ${url})`;
+    return null;
   }
 
   // Greenhouse renders each field with id = the API field name. Attribute
