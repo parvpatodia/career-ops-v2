@@ -26,6 +26,11 @@ modes/_profile.md
 # Generated
 .resolved-prompt-*
 node_modules/
+# Write-only audit/efficiency logs; nothing reads them back. Every test and
+# every CLI run appends here, which dirtied the tracked tree (LESSONS 2026-06-12).
+# Scanner-cache *.json in this dir stay tracked (the pipeline reads them).
+data/daily_log/*-ops.jsonl
+data/daily_log/token-usage.jsonl
 
 # OS
 .DS_Store
