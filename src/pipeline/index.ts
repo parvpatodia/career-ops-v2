@@ -101,7 +101,7 @@ async function main(): Promise<void> {
   // Skip jobs already tracked
   const existingIds = loadExistingJobIds();
   const toProcess = onTerm.filter((j) => !existingIds.has(j.id));
-  log.info(`New jobs to process: ${toProcess.length} (${fresh.length - toProcess.length} already tracked)`);
+  log.info(`New jobs to process: ${toProcess.length} (${onTerm.length - toProcess.length} already tracked)`);
 
   if (toProcess.length === 0) {
     log.info('Nothing new to process. Run npm run scan first, or use --all-days to reprocess.');

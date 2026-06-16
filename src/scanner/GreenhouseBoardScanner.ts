@@ -153,7 +153,7 @@ export function htmlToText(escaped: string): string {
   return decodeEntities(text).replace(/\s+/g, ' ').trim();
 }
 
-function decodeEntities(s: string): string {
+export function decodeEntities(s: string): string {
   return s
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')

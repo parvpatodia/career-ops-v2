@@ -66,6 +66,14 @@ describe('TermFilter (default Summer/Fall 2026)', () => {
     expect(r.offTerm).toHaveLength(0);
   });
 
+  it('keeps a bare FUTURE year in a title (grad class / deadline, not a term)', () => {
+    // "Class of 2027" / "apply by 2027" are not term statements; targeting 2026
+    // must not drop these. Only PAST bare years exclude.
+    const r = tf.filter([job('Software Engineer Intern — Class of 2027'), job('ML Intern (apply by 2027)')]);
+    expect(r.offTerm).toHaveLength(0);
+    expect(titlesOf(r.matched)).toHaveLength(2);
+  });
+
   it('reads a season+year term from the JD', () => {
     const r = tf.filter([job('Machine Learning Intern', 'Join our Summer 2025 cohort in San Jose.')]);
     expect(r.offTerm).toHaveLength(1);

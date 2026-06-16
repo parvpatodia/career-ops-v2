@@ -114,6 +114,24 @@ describe('LeverBoardScanner', () => {
     expect(swe.jd).toContain('Requirements: Python & PyTorch');
   });
 
+  it('does not truncate single-escaped list content at &lt; / &gt; (single-decode)', async () => {
+    const posting = {
+      id: 'b1',
+      text: 'Backend Intern',
+      hostedUrl: 'https://jobs.lever.co/acme/b1',
+      categories: { commitment: 'Internship' },
+      createdAt: daysAgoMs(1),
+      descriptionPlain: 'Work on systems.',
+      lists: [{ text: 'Requirements', content: '<li>Comfortable when a &lt; b and O(n &lt; 100)</li>' }],
+    };
+    const fetchOne: FetchLike = async (url) =>
+      url.includes('/acme')
+        ? { ok: true, status: 200, json: async () => [posting] }
+        : { ok: false, status: 404, json: async () => ({}) };
+    const jobs = await new Testable({ ...CFG, companies: ['acme'] }, fetchOne).scanPublic({});
+    expect(jobs[0]!.jd).toContain('Comfortable when a < b and O(n < 100)');
+  });
+
   it('a 404 company is skipped without killing the scan', async () => {
     expect((await scanner.scanPublic({})).length).toBeGreaterThan(0);
   });
