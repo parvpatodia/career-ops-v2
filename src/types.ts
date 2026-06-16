@@ -95,6 +95,10 @@ export interface Application {
   pdfPath?: string;
   coverLetterPath?: string;
   notes: string;
+  // Full JD text, persisted so the apply engine's AnswerGenerator has context
+  // without re-fetching. Previously stored via an untyped cast (pipeline +
+  // apply CLI); made a typed optional field for the M7 integration.
+  jd?: string;
   tailoredAt?: string;
   appliedAt?: string;
 }
