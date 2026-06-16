@@ -173,7 +173,13 @@ export class Orchestrator {
       });
       return {
         phase: 'queued',
-        application: { ...existing, pdfPath: t.pdfPath, coverLetterPath: t.coverLetterPath },
+        // Mirror the conditional update: a re-tailor with no new cover letter
+        // must not drop the path already on the stored application.
+        application: {
+          ...existing,
+          pdfPath: t.pdfPath,
+          ...(t.coverLetterPath ? { coverLetterPath: t.coverLetterPath } : {}),
+        },
       };
     }
   }
@@ -233,8 +239,14 @@ export class Orchestrator {
       await opened.session.close().catch(() => {});
       // Re-render the generated view (applications.json/.md) from the now-updated
       // shared log: the Autopilot's submit event goes straight to the EventStore,
-      // bypassing the ApplicationStore facade that owns the view.
-      apps.load();
+      // bypassing the ApplicationStore facade that owns the view. Best-effort: the
+      // submission is already durable on the log + receipt, so a view-rewrite IO
+      // error must NOT mask the apply result (or any thrown error) to the caller.
+      try {
+        apps.load();
+      } catch (err) {
+        this.log.warn(`view refresh after apply failed (log is authoritative): ${(err as Error).message}`);
+      }
     }
   }
 
