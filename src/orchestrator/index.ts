@@ -56,6 +56,9 @@ function reportApply(app: Application, result: ApplyGateResult): void {
     case 'ready_to_submit':
       console.log(`  🟢 READY TO SUBMIT — verified green, filled and stopped. Re-run with --approve to submit.`);
       break;
+    case 'submit_unconfirmed':
+      console.log(`  ⚠️  SUBMIT UNCONFIRMED — clicked submit but the ATS gave NO confirmation. NOT recorded as applied. Open ${app.url} and finish/verify it by hand.`);
+      break;
     case 'needs_input':
       console.log(`  ✋ NEEDS INPUT — ${result.pending.length} unknown question(s) flagged + notified:`);
       for (const p of result.pending) console.log(`       • "${p.label}"`);

@@ -165,6 +165,20 @@ describe('Autopilot', () => {
     expect(fs.readdirSync(path.join(dir, 'receipts'))).toHaveLength(1);
   });
 
+  it('submit clicked but NO ATS confirmation: NOT recorded as submitted (no false success)', async () => {
+    // FakeSubmit returning null confirmation simulates a validation wall / silent drop.
+    const { pilot, submit } = make([VERIFIED], new FakeSubmit(null));
+    const result = await pilot.run(CTX, JOB, APPROVAL);
+
+    expect(result.phase).toBe('submit_unconfirmed');
+    expect(submit.clickCount).toBe(1);                    // it DID click
+    expect(eventTypes()).toEqual(['fill_verified']);      // but recorded NO 'submitted'
+    expect(eventTypes()).not.toContain('submitted');
+    expect(store.projection().isSubmitted(JOB.appId)).toBe(false); // not marked applied
+    expect(fs.existsSync(path.join(dir, 'receipts'))).toBe(false);  // no receipt written
+    expect(sent.some((n) => n.kind === 'error')).toBe(true); // human told to verify
+  });
+
   it('idempotency: a submitted application is never submitted again', async () => {
     const first = make([VERIFIED]);
     await first.pilot.run(CTX, JOB, APPROVAL);

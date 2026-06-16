@@ -72,6 +72,9 @@ export type AutopilotResult =
   | { phase: 'verify_failed'; verdict: VerifierVerdict }
   | { phase: 'ready_to_submit'; verdict: VerifierVerdict }
   | { phase: 'submitted'; receipt: Receipt; verdict: VerifierVerdict }
+  // Submit was clicked but the ATS returned NO confirmation: we cannot assert
+  // the application was received, so it is NOT recorded as submitted.
+  | { phase: 'submit_unconfirmed'; verdict: VerifierVerdict }
   | { phase: 'already_submitted' };
 
 export interface AutopilotDeps {
@@ -132,6 +135,19 @@ export class Autopilot {
 
         await submit.clickSubmit();
         const confirmation = await submit.readConfirmation();
+
+        // No ATS confirmation => we CANNOT assert the application was received
+        // (the click may have hit a validation wall). Recording 'submitted' here
+        // is a false success — the exact failure verify-or-abstain forbids, and
+        // the Ashby silent-drop lesson (2026-06-10). So we do NOT record it;
+        // the app stays un-applied and the human is told to complete it.
+        if (!confirmation) {
+          notifier.error(
+            `${job.company} — ${job.role}: submit clicked but the ATS gave NO confirmation. NOT recorded as applied — complete/verify it manually.`
+          );
+          return { phase: 'submit_unconfirmed', verdict: outcome.verdict };
+        }
+
         const receipt = recorder.recordSubmission({
           appId: job.appId,
           company: job.company,
@@ -140,11 +156,9 @@ export class Autopilot {
           skipped: outcome.skipped.map((f) => f.label),
           ...(job.resumePdfPath ? { resumePdfPath: job.resumePdfPath } : {}),
           screenshotPaths: job.screenshotPaths ?? [],
-          ...(confirmation ? { atsConfirmation: confirmation } : {}),
+          atsConfirmation: confirmation,
         });
-        notifier.batchComplete(
-          `${job.company} — ${job.role}: submitted${confirmation ? ` (${confirmation})` : ''}`
-        );
+        notifier.batchComplete(`${job.company} — ${job.role}: submitted (${confirmation})`);
         return { phase: 'submitted', receipt, verdict: outcome.verdict };
       }
     }
