@@ -14,6 +14,7 @@
  */
 
 import { SKILL_PATTERNS } from '../evaluator/skills.js';
+import { containsTerm, countTerm } from './text.js';
 
 export interface RankedKeyword {
   /** Canonical surface form used for ATS matching (e.g. "PyTorch"). */
@@ -140,16 +141,10 @@ export class KeywordExtractor {
 
   /** Case-insensitive whole-term occurrence count. */
   private countHits(text: string, term: string): number {
-    const re = new RegExp(`(?<![\\w])${this.escape(term)}(?![\\w])`, 'gi');
-    return (text.match(re) || []).length;
+    return countTerm(text, term);
   }
 
   private regionHas(regionLc: string, term: string): boolean {
-    const re = new RegExp(`(?<![\\w])${this.escape(term)}(?![\\w])`, 'i');
-    return re.test(regionLc);
-  }
-
-  private escape(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return containsTerm(regionLc, term);
   }
 }
