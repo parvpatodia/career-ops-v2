@@ -119,7 +119,10 @@ export class GreenhouseFormSource implements AtsFormSource {
         .allInnerTexts()
         .catch(() => [] as string[]);
       const joined = texts.join(' ').trim();
-      return joined.length > 0 ? joined : null;
+      if (joined.length > 0) return joined;
+      // Fallback for a plain <input type=file> (the input is still present, e.g.
+      // a classic form or the fixture): read the attached file's name directly.
+      return readControl(this.locate(field.id), field);
     }
     return readControl(this.locate(field.id), field);
   }

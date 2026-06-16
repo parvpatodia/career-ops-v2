@@ -11,21 +11,27 @@
  * Ashby is one FormSource away (M4 noted ~one file each); register it here then.
  */
 
-export type PortalKind = 'workday' | 'greenhouse';
+export type PortalKind = 'workday' | 'greenhouse' | 'generic';
 
 export type PortalSupport =
   | { supported: true; kind: PortalKind }
   | { supported: false; ats: string };
 
-const SUPPORTED: ReadonlySet<PortalKind> = new Set<PortalKind>(['workday', 'greenhouse']);
+const FIRST_CLASS: ReadonlySet<string> = new Set(['workday', 'greenhouse']);
+// Excluded by policy, never automated even generically (LESSONS 2026-06-10:
+// LinkedIn Easy Apply automation causes account bans).
+const EXCLUDED: ReadonlySet<string> = new Set(['linkedin']);
 
 export class PortalRouter {
   support(ats: string): PortalSupport {
     const a = ats.toLowerCase().trim();
-    if ((SUPPORTED as ReadonlySet<string>).has(a)) {
-      return { supported: true, kind: a as PortalKind };
-    }
-    return { supported: false, ats: a };
+    if (FIRST_CLASS.has(a)) return { supported: true, kind: a as PortalKind };
+    if (EXCLUDED.has(a)) return { supported: false, ats: a };
+    // Everything else: the vendor-neutral GenericFormSource. This is breadth,
+    // NOT a guess — it still fills via the IntentPayload gate and abstains on a
+    // read-back mismatch (verify-or-abstain). A first-class FormSource (a
+    // board-API schema) is more precise; register it in FIRST_CLASS when built.
+    return { supported: true, kind: 'generic' };
   }
 
   isSupported(ats: string): boolean {

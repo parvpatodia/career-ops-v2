@@ -29,6 +29,7 @@ import { WorkdayDriver } from '../applier/WorkdayDriver.js';
 import { WorkdayAdapter } from '../applier/WorkdayAdapter.js';
 import { ApplicationAdapter } from '../applier/ApplicationAdapter.js';
 import { GreenhouseFormSource } from '../applier/GreenhouseFormSource.js';
+import { GenericFormSource } from '../applier/GenericFormSource.js';
 import type { Application } from '../types.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
 import type { ApplySession, ApplySessionFactory, OpenResult } from './Orchestrator.js';
@@ -70,8 +71,13 @@ async function buildSession(
       // each consumer sees only its slice (interface segregation).
       return { adapter: new WorkdayAdapter(driver, answers), submit: driver, close };
     }
-    const source = new GreenhouseFormSource(page, greenhouseJob ?? {});
-    return { adapter: new ApplicationAdapter(source, answers), submit: source, close };
+    if (kind === 'greenhouse') {
+      const source = new GreenhouseFormSource(page, greenhouseJob ?? {});
+      return { adapter: new ApplicationAdapter(source, answers), submit: source, close };
+    }
+    // Generic: DOM-discovered fields for any ATS, still through verify-or-abstain.
+    const generic = new GenericFormSource(page);
+    return { adapter: new ApplicationAdapter(generic, answers), submit: generic, close };
   } catch (err) {
     await close();
     throw err;
