@@ -174,7 +174,7 @@ describe('WorkdayAdapter', () => {
 
     expect(outcome.kind).toBe('verified');
     if (outcome.kind === 'verified') {
-      expect(outcome.eeo.map((e) => e.automationId)).toEqual(['Self_Identify_gender']);
+      expect(outcome.eeo.map((e) => e.id)).toEqual(['Self_Identify_gender']);
     }
     expect(driver.filled.has('Self_Identify_gender')).toBe(false);
   });
@@ -191,7 +191,7 @@ describe('WorkdayAdapter', () => {
     expect(outcome.kind).toBe('abstained');
     if (outcome.kind === 'abstained') {
       expect(outcome.reasons.some((r) => r.why.includes('no fillable fields'))).toBe(true);
-      expect(outcome.eeo.map((e) => e.automationId)).toEqual(['Self_Identify_gender']);
+      expect(outcome.eeo.map((e) => e.id)).toEqual(['Self_Identify_gender']);
     }
     expect(driver.fillCount).toBe(0);
     expect(eventTypes()).not.toContain('submitted');

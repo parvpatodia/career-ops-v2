@@ -25,7 +25,7 @@ import { Applier } from './Applier.js';
 import { WorkdayDriver } from './WorkdayDriver.js';
 import { WorkdayAdapter } from './WorkdayAdapter.js';
 import type { WorkdayOutcome } from './WorkdayAdapter.js';
-import type { WorkdayEeoField } from './WorkdaySchemaMapper.js';
+import type { EeoField } from './ApplicationAdapter.js';
 import { AnswerKB, CompositeAnswerSource } from './AnswerKB.js';
 import type { AnswerContext } from './AnswerGenerator.js';
 
@@ -144,7 +144,7 @@ export class WorkdayHandler extends Applier {
   }
 
   // EEO / self-identification fields are surfaced for the human, never auto-filled.
-  private eeoQuestions(eeo: WorkdayEeoField[]): ApplyResult['screeningQuestions'] {
+  private eeoQuestions(eeo: EeoField[]): ApplyResult['screeningQuestions'] {
     return eeo.map((e) => ({
       question: `EEO / self-identification: ${e.label}`.slice(0, 120),
       answer: '[FLAGGED] Voluntary self-ID — fill manually if you choose.',
