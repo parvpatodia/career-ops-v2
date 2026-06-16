@@ -25,6 +25,7 @@ export interface ContactFacts {
   email: string;
   phone: string;
   linkedin: string;
+  github: string;
   portfolio: string | null;
   location: string;
 }
@@ -77,6 +78,7 @@ export class ResumeVerifier {
       ['email', identity.email],
       ['phone', identity.phone],
       ['linkedin', identity.linkedin],
+      ['github', identity.github],
       ['portfolio', identity.portfolio],
       ['location', identity.location],
     ];

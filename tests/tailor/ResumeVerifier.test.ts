@@ -8,6 +8,7 @@ const IDENTITY: ContactFacts = {
   email: 'test@example.com',
   phone: '415-000-0000',
   linkedin: 'https://linkedin.com/in/testuser',
+  github: 'https://github.com/testuser',
   portfolio: 'https://testuser.dev',
   location: 'San Francisco, CA',
 };
@@ -20,6 +21,7 @@ const CLEAN_HTML = `<!DOCTYPE html><html><body>
 <div class="contact-row">
   <span>415-000-0000</span> | <span>test@example.com</span> |
   <a href="https://linkedin.com/in/testuser">linkedin.com/in/testuser</a> |
+  <a href="https://github.com/testuser">github.com/testuser</a> |
   <a href="https://testuser.dev">testuser.dev</a> | <span>San Francisco, CA</span>
 </div>
 <h2>Professional Summary</h2><p>ML engineer shipping models to production.</p>

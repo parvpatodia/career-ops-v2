@@ -6,6 +6,9 @@
  */
 
 import { PdfGenerator } from '../pdf/PdfGenerator.js';
+import { ResumeRenderer } from '../tailor/ResumeRenderer.js';
+import { ProfileLoader } from '../applier/ProfileLoader.js';
+import { contactFacts } from '../tailor/identity.js';
 import type { ResumeVariant } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 import fs from 'fs';
@@ -24,7 +27,9 @@ const VARIANTS: Array<{ variant: ResumeVariant; mdPath: string; outputName: stri
 const OUTPUT_DIR = 'output/resumes';
 
 export async function prepareResumes(): Promise<void> {
-  const generator = new PdfGenerator();
+  const generator = new PdfGenerator(OUTPUT_DIR);
+  const renderer = new ResumeRenderer();
+  const identity = contactFacts(new ProfileLoader().getIdentity());
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   for (const { variant, mdPath, outputName } of VARIANTS) {
@@ -37,12 +42,9 @@ export async function prepareResumes(): Promise<void> {
 
     log.info(`Generating ${outputName}...`);
     try {
-      const generatedPath = await generator.generate(`parv-${variant}`, variant, mdPath);
-      // Rename to standard name
-      if (generatedPath !== outputPath) {
-        fs.renameSync(generatedPath, outputPath);
-      }
-      log.info(`Done: ${outputPath}`);
+      const html = renderer.renderHtml(fs.readFileSync(mdPath, 'utf8'), identity);
+      const result = await generator.htmlToPdf(html, outputPath);
+      log.info(`Done: ${result.pdfPath} (${result.pageCount}p, ${(result.bytes / 1024).toFixed(1)}KB)`);
     } catch (err) {
       log.error(`Failed to generate ${outputName}`, err);
     }
