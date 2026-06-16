@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Greenhouse Application Form</title></head>
+<body>
+<!-- Greenhouse-style form. Each input id = the boards-API field name in
+     greenhouse-job.json, which is how the GreenhouseFormSource locates fields.
+     Includes the same unknown screening question (drives notify/resume) and a
+     voluntary self-ID select (surfaced, never auto-filled). The Submit button
+     reveals a confirmation (no network). -->
+<div id="application_form">
+  <h1>Apply — Demo Corp (Greenhouse)</h1>
+
+  <div><label for="first_name">First Name *</label>
+    <input id="first_name" type="text" required></div>
+  <div><label for="last_name">Last Name *</label>
+    <input id="last_name" type="text" required></div>
+  <div><label for="email">Email *</label>
+    <input id="email" type="text" required></div>
+  <div><label for="phone">Phone</label>
+    <input id="phone" type="text"></div>
+  <div><label for="resume">Resume/CV</label>
+    <input id="resume" type="file" accept=".pdf"></div>
+
+  <div><label for="question_workauth">Are you authorized to work in the United States? *</label>
+    <select id="question_workauth" required>
+      <option value=""></option>
+      <option>Yes</option>
+      <option>No</option>
+    </select></div>
+  <div><label for="question_startdate">Earliest start date *</label>
+    <input id="question_startdate" type="text" required></div>
+  <div><label for="question_essay">What is the most interesting GPU kernel you have written? *</label>
+    <textarea id="question_essay" required></textarea></div>
+
+  <fieldset>
+    <legend>Voluntary Self-Identification</legend>
+    <label for="gender">Gender</label>
+    <select id="gender">
+      <option value=""></option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Decline to self-identify</option>
+    </select>
+  </fieldset>
+
+  <button id="submit_app" type="button"
+          onclick="document.getElementById('application_confirmation').style.display='block'">
+    Submit Application
+  </button>
+  <div id="application_confirmation" style="display:none">
+    Confirmation #GH-DEMO-20260616-22817
+  </div>
+</div>
+</body>
+</html>
