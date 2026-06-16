@@ -199,6 +199,32 @@ export class WorkdayDriver implements WorkdayPageDriver {
     }
   }
 
+  // ── SubmitDriver surface (used only by the Autopilot, after verify + approval) ──
+  // WHY here and not on the WorkdayPageDriver the adapter holds: the fill+verify
+  // maker must not be able to submit. These methods satisfy SubmitDriver
+  // structurally, so the Autopilot can use the same WorkdayDriver instance for
+  // submission while the adapter only ever sees the submit-free surface.
+
+  async clickSubmit(): Promise<void> {
+    const btn = this.page
+      .locator(
+        '[data-automation-id="submitButton"], [data-automation-id="bottom-navigation-next-button"], ' +
+          'button:has-text("Submit")'
+      )
+      .first();
+    await btn.scrollIntoViewIfNeeded({ timeout: 5_000 });
+    await btn.click({ timeout: 5_000 });
+  }
+
+  async readConfirmation(): Promise<string | null> {
+    const conf = this.page
+      .locator('[data-automation-id="confirmationId"], [data-automation-id="confirmationPage"]')
+      .first();
+    const text = await conf.textContent({ timeout: 5_000 }).catch(() => null);
+    const trimmed = (text ?? '').replace(/\s+/g, ' ').trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+
   private async fillSelect(intent: FieldIntent): Promise<void> {
     const loc = this.page.locator(this.sel(intent.field.id)).first();
     const tag = await loc.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
