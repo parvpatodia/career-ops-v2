@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head><title>Demo: Workday Full Application</title></head>
+<body>
+<!-- A fuller Workday-style application: personal info, an answerable screening
+     dropdown, an UNKNOWN free-text screening question (triggers abstain ->
+     notify -> resume), a voluntary self-ID section (must NOT be auto-filled),
+     and a Submit button that reveals a confirmation reference (no network). -->
+<div id="app">
+  <h1>Apply — Demo Corp (Workday)</h1>
+
+  <h2>My Information</h2>
+  <div class="fg"><label>First Name *</label>
+    <input data-automation-id="legalNameSection_firstName" type="text" required></div>
+  <div class="fg"><label>Last Name *</label>
+    <input data-automation-id="legalNameSection_lastName" type="text" required></div>
+  <div class="fg"><label>Email *</label>
+    <input data-automation-id="email" type="text" required></div>
+  <div class="fg"><label>Phone Number</label>
+    <input data-automation-id="phone-number" type="tel"></div>
+  <div class="fg"><label>Address Line 1</label>
+    <input data-automation-id="addressSection_addressLine1" type="text"></div>
+  <div class="fg"><label>Resume</label>
+    <input data-automation-id="file-upload-input" type="file" accept=".pdf"></div>
+
+  <h2>Application Questions</h2>
+  <div class="fg"><label>Are you authorized to work in the United States? *</label>
+    <select data-automation-id="workAuthorization" required>
+      <option value=""></option>
+      <option>Yes</option>
+      <option>No</option>
+    </select></div>
+  <div class="fg"><label>Earliest start date *</label>
+    <input data-automation-id="startDate" type="text" required></div>
+  <div class="fg"><label>What is the most interesting GPU kernel you have written? *</label>
+    <textarea data-automation-id="screening_gpuKernel" required></textarea></div>
+
+  <h2>Voluntary Self-Identification</h2>
+  <div class="fg" data-automation-id="selfIdentificationSection">
+    <label>Gender</label>
+    <select data-automation-id="Self_Identify_gender">
+      <option value=""></option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Decline to self-identify</option>
+    </select></div>
+
+  <button data-automation-id="submitButton" type="button"
+          onclick="document.getElementById('conf').style.display='block'">Submit</button>
+  <div id="conf" data-automation-id="confirmationId" style="display:none">
+    Application received. Reference WD-DEMO-20260616-4417
+  </div>
+</div>
+</body>
+</html>

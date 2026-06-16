@@ -12,6 +12,7 @@
     "apply": "tsx src/applier/index.ts",
     "demo": "tsx scripts/demo.ts",
     "demo:workday": "tsx scripts/demo-workday.ts",
+    "demo:autopilot": "tsx scripts/demo-autopilot.ts",
     "migrate": "tsx scripts/migrate-legacy.ts",
     "expire": "tsx scripts/expire-stale.ts",
     "dashboard": "tsx scripts/dashboard.ts",

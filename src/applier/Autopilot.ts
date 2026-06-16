@@ -71,7 +71,7 @@ export type AutopilotResult =
   | { phase: 'needs_input'; pending: PendingQuestion[] }
   | { phase: 'verify_failed'; verdict: VerifierVerdict }
   | { phase: 'ready_to_submit'; verdict: VerifierVerdict }
-  | { phase: 'submitted'; receipt: Receipt }
+  | { phase: 'submitted'; receipt: Receipt; verdict: VerifierVerdict }
   | { phase: 'already_submitted' };
 
 export interface AutopilotDeps {
@@ -145,7 +145,7 @@ export class Autopilot {
         notifier.batchComplete(
           `${job.company} — ${job.role}: submitted${confirmation ? ` (${confirmation})` : ''}`
         );
-        return { phase: 'submitted', receipt };
+        return { phase: 'submitted', receipt, verdict: outcome.verdict };
       }
     }
   }
