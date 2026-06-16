@@ -1,0 +1,36 @@
+{
+  "__source": "Synthetic boards-API job (questions=true) for the multi-portal demo. Field names align to the ids in greenhouse-form.html. Labels match answers.demo.yml so one demo AnswerKB covers both portals; the GPU-kernel question is intentionally unanswered to drive the notify/resume touchpoint.",
+  "id": 8675309,
+  "title": "Machine Learning Engineer Intern",
+  "questions": [
+    { "label": "First Name", "required": true, "fields": [{ "name": "first_name", "type": "input_text", "values": [] }] },
+    { "label": "Last Name", "required": true, "fields": [{ "name": "last_name", "type": "input_text", "values": [] }] },
+    { "label": "Email", "required": true, "fields": [{ "name": "email", "type": "input_text", "values": [] }] },
+    { "label": "Phone", "required": false, "fields": [{ "name": "phone", "type": "input_text", "values": [] }] },
+    {
+      "label": "Resume/CV",
+      "required": false,
+      "fields": [
+        { "name": "resume", "type": "input_file", "values": [] },
+        { "name": "resume_text", "type": "textarea", "values": [] }
+      ]
+    },
+    {
+      "label": "Are you authorized to work in the United States?",
+      "required": true,
+      "fields": [{ "name": "question_workauth", "type": "multi_value_single_select", "values": [{ "label": "Yes", "value": 1 }, { "label": "No", "value": 0 }] }]
+    },
+    { "label": "Earliest start date", "required": true, "fields": [{ "name": "question_startdate", "type": "input_text", "values": [] }] },
+    { "label": "What is the most interesting GPU kernel you have written?", "required": true, "fields": [{ "name": "question_essay", "type": "textarea", "values": [] }] }
+  ],
+  "demographic_questions": {
+    "header": "Voluntary Self-Identification",
+    "questions": [
+      {
+        "label": "Gender",
+        "required": false,
+        "fields": [{ "name": "gender", "type": "multi_value_single_select", "values": [{ "label": "Male", "value": 1 }, { "label": "Female", "value": 2 }, { "label": "Decline to self-identify", "value": 3 }] }]
+      }
+    ]
+  }
+}

@@ -1,32 +1,34 @@
 /**
- * M3.5 end-to-end evidence: the autonomous autopilot loop against a realistic
- * Workday fixture, in headless Chromium, for real.
+ * M4 end-to-end evidence: the SAME autopilot loop driving TWO portals
+ * (Workday and Greenhouse) against realistic fixtures, in headless Chromium.
  *
  * Usage: npm run demo:autopilot
  *
- * What it proves, with no human intervention except the one designed touchpoint:
- *   PASS 1  fill+verify runs; the unknown free-text question makes it ABSTAIN
- *           before touching the form; a REAL macOS notification fires and the
- *           question is logged to the AnswerInbox.
+ * For each portal, with no human input except the one designed touchpoint:
+ *   PASS 1  fill+verify; the unknown free-text question ABSTAINS before
+ *           touching the form; a REAL macOS notification fires; the question is
+ *           logged to the AnswerInbox.
  *   resume  the answer is supplied (AnswerInbox.resolve) -> learned forever.
  *   PASS 2  re-run with the answer + an explicit batch approval: every field is
  *           auto-filled, INDEPENDENTLY read back and verified green, then
- *           submitted, with a receipt written and a completion notification.
+ *           submitted (fixture button only), with a receipt + confirmation.
  *
- * WHY a stub identity + demo AnswerKB (no config/profile.yml, no real PII):
- * runs in a fresh clone. WHY temp store/inbox/receipts: a fixture exercise must
- * not write to production data. WHY safe: "submit" clicks the fixture's button
- * (reveals a confirmation div, no network) — never a real employer.
+ * Only the FormSource differs between portals; ApplicationAdapter, Autopilot,
+ * Verifier, AnswerInbox, Notifier, SubmissionRecorder are shared. Safe: submit
+ * clicks a fixture button (no network); no profile.yml; no real PII.
  */
 
 import { chromium } from 'playwright';
+import type { Browser, Page } from 'playwright';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { WorkdayDriver } from '../src/applier/WorkdayDriver.js';
 import { WorkdayAdapter } from '../src/applier/WorkdayAdapter.js';
+import { ApplicationAdapter } from '../src/applier/ApplicationAdapter.js';
+import { GreenhouseFormSource } from '../src/applier/GreenhouseFormSource.js';
 import { Autopilot } from '../src/applier/Autopilot.js';
-import type { JobRef, BatchApproval } from '../src/applier/Autopilot.js';
+import type { FillVerifyStep, SubmitDriver, JobRef, BatchApproval } from '../src/applier/Autopilot.js';
 import { Notifier } from '../src/applier/Notifier.js';
 import { AnswerInbox } from '../src/applier/AnswerInbox.js';
 import { AnswerKB, CompositeAnswerSource } from '../src/applier/AnswerKB.js';
@@ -45,12 +47,11 @@ const C = {
   dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
 };
 
-// Obvious placeholder identity (NOT real PII), matched by label substring.
 const IDENTITY: Record<string, string> = {
   'first name': 'Ada',
   'last name': 'Lovelace',
   'email': 'ada@example.com',
-  'phone number': '+1-555-0100',
+  'phone': '+1-555-0100',
   'address line 1': '1 Demo Street, San Jose, CA 95113',
 };
 
@@ -64,32 +65,52 @@ const stubIdentity: AnswerSource = {
   },
 };
 
-async function main(): Promise<void> {
-  console.log(C.bold('\n╔══════════════════════════════════════════════════════════╗'));
-  console.log(C.bold('║   career-ops M3.5 — Autopilot: notify · resume · submit   ║'));
-  console.log(C.bold('╚══════════════════════════════════════════════════════════╝'));
-  console.log(C.dim('  Fixture : tests/demo/fixtures/workday-full.html (local, no network)'));
-  console.log(C.dim('  Submit  : clicks the fixture button only — never a real employer\n'));
+const GPU_ANSWER = 'A fused FlashAttention kernel in Triton, 2.3x over the naive PyTorch baseline.';
+const ANSWERS_FILE = path.resolve('tests/demo/fixtures/answers.demo.yml');
+const GH_JOB = JSON.parse(fs.readFileSync(path.resolve('tests/demo/fixtures/greenhouse-job.json'), 'utf8'));
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'autopilot-demo-'));
+interface Portal {
+  name: string;
+  fixture: string;
+  build(page: Page, answers: AnswerSource): { adapter: FillVerifyStep; submit: SubmitDriver };
+}
+
+const PORTALS: Portal[] = [
+  {
+    name: 'Workday',
+    fixture: `file://${path.resolve('tests/demo/fixtures/workday-full.html')}`,
+    build: (page, answers) => {
+      const d = new WorkdayDriver(page);
+      return { adapter: new WorkdayAdapter(d, answers), submit: d };
+    },
+  },
+  {
+    name: 'Greenhouse',
+    fixture: `file://${path.resolve('tests/demo/fixtures/greenhouse-form.html')}`,
+    build: (page, answers) => {
+      const s = new GreenhouseFormSource(page, GH_JOB);
+      return { adapter: new ApplicationAdapter(s, answers), submit: s };
+    },
+  },
+];
+
+async function runPortal(portal: Portal, browser: Browser, notifier: Notifier): Promise<boolean> {
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log(C.bold(C.cyan(`  ${portal.name.toUpperCase()} — Demo Corp | ML Engineer Intern`)));
+  console.log('═'.repeat(60));
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `autopilot-${portal.name}-`));
   const resumePdf = path.join(tmp, 'resume-demo.pdf');
   fs.writeFileSync(resumePdf, '%PDF-1.4 demo bytes');
 
   const store = new EventStore(path.join(tmp, 'events.jsonl'));
   const recorder = new SubmissionRecorder(store, path.join(tmp, 'receipts'));
   const inbox = new AnswerInbox(path.join(tmp, 'pending.json'), path.join(tmp, 'learned.yml'));
-  const notifier = new Notifier(); // real macOS banners
-
-  // KB(demo) first, then learned answers, then the stub identity.
   const buildAnswers = (): AnswerSource =>
-    new CompositeAnswerSource([
-      new AnswerKB(path.resolve('tests/demo/fixtures/answers.demo.yml')),
-      inbox.learnedSource(),
-      stubIdentity,
-    ]);
+    new CompositeAnswerSource([new AnswerKB(ANSWERS_FILE), inbox.learnedSource(), stubIdentity]);
 
   const job: JobRef = {
-    appId: appIdFor('Demo Corp', 'Machine Learning Engineer Intern'),
+    appId: appIdFor('Demo Corp', `${portal.name} ML Intern`),
     company: 'Demo Corp',
     role: 'Machine Learning Engineer Intern',
     resumePdfPath: resumePdf,
@@ -97,70 +118,76 @@ async function main(): Promise<void> {
   };
   const ctx: AnswerContext = { company: job.company, role: job.role };
 
-  const fixture = `file://${path.resolve('tests/demo/fixtures/workday-full.html')}`;
-  const browser = await chromium.launch({ headless: true });
-  let exitCode = 1;
+  const page = await browser.newContext().then((c) => c.newPage());
+  let submitted = false;
 
   try {
-    const page = await browser.newContext().then((c) => c.newPage());
-    await page.goto(fixture, { waitUntil: 'domcontentloaded', timeout: 10_000 });
-    const driver = new WorkdayDriver(page);
+    await page.goto(portal.fixture, { waitUntil: 'domcontentloaded', timeout: 10_000 });
 
-    // ── PASS 1: autonomous, no approval ──────────────────────────────────
-    console.log(C.bold('  PASS 1 — autonomous fill + verify (no approval yet)'));
-    const pilot1 = new Autopilot({ adapter: new WorkdayAdapter(driver, buildAnswers()), submit: driver, notifier, inbox, store, recorder });
-    const r1 = await pilot1.run(ctx, job);
-    console.log(`  Result  : ${C.bold(r1.phase.toUpperCase())}`);
-
+    // PASS 1 — autonomous, no approval.
+    const p1 = portal.build(page, buildAnswers());
+    const r1 = await new Autopilot({ adapter: p1.adapter, submit: p1.submit, notifier, inbox, store, recorder }).run(ctx, job);
+    console.log(`  PASS 1 (autonomous) : ${C.bold(r1.phase.toUpperCase())}`);
     if (r1.phase === 'needs_input') {
-      for (const p of r1.pending) {
-        console.log(`   ${C.yellow('⚑ unknown')} "${p.label}"`);
-        console.log(`     ${C.dim(p.why)}`);
-      }
-      console.log(`   ${C.cyan('→ Real macOS notification fired. Logged to inbox. No field filled (abstain-before-fill).')}\n`);
-
-      // ── Resume touchpoint: Parv answers the flagged question ───────────
-      const answer = 'A fused FlashAttention kernel in Triton, 2.3x over the naive PyTorch baseline.';
-      console.log(C.bold('  RESUME — Parv answers the notification'));
-      inbox.resolve(r1.pending[0]!.label, answer);
-      console.log(`   ${C.green('✓ saved to AnswerKB (learned)')}: "${answer.slice(0, 56)}…"`);
-      console.log(`   ${C.dim('This question will never be unknown again.')}\n`);
-    } else {
-      console.log(C.red('  Expected needs_input on pass 1 (the GPU-kernel question). Aborting.'));
+      for (const p of r1.pending) console.log(`    ${C.yellow('⚑')} "${p.label}" ${C.dim('(real notification fired, no field filled)')}`);
+      inbox.resolve(r1.pending[0]!.label, GPU_ANSWER);
+      console.log(`    ${C.green('✓ answered')} -> learned (never unknown again)`);
     }
 
-    // ── PASS 2: resume with the learned answer + explicit approval ───────
-    console.log(C.bold('  PASS 2 — resume with approval (the "click of a button")'));
+    // PASS 2 — resume with approval.
     const approval: BatchApproval = { approvedBy: 'parv', approvedAt: new Date().toISOString(), note: 'demo batch' };
-    const pilot2 = new Autopilot({ adapter: new WorkdayAdapter(driver, buildAnswers()), submit: driver, notifier, inbox, store, recorder });
-    const r2 = await pilot2.run(ctx, job, approval);
-    console.log(`  Result  : ${C.bold(r2.phase.toUpperCase())}\n`);
+    const p2 = portal.build(page, buildAnswers());
+    const r2 = await new Autopilot({ adapter: p2.adapter, submit: p2.submit, notifier, inbox, store, recorder }).run(ctx, job, approval);
+    console.log(`  PASS 2 (approved)   : ${C.bold(r2.phase.toUpperCase())}`);
 
     if (r2.phase === 'submitted') {
-      console.log(C.bold('  Field read-back verification (independent of fill):'));
       for (const c of r2.verdict.checks) {
         const got = c.actual === null ? '<unread>' : c.actual;
-        console.log(`   ${C.green('✓')} ${c.label.padEnd(20)} : ${C.green(got.slice(0, 52))}`);
+        console.log(`    ${C.green('✓')} ${c.label.slice(0, 46).padEnd(46)} : ${C.green(got.slice(0, 40))}`);
       }
-      console.log(`\n  ${C.green('SUBMITTED')} (fixture). Receipt ${C.bold(r2.receipt.correlationId)}`);
-      console.log(`   confirmation : ${r2.receipt.atsConfirmation ?? '(none)'}`);
-      console.log(`   resume sha256: ${r2.receipt.resumeSha256?.slice(0, 16)}…`);
-      console.log(`   ${C.cyan('→ Completion notification fired.')}`);
-      console.log(`   ${C.dim('event log: ' + store.readAll().events.map((e) => e.type).join(' → '))}`);
-      exitCode = 0;
+      console.log(`    ${C.green('SUBMITTED')} (fixture) — receipt ${r2.receipt.correlationId}, ${r2.receipt.atsConfirmation ?? '(no confirmation)'}`);
+      console.log(`    ${C.dim('event log: ' + store.readAll().events.map((e) => e.type).join(' → '))}`);
+      submitted = true;
     }
 
     fs.mkdirSync('output/demo', { recursive: true });
-    const shot = path.resolve('output/demo/workday-autopilot.png');
-    await page.screenshot({ path: shot, fullPage: true }).catch(() => {});
-    console.log(C.dim(`\n  Screenshot → ${shot}`));
+    await page.screenshot({ path: path.resolve('output/demo', `autopilot-${portal.name.toLowerCase()}.png`), fullPage: true }).catch(() => {});
   } finally {
-    await browser.close();
+    await page.close().catch(() => {});
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 
-  console.log('');
-  process.exit(exitCode);
+  return submitted;
+}
+
+async function main(): Promise<void> {
+  console.log(C.bold('\n╔══════════════════════════════════════════════════════════╗'));
+  console.log(C.bold('║   career-ops M4 — Autopilot across portals (one pipeline) ║'));
+  console.log(C.bold('╚══════════════════════════════════════════════════════════╝'));
+  console.log(C.dim('  Fixtures local, no network. Submit clicks a fixture button only.'));
+
+  const browser = await chromium.launch({ headless: true });
+  const notifier = new Notifier(); // real macOS banners
+  const results: Record<string, boolean> = {};
+
+  try {
+    for (const portal of PORTALS) {
+      results[portal.name] = await runPortal(portal, browser, notifier);
+    }
+  } finally {
+    await browser.close();
+  }
+
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log(C.bold('  SCORECARD'));
+  let pass = 0;
+  for (const [name, ok] of Object.entries(results)) {
+    if (ok) pass++;
+    console.log(`  ${ok ? C.green('PASS ✓') : C.red('FAIL ✗')}  ${name} — fill → verify → submit (fixture)`);
+  }
+  console.log(`  ${pass}/${Object.keys(results).length} portals through the same verify-or-abstain + submit pipeline\n`);
+
+  process.exit(pass === PORTALS.length ? 0 : 1);
 }
 
 main().catch((err) => {
