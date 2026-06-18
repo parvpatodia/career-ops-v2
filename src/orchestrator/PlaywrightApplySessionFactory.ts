@@ -26,10 +26,12 @@ import { UrlResolver } from '../applier/UrlResolver.js';
 import { PortalRouter } from './PortalRouter.js';
 import type { PortalKind } from './PortalRouter.js';
 import { WorkdayDriver } from '../applier/WorkdayDriver.js';
-import { WorkdayAdapter } from '../applier/WorkdayAdapter.js';
+import { WorkdayFormSource } from '../applier/WorkdayAdapter.js';
 import { ApplicationAdapter } from '../applier/ApplicationAdapter.js';
+import type { AtsFormSource } from '../applier/ApplicationAdapter.js';
 import { GreenhouseFormSource } from '../applier/GreenhouseFormSource.js';
 import { GenericFormSource } from '../applier/GenericFormSource.js';
+import type { SubmitDriver } from '../applier/Autopilot.js';
 import type { Application } from '../types.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
 import type { ApplySession, ApplySessionFactory, OpenResult } from './Orchestrator.js';
@@ -65,19 +67,25 @@ async function buildSession(
   };
   try {
     await page.goto(navigateUrl, { waitUntil: 'domcontentloaded', timeout: gotoTimeoutMs });
+
+    // Construct the portal's source + submit surface; the source is exposed on
+    // the session so the attended (partial-fill) flow can drive it directly.
+    let source: AtsFormSource;
+    let submit: SubmitDriver;
     if (kind === 'workday') {
-      const driver = new WorkdayDriver(page);
-      // The driver is BOTH the submit-free page surface and the SubmitDriver;
-      // each consumer sees only its slice (interface segregation).
-      return { adapter: new WorkdayAdapter(driver, answers), submit: driver, close };
+      const driver = new WorkdayDriver(page); // BOTH the page surface and SubmitDriver
+      source = new WorkdayFormSource(driver);
+      submit = driver;
+    } else if (kind === 'greenhouse') {
+      const gh = new GreenhouseFormSource(page, greenhouseJob ?? {});
+      source = gh;
+      submit = gh;
+    } else {
+      const generic = new GenericFormSource(page); // DOM-discovered, any ATS
+      source = generic;
+      submit = generic;
     }
-    if (kind === 'greenhouse') {
-      const source = new GreenhouseFormSource(page, greenhouseJob ?? {});
-      return { adapter: new ApplicationAdapter(source, answers), submit: source, close };
-    }
-    // Generic: DOM-discovered fields for any ATS, still through verify-or-abstain.
-    const generic = new GenericFormSource(page);
-    return { adapter: new ApplicationAdapter(generic, answers), submit: generic, close };
+    return { adapter: new ApplicationAdapter(source, answers), submit, source, close };
   } catch (err) {
     await close();
     throw err;
