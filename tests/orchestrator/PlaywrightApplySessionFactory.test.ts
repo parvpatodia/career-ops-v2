@@ -52,14 +52,13 @@ describe('PlaywrightApplySessionFactory (abstain before browser)', () => {
     expect(spy.contexts).toBe(0);
   });
 
-  it('Greenhouse with no board-job provider: abstains, never opens the browser', async () => {
+  it('Greenhouse with no board schema falls back to GENERIC (DOM fill), does not abstain', async () => {
+    // newContext is reached now (generic fill), so a browser that throws there
+    // surfaces as a thrown open() — proving we did NOT abstain before the browser.
     const spy = new SpyBrowser();
     const factory = new PlaywrightApplySessionFactory({ browser: spy as unknown as Browser });
 
-    const r = await factory.open(app('https://boards.greenhouse.io/globex/jobs/1'), noAnswers);
-
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.ats).toMatch(/greenhouse/);
-    expect(spy.contexts).toBe(0);
+    await expect(factory.open(app('https://boards.greenhouse.io/globex/jobs/1'), noAnswers)).rejects.toThrow();
+    expect(spy.contexts).toBe(1); // it tried to open a page for the generic fill
   });
 });

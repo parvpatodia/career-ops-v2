@@ -106,24 +106,25 @@ export class PlaywrightApplySessionFactory implements ApplySessionFactory {
     const support = this.router.support(resolved.ats);
     if (!support.supported) return { ok: false, unsupported: true, ats: resolved.ats };
 
+    let kind = support.kind;
     let greenhouseJob: Record<string, unknown> | undefined;
     if (support.kind === 'greenhouse') {
-      if (!this.opts.greenhouseJob) {
-        // No way to learn the field schema -> cannot fill safely -> abstain.
-        return { ok: false, unsupported: true, ats: 'greenhouse (no board-job provider)' };
+      const fetched = this.opts.greenhouseJob ? await this.opts.greenhouseJob(app) : null;
+      if (fetched) {
+        greenhouseJob = fetched;
+      } else {
+        // No board schema (a Greenhouse EMBED on a custom domain, e.g.
+        // company.com/careers?gh_jid=..., or a fetch failure): fall back to the
+        // vendor-neutral GenericFormSource, which DOM-discovers the rendered form
+        // and still verifies-or-abstains. Breadth, not a guess.
+        kind = 'generic';
       }
-      const fetched = await this.opts.greenhouseJob(app);
-      if (!fetched) {
-        // Schema fetch failed (bad URL / HTTP / network) -> abstain, no guess.
-        return { ok: false, unsupported: true, ats: 'greenhouse (board schema unavailable)' };
-      }
-      greenhouseJob = fetched;
     }
 
     const session = await buildSession(
       this.opts.browser,
       resolved.url,
-      support.kind,
+      kind,
       answers,
       this.opts.gotoTimeoutMs ?? DEFAULT_GOTO_TIMEOUT_MS,
       greenhouseJob
