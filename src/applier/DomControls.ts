@@ -110,11 +110,23 @@ async function fillSelect(page: Page, locator: Locator, value: string): Promise<
   }
 
   if (kind === 'react-select') {
-    // Open the control, type to filter, Enter to pick the highlighted option.
+    // Open the control, type to filter, then CLICK the exact-text option. Clicking
+    // the rendered option is more reliable than pressing Enter (which only works
+    // if react-select highlighted the right row) — this is what fixes searchable
+    // selects like a ~200-entry Country list reading back the wrong value.
     const control = locator.locator('xpath=ancestor::*[contains(@class,"select__control")][1]');
     await control.click({ timeout: 5_000 }).catch(() => {});
     await locator.pressSequentially(value, { delay: 30 }).catch(() => {});
-    await page.keyboard.press('Enter');
+    const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const option = page
+      .locator('.select__option, [role="option"]')
+      .filter({ hasText: new RegExp(`^\\s*${escaped}\\s*$`, 'i') })
+      .first();
+    if (await option.count().catch(() => 0) > 0) {
+      await option.click({ timeout: 5_000 }).catch(() => page.keyboard.press('Enter'));
+    } else {
+      await page.keyboard.press('Enter'); // fallback: select the highlighted row
+    }
     return;
   }
 
