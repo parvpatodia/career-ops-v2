@@ -17,6 +17,7 @@ interface FakeOpts {
   evaluateReturn?: unknown; // tagName (fill) or selected text (read)
   isChecked?: boolean;
   inputValue?: string;
+  optionCount?: number; // how many react-select options the locator "matches"
 }
 
 class FakeLocator {
@@ -32,6 +33,7 @@ class FakeLocator {
   async isChecked(): Promise<boolean> { return this.opts.isChecked ?? false; }
   async inputValue(): Promise<string> { return this.opts.inputValue ?? ''; }
   async evaluate(): Promise<unknown> { return this.opts.evaluateReturn; }
+  async count(): Promise<number> { return this.opts.optionCount ?? 0; }
   filter(): this { return this; }
   first(): this { return this; }
   // react-select fill resolves the .select__control via locator(xpath); return
@@ -43,7 +45,8 @@ class FakeLocator {
 
 class FakePage {
   keyPresses: string[] = [];
-  optionLocator = new FakeLocator();
+  // optionCount 1 => the matching .select__option is found and clicked.
+  optionLocator = new FakeLocator({ optionCount: 1 });
   keyboard = { press: async (k: string): Promise<void> => { this.keyPresses.push(k); } };
   locator(): FakeLocator { return this.optionLocator; }
 }
@@ -87,14 +90,23 @@ describe('fillControl routing', () => {
     expect(loc.arg('selectOption')).toEqual({ label: 'Yes' });
   });
 
-  it('react-select -> opens the control, types the value, presses Enter', async () => {
+  it('react-select -> opens the control, types, and CLICKS the matching option', async () => {
+    const loc = new FakeLocator({ evaluateReturn: 'react-select' });
+    const page = new FakePage(); // optionLocator matches (optionCount 1)
+    await fillControl(P(page), L(loc), intent('select', 'Yes'));
+    expect(loc.has('click')).toBe(true);                 // opened the .select__control (locator() -> self)
+    expect(loc.arg('pressSequentially')).toBe('Yes');    // typed to filter
+    expect(page.optionLocator.has('click')).toBe(true);  // clicked the matching option (robust)
+    expect(page.keyPresses).not.toContain('Enter');      // option found -> no Enter fallback
+    expect(loc.has('selectOption')).toBe(false);         // not the native path
+  });
+
+  it('react-select with no matching option -> falls back to Enter', async () => {
     const loc = new FakeLocator({ evaluateReturn: 'react-select' });
     const page = new FakePage();
+    page.optionLocator = new FakeLocator({ optionCount: 0 }); // no option matched
     await fillControl(P(page), L(loc), intent('select', 'Yes'));
-    expect(loc.has('click')).toBe(true);              // clicked the .select__control (locator() -> self)
-    expect(loc.arg('pressSequentially')).toBe('Yes'); // typed to filter
-    expect(page.keyPresses).toContain('Enter');       // selected the highlighted option
-    expect(loc.has('selectOption')).toBe(false);      // not the native path
+    expect(page.keyPresses).toContain('Enter');
   });
 
   it('legacy custom listbox -> opens then clicks the matching [role=option]', async () => {
