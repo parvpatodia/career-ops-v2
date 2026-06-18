@@ -34,6 +34,7 @@ import type {
 } from '../applier/Autopilot.js';
 import type { AnswerContext } from '../applier/AnswerGenerator.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
+import type { AtsFormSource } from '../applier/ApplicationAdapter.js';
 import { SubmissionRecorder } from '../applier/SubmissionRecorder.js';
 import { Notifier } from '../applier/Notifier.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
@@ -50,6 +51,9 @@ export interface TailorStep {
 export interface ApplySession {
   adapter: FillVerifyStep;
   submit: SubmitDriver;
+  /** The raw form source, for the attended (partial-fill) flow. Set by the real
+   *  Playwright factory; omitted by stub factories used in autonomous tests. */
+  source?: AtsFormSource;
   /** Tear down the browser/page. Always called, even on a thrown apply. */
   close(): Promise<void>;
 }

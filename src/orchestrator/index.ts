@@ -26,6 +26,8 @@
  */
 
 import 'dotenv/config';
+import { createInterface } from 'readline/promises';
+import { stdin, stdout } from 'process';
 import { chromium } from 'playwright';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
@@ -33,6 +35,9 @@ import { AnswerKB, CompositeAnswerSource } from '../applier/AnswerKB.js';
 import { AnswerGenerator } from '../applier/AnswerGenerator.js';
 import { EssayAnswerSource } from '../applier/EssayAnswerSource.js';
 import { GeminiClient } from '../applier/GeminiClient.js';
+import { AttendedFiller } from '../applier/AttendedFiller.js';
+import type { AttendedResult } from '../applier/AttendedFiller.js';
+import type { AnswerContext } from '../applier/AnswerGenerator.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Orchestrator } from './Orchestrator.js';
@@ -47,6 +52,21 @@ import type { Application } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('run');
+
+function printAttended(res: AttendedResult): void {
+  if (res.kind === 'auth_required') {
+    console.log('  🔒 Login wall — log in in the browser, then re-run.');
+    return;
+  }
+  console.log(`  ✅ Filled + verified (${res.verified.length}): ${res.verified.map((f) => f.label).join(', ') || '(none)'}`);
+  if (res.verifyFailed.length > 0) {
+    console.log(`  ⚠️  Filled but NOT verified — recheck: ${res.verifyFailed.map((f) => `${f.label} (got "${String(f.readBack).slice(0, 24)}")`).join(', ')}`);
+  }
+  if (res.needsHuman.length > 0) {
+    console.log(`  ✋ You complete (${res.needsHuman.length}):`);
+    for (const h of res.needsHuman) console.log(`       • ${h.label.slice(0, 70)}  — ${h.why}`);
+  }
+}
 
 function reportApply(app: Application, result: ApplyGateResult): void {
   switch (result.phase) {
@@ -105,6 +125,7 @@ async function main(): Promise<void> {
 
   const useApprove = args.includes('--approve');
   const useTailor = args.includes('--tailor');
+  const useAttended = args.includes('--attended');
   const batchIdx = args.indexOf('--batch');
   const batchSize = batchIdx !== -1 ? parseInt(args[batchIdx + 1] ?? '5', 10) : 5;
   const jobIdx = args.indexOf('--job');
@@ -182,6 +203,46 @@ async function main(): Promise<void> {
 
   let submitted = 0;
   try {
+    // ── Attended mode: system fills + verifies what it can, you finish + submit ──
+    if (useAttended) {
+      const rl = process.stdin.isTTY ? createInterface({ input: stdin, output: stdout }) : null;
+      console.log(`Attended: I fill + verify what I safely can in the visible browser; you complete the flagged items, solve any captcha, and click Submit.\n`);
+      for (let i = 0; i < queue.length; i++) {
+        const app = queue[i]!;
+        console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id})`);
+        const opened = await sessions.open(app, answers());
+        if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); continue; }
+        if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); continue; }
+        const ctx: AnswerContext = {
+          company: app.company, role: app.role, resumeVariant: app.resumeVariant,
+          ...(app.jd ? { jd: app.jd } : {}),
+        };
+        await essaySource.prewarm(ctx).catch(() => {});
+        try {
+          const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
+          printAttended(res);
+          if (res.kind === 'filled' && rl) {
+            await rl.question('  → Finish the flagged items + captcha in the browser, click Submit, then press Enter (s to skip): ');
+            const did = await rl.question('  → Did you submit it? (y/n): ');
+            if (did.trim().toLowerCase() === 'y') {
+              store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+              submitted++;
+              console.log('  ✓ marked Applied. `npm run inbox` will confirm from the email.');
+            }
+          } else if (res.kind === 'filled') {
+            console.log('  (non-interactive: review above; re-run in a terminal to complete + submit.)');
+          }
+        } catch (err) {
+          console.log(`  ⚠️  fill error: ${(err as Error).message}`);
+        } finally {
+          await opened.session.close();
+        }
+      }
+      rl?.close();
+      console.log(`\n═══ Attended done. Marked applied this run: ${submitted}/${queue.length}. ═══\n`);
+      return;
+    }
+
     for (let i = 0; i < queue.length; i++) {
       const app = queue[i]!;
       console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
