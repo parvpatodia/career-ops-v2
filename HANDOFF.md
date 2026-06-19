@@ -1,6 +1,27 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-16 (M7 integration done).
+> Read at session start (CLAUDE.md load order). Last updated 2026-06-19 (attended mode + captcha routing + preflight).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-06-19) — the HONEST submission paths
+Fully-autonomous, zero-human submission is impossible on captcha-protected forms by policy
+(invariant 6: never solve a captcha). Two real paths exist; both keep accuracy paramount
+(every filled field is read back and verified, or flagged, or handed off — never claimed):
+- **`npm run run -- --preflight`** (read-only): scans each Ready job and classifies it
+  **AUTO** (no captcha, no required-unmapped, no unknown question, ≥1 fillable -> predicted
+  hands-off submittable) vs **ATTENDED** (needs you), with reasons. Never fills, never submits.
+  Run this first to point `--approve` only at the captcha-free subset.
+- **`npm run run -- --approve`** (autonomous): submits AUTO forms after an independent green
+  verdict. A captcha is now detected DURING the scan and routed to `auth_required` BEFORE any
+  fill (no blind submit into a wall). Most modern forms hit this -> use attended.
+- **`npm run run -- --attended`** (co-pilot, the realistic real-submission path): fills +
+  verifies what it safely can in a VISIBLE browser, lists exactly what you must do (captcha,
+  genuine multi-selects, the Scale-AI Country widget), you finish + click Submit; the inbox
+  tracker confirms from the email. Requires you at the keyboard (synchronous, TTY-gated).
+- Captcha detection: `CaptchaDetector` (reCAPTCHA v2 / hCaptcha / Turnstile; invisible v3
+  excluded). Selectors proven on real DOM by `npm run demo:captcha` (5/5).
+- Still open / non-blocking: email creds not in the vault yet (GMAIL_USER set, app password
+  missing -> `npm run inbox` is idle); Scale-AI Country "+1" read quirk (verifier flags it);
+  no real application submitted yet (attended needs Parv to finish + submit).
 
 ## Where the project is (M3–M7 done)
 All subsystems are built AND now INTEGRATED into one cohesive flow. The verify-or-abstain
@@ -36,6 +57,8 @@ core runs the real entry point, not just demos.
      gated on a verified verdict + idempotency).
    - `npm run run -- --tailor` — re-tailor with M6 before applying (use if the queue was
      populated by the legacy pipeline).
+   - `npm run run -- --preflight` — read-only AUTO vs ATTENDED triage (see Latest, above).
+   - `npm run run -- --attended` — co-pilot fill + verify + human handoff (see Latest, above).
    - `--batch N` (default 5), `--job ID`, `--stats`.
 - Needs config/profile.yml + config/answers.yml + config/scoring.yml + cv/ (gitignored,
   present on Parv's machine).
