@@ -81,6 +81,8 @@ export class AttendedFiller {
     });
 
     const needsHuman: HumanField[] = [
+      // A captcha is the human's to solve (invariant 6); the rest is still filled.
+      ...(schema.captcha ? [{ label: `Captcha (${schema.captcha.kind})`, why: 'solve it in the browser before you submit' }] : []),
       // Unknown / needs-review questions the gate refused to guess.
       ...payload.reasons.map((r) => ({ label: r.label, why: r.why })),
       // Self-identification: surfaced, never auto-filled (invariant 7).

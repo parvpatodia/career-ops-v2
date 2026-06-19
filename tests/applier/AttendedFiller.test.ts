@@ -33,9 +33,15 @@ const answers: AnswerSource = {
 class FakeSource implements AtsFormSource {
   readonly ats = 'generic';
   filled: FieldIntent[] = [];
-  constructor(private readonly authWall = false, private readonly readMap: Record<string, string | null> = {}) {}
+  constructor(
+    private readonly authWall = false,
+    private readonly readMap: Record<string, string | null> = {},
+    private readonly captcha = false
+  ) {}
   async isAuthWall(): Promise<boolean> { return this.authWall; }
-  async scanSchema(): Promise<NormalizedSchema> { return SCHEMA; }
+  async scanSchema(): Promise<NormalizedSchema> {
+    return this.captcha ? { ...SCHEMA, captcha: { kind: 'recaptcha' } } : SCHEMA;
+  }
   async fill(intent: FieldIntent): Promise<void> { this.filled.push(intent); }
   async readBack(field: FormField): Promise<string | null> {
     return field.id in this.readMap ? this.readMap[field.id]! : ANSWERS[field.label.toLowerCase()] ?? null;
@@ -75,5 +81,15 @@ describe('AttendedFiller', () => {
     const r = await new AttendedFiller(src, answers).fill(ctx);
     expect(r.kind).toBe('auth_required');
     expect(src.filled).toHaveLength(0);
+  });
+
+  it('still fills the rest but hands the captcha to the human', async () => {
+    // A captcha must NOT abort the attended fill (unlike the autonomous path):
+    // it fills + verifies what it can and adds the captcha to needsHuman.
+    const src = new FakeSource(false, {}, true);
+    const r = await new AttendedFiller(src, answers).fill(ctx);
+    if (r.kind !== 'filled') throw new Error('expected filled');
+    expect(r.verified.map((f) => f.label).sort()).toEqual(['Email', 'First Name']);
+    expect(r.needsHuman.some((h) => /captcha/i.test(h.label))).toBe(true);
   });
 });

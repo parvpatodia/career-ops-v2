@@ -14,6 +14,9 @@
  *                                     (verify-or-abstain) before applying.
  *   npm run run -- --batch 10         how many Ready jobs to process (default 5).
  *   npm run run -- --job 007          one application by id (or jobId).
+ *   npm run run -- --preflight        read-only: classify each Ready job AUTO
+ *                                     (hands-off submittable) vs ATTENDED (needs
+ *                                     you). Scans only, never fills or submits.
  *   npm run run -- --stats            queue breakdown, no browser.
  *
  * HARD RULES (AGENTS.md): submit happens ONLY with --approve AND only after an
@@ -45,7 +48,8 @@ import type { ApplyGateResult } from './Orchestrator.js';
 import { PlaywrightApplySessionFactory } from './PlaywrightApplySessionFactory.js';
 import { GreenhouseBoardJobProvider } from './GreenhouseBoardJobFetcher.js';
 import { Tailor } from '../tailor/Tailor.js';
-import { isIneligible, jobFromApp } from './queuePlanning.js';
+import { isIneligible, jobFromApp, triageForm } from './queuePlanning.js';
+import { IntentPayloadBuilder } from '../applier/IntentPayload.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
 import type { BatchApproval } from '../applier/Autopilot.js';
 import type { Application } from '../types.js';
@@ -126,6 +130,7 @@ async function main(): Promise<void> {
   const useApprove = args.includes('--approve');
   const useTailor = args.includes('--tailor');
   const useAttended = args.includes('--attended');
+  const usePreflight = args.includes('--preflight');
   const batchIdx = args.indexOf('--batch');
   const batchSize = batchIdx !== -1 ? parseInt(args[batchIdx + 1] ?? '5', 10) : 5;
   const jobIdx = args.indexOf('--job');
@@ -203,6 +208,52 @@ async function main(): Promise<void> {
 
   let submitted = 0;
   try {
+    // ── Preflight (read-only): classify each Ready job AUTO vs ATTENDED ──
+    // Scans + builds the payload only. NEVER fills, NEVER submits. Tells you
+    // which forms --approve can take hands-off and which need --attended.
+    if (usePreflight) {
+      console.log('Preflight (read-only): AUTO = predicted hands-off submittable via --approve; ATTENDED = needs you.\n');
+      let auto = 0;
+      let attended = 0;
+      for (let i = 0; i < queue.length; i++) {
+        const app = queue[i]!;
+        process.stdout.write(`[${i + 1}/${queue.length}] ${app.company} — ${app.role}\n`);
+        const opened = await sessions.open(app, answers());
+        if (!opened.ok) { console.log(`     → ATTENDED (unsupported ATS "${opened.ats}")\n`); attended++; continue; }
+        if (!opened.session.source) { console.log('     → ATTENDED (no form source)\n'); attended++; await opened.session.close(); continue; }
+        const ctx: AnswerContext = {
+          company: app.company, role: app.role, resumeVariant: app.resumeVariant,
+          ...(app.jd ? { jd: app.jd } : {}),
+        };
+        try {
+          if (await opened.session.source.isAuthWall()) { console.log('     → ATTENDED (login wall)\n'); attended++; continue; }
+          await essaySource.prewarm(ctx).catch(() => {});
+          const schema = await opened.session.source.scanSchema();
+          const payload = new IntentPayloadBuilder(answers()).build(schema.fields, ctx, app.pdfPath);
+          const verdict = triageForm({
+            hasCaptcha: !!schema.captcha,
+            requiredUnmapped: schema.unmapped.filter((u) => u.required).length,
+            unknownQuestions: payload.reasons.length,
+            fillableFields: payload.intents.length,
+          });
+          if (verdict.mode === 'auto') {
+            auto++;
+            console.log(`     → AUTO — ${payload.intents.length} field(s) would fill + verify; re-run with --approve --job ${app.id}\n`);
+          } else {
+            attended++;
+            console.log(`     → ATTENDED — ${verdict.reasons.join('; ')}\n`);
+          }
+        } catch (err) {
+          attended++;
+          console.log(`     → ATTENDED (scan error: ${(err as Error).message})\n`);
+        } finally {
+          await opened.session.close();
+        }
+      }
+      console.log(`═══ Preflight: ${auto} AUTO (--approve hands-off), ${attended} ATTENDED (--attended). ═══\n`);
+      return;
+    }
+
     // ── Attended mode: system fills + verifies what it can, you finish + submit ──
     if (useAttended) {
       const rl = process.stdin.isTTY ? createInterface({ input: stdin, output: stdout }) : null;

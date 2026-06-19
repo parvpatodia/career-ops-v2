@@ -23,6 +23,7 @@ import type { AnswerContext } from './AnswerGenerator.js';
 import { Verifier } from './Verifier.js';
 import type { ReadBackValue, VerifierVerdict } from './Verifier.js';
 import type { SubmissionRecorder } from './SubmissionRecorder.js';
+import type { CaptchaSignal } from './CaptchaDetector.js';
 
 /** Self-identification fields, surfaced for the human, never auto-filled. */
 export interface EeoField {
@@ -43,6 +44,8 @@ export interface NormalizedSchema {
   fields: FormField[];
   eeo: EeoField[];
   unmapped: UnmappedField[];
+  /** A captcha present on the form (a human touchpoint), or absent. */
+  captcha?: CaptchaSignal;
 }
 
 /**
@@ -94,6 +97,15 @@ export class ApplicationAdapter {
     const builder = new IntentPayloadBuilder(this.answers);
 
     const schema = await this.source.scanSchema();
+
+    // A captcha is a designed human touchpoint (invariant 6): never auto-solved.
+    // Detected during the scan, we hand off BEFORE filling — the autonomous,
+    // all-or-nothing path is the wrong tool when a human must solve a captcha to
+    // submit (use --attended for those). Routing to auth_required reuses the
+    // existing human-takeover phase + notification, and avoids a blind submit
+    // click into a wall that would only yield submit_unconfirmed.
+    if (schema.captcha) return { kind: 'auth_required' };
+
     const payload = builder.build(schema.fields, ctx, resumePdfPath);
 
     // A required field whose widget the mapper does not understand cannot be

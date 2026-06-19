@@ -23,6 +23,7 @@ import type { AtsFormSource, NormalizedSchema, EeoField } from './ApplicationAda
 import type { FieldIntent, FormField } from './IntentPayload.js';
 import { GreenhouseSchemaMapper } from './GreenhouseSchemaMapper.js';
 import { fillControl, readControl } from './DomControls.js';
+import { detectCaptcha } from './CaptchaDetector.js';
 
 export class GreenhouseFormSource implements AtsFormSource {
   readonly ats = 'greenhouse';
@@ -54,6 +55,7 @@ export class GreenhouseFormSource implements AtsFormSource {
     // schema-only fill verifies green yet the form rejects submit. Discover them
     // from the DOM and add them so the fill is complete.
     const builtins = await this.discoverBuiltinFields(known);
+    const captcha = await detectCaptcha(this.page);
     return {
       fields: [...apiFields, ...builtins],
       eeo: this.demographicFields(),
@@ -63,6 +65,7 @@ export class GreenhouseFormSource implements AtsFormSource {
         required: u.required,
         widget: u.type,
       })),
+      ...(captcha ? { captcha } : {}),
     };
   }
 

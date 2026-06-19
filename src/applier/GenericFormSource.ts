@@ -16,6 +16,7 @@ import type { Page } from 'playwright';
 import type { AtsFormSource, NormalizedSchema, EeoField, UnmappedField } from './ApplicationAdapter.js';
 import type { FieldIntent, FormField } from './IntentPayload.js';
 import { fillControl, readControl } from './DomControls.js';
+import { detectCaptcha } from './CaptchaDetector.js';
 
 interface RawField {
   id: string;
@@ -71,7 +72,8 @@ export class GenericFormSource implements AtsFormSource {
       }
       fields.push({ id: f.id, label: f.label, type, required: f.required });
     }
-    return { fields, eeo, unmapped };
+    const captcha = await detectCaptcha(this.page);
+    return { fields, eeo, unmapped, ...(captcha ? { captcha } : {}) };
   }
 
   fill(intent: FieldIntent): Promise<void> {
