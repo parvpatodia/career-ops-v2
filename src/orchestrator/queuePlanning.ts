@@ -20,6 +20,40 @@ export function isIneligible(app: Application): boolean {
   return INELIGIBLE_KEYWORDS.some((kw) => haystack.includes(kw));
 }
 
+/** What the read-only preflight observes about one scanned form. */
+export interface TriageInput {
+  hasCaptcha: boolean;
+  /** Required fields whose widget the mapper cannot fill safely. */
+  requiredUnmapped: number;
+  /** Required/needs-review questions with no approved answer (the gate abstains). */
+  unknownQuestions: number;
+  /** Fields the payload would fill (gated, confident). */
+  fillableFields: number;
+}
+
+export interface TriageVerdict {
+  /** 'auto': predicted hands-off submittable via --approve. 'attended': needs you. */
+  mode: 'auto' | 'attended';
+  reasons: string[];
+}
+
+/**
+ * Predict whether a form can go hands-off. A form is AUTO only when nothing
+ * needs a human: no captcha, no required widget the filler can't map, no unknown
+ * question, and at least one field actually fills (an empty payload abstains).
+ * Pure (no IO) so the routing is unit-tested; --approve still INDEPENDENTLY
+ * verifies before it ever submits, so a wrong "auto" guess cannot cause a bad
+ * submission — it would just verify_failed or abstain at run time.
+ */
+export function triageForm(input: TriageInput): TriageVerdict {
+  const reasons: string[] = [];
+  if (input.hasCaptcha) reasons.push('captcha present (you solve it)');
+  if (input.requiredUnmapped > 0) reasons.push(`${input.requiredUnmapped} required field(s) the filler can't map safely`);
+  if (input.unknownQuestions > 0) reasons.push(`${input.unknownQuestions} unknown question(s) with no approved answer`);
+  if (input.fillableFields === 0) reasons.push('no fillable fields detected');
+  return { mode: reasons.length === 0 ? 'auto' : 'attended', reasons };
+}
+
 export function parseNotes(notes: string): { platform: Platform; location: string } {
   const parts = (notes ?? '').split(' | ');
   // `||` not `??`: an empty/blank platform token must fall back to 'direct'

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isIneligible, jobFromApp, parseNotes } from '../../src/orchestrator/queuePlanning.js';
+import { isIneligible, jobFromApp, parseNotes, triageForm } from '../../src/orchestrator/queuePlanning.js';
 import type { Application } from '../../src/types.js';
 
 function app(overrides: Partial<Application> = {}): Application {
@@ -65,5 +65,36 @@ describe('jobFromApp reconstruction', () => {
   it('marks remote from the location note', () => {
     expect(jobFromApp(app({ notes: 'lever | Remote - US' })).job.remote).toBe(true);
     expect(jobFromApp(app({ notes: 'lever | San Jose, CA' })).job.remote).toBe(false);
+  });
+});
+
+describe('triageForm (AUTO vs ATTENDED)', () => {
+  const clean = { hasCaptcha: false, requiredUnmapped: 0, unknownQuestions: 0, fillableFields: 5 };
+
+  it('is AUTO only when nothing needs a human', () => {
+    const v = triageForm(clean);
+    expect(v.mode).toBe('auto');
+    expect(v.reasons).toEqual([]);
+  });
+
+  it('a captcha forces ATTENDED', () => {
+    expect(triageForm({ ...clean, hasCaptcha: true }).mode).toBe('attended');
+  });
+
+  it('a required unmapped widget forces ATTENDED', () => {
+    expect(triageForm({ ...clean, requiredUnmapped: 1 }).mode).toBe('attended');
+  });
+
+  it('an unknown question forces ATTENDED', () => {
+    expect(triageForm({ ...clean, unknownQuestions: 2 }).mode).toBe('attended');
+  });
+
+  it('no fillable fields forces ATTENDED (an empty payload abstains)', () => {
+    expect(triageForm({ ...clean, fillableFields: 0 }).mode).toBe('attended');
+  });
+
+  it('reports every blocking reason', () => {
+    const v = triageForm({ hasCaptcha: true, requiredUnmapped: 1, unknownQuestions: 1, fillableFields: 0 });
+    expect(v.reasons).toHaveLength(4);
   });
 });
