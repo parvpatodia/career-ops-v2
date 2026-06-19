@@ -20,6 +20,7 @@ config/profile.yml
 config/answers.yml
 config/answers.learned.yml
 config/outreach-snippets.yml
+config/outreach-targets.yml
 data/pending-answers.json
 portals.yml
 modes/_profile.md
