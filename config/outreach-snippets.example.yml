@@ -43,6 +43,10 @@ snippets:
   - key: recruiter.coop
     text: "I'm targeting a Fall 2026 co-op starting in August and would like to be considered for relevant openings on your team."
 
+  # Short, for LinkedIn connection notes (capped near 300 chars). Keep it tight.
+  - key: linkedin.intro
+    text: "I'm an MS AI student at Northeastern in Silicon Valley working on computer vision and robot learning."
+
   - key: common.signature
     text: |-
       Parv Patodia

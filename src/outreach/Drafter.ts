@@ -99,11 +99,18 @@ export class Drafter {
     };
   }
 
-  /** Build a copy-paste LinkedIn DM. Not gated (you send it), but kept clean. */
+  /**
+   * Build a copy-paste LinkedIn DM. Not gated (you send it), but kept clean and
+   * SHORT: a connection note caps near 300 chars, so it prefers a dedicated
+   * short `linkedin.intro` snippet over the long email intro.
+   */
   linkedin(c: Candidate): LinkedInDraft {
-    const intro = this.snippets.resolve(SEGMENT_CLAIMS[c.segment][0]!) ?? "I'm an MS AI student at Northeastern.";
+    const intro =
+      this.snippets.resolve('linkedin.intro') ??
+      this.snippets.resolve(SEGMENT_CLAIMS[c.segment][0]!) ??
+      "I'm an MS AI student at Northeastern.";
     const url = c.linkedinUrl ?? `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(c.name)}`;
-    const message = `Hi ${firstName(c.name)}, I came across ${c.hook}. ${intro} Would you be open to connecting?`;
+    const message = `Hi ${firstName(c.name)}, I came across ${c.hook} and wanted to connect. ${intro} Open to a quick chat?`;
     return { name: c.name, linkedinUrl: url, segment: c.segment, message, hook: c.hook };
   }
 
