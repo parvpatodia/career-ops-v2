@@ -19,6 +19,8 @@ import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { EmailTracker } from './EmailTracker.js';
 import { fetchRecentHeaders, accountsFromEnv } from './ImapClient.js';
 import { SecretVault, CredentialStore } from '../secrets/SecretVault.js';
+import { OutreachStore } from '../outreach/OutreachStore.js';
+import { OutreachReconciler } from '../outreach/OutreachReconciler.js';
 
 /** Email creds from the encrypted vault override .env (vault is the secure source). */
 function loadCreds(): NodeJS.ProcessEnv {
@@ -51,6 +53,13 @@ async function main(): Promise<void> {
     console.log(`  ${u.company.padEnd(24)} ${u.from} -> ${u.to}   ${u.account}  "${u.subject.slice(0, 50)}"`);
   }
   if (summary.updates.length === 0) console.log('  (no status changes)');
+
+  // Outreach reconcile: replies suppress future cold emails, bounces mark dead
+  // addresses. Same inbox fetch, separate log (data/outreach.jsonl).
+  const outreach = new OutreachReconciler(new OutreachStore(), (acct) => fetchRecentHeaders(acct, days));
+  const o = await outreach.run(accounts);
+  console.log(`\nOutreach reconcile: ${o.repliesRecorded} replies, ${o.bouncesRecorded} bounces` +
+    (o.unmatchedBounces ? `, ${o.unmatchedBounces} bounce(s) needing a manual check` : ''));
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });

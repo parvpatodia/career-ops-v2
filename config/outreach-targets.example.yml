@@ -1,0 +1,19 @@
+# Outreach targets. Copy to config/outreach-targets.yml and edit.
+#
+# companies: Hunter domain-search pulls real people (name, role, email) from each
+#   domain. This is the reliable auto-send path. Use real company email domains.
+# arxiv: free keyless queries that surface researchers to add to the LinkedIn
+#   copy-paste pack (arXiv does not expose emails). Match them to your fields.
+
+companies:
+  - { company: "Figure AI", domain: "figure.ai", limit: 8 }
+  - { company: "Physical Intelligence", domain: "physicalintelligence.company", limit: 8 }
+  - { company: "Skild AI", domain: "skild.ai", limit: 8 }
+  - { company: "Waymo", domain: "waymo.com", limit: 8 }
+  - { company: "Wayve", domain: "wayve.ai", limit: 8 }
+
+arxiv:
+  - { query: "diffusion policy robot manipulation", maxResults: 4 }
+  - { query: "autonomous driving motion planning", maxResults: 4 }
+  - { query: "human pose estimation", maxResults: 3 }
+  - { query: "knowledge distillation language models", maxResults: 3 }

@@ -1,18 +1,19 @@
 /**
- * Append-only JSONL event log with an advisory lock and an append-time
- * transition guard. The single write path for all tracker state
- * (AGENTS.md invariant 4).
+ * The single write path for all job-application tracker state (AGENTS.md
+ * invariant 4). EventStore owns the job-application meaning: the event-type
+ * whitelist, the seq numbering, and the Projection transition guard. The
+ * append-only IO, advisory lock, and incremental read cache live in JsonlLog,
+ * shared with the outreach log.
  *
- * WHY JSONL over SQLite: append-only means a corrupt line can only ever
- * cost itself, never the file; zero native deps; diffable in git tooling.
- * Revisit if query needs grow (SPEC M1 non-goals).
+ * WHY events, not CRUD: v1 lost data via read-modify-write of one JSON file
+ * from three unlocked writers (LESSONS.md 2026-06-10). An append-only log
+ * cannot lose prior records, and every state change keeps its history.
  */
 
-import fs from 'fs';
-import path from 'path';
 import { Projection } from './Projection.js';
 import { validateEvent, isValidAppId, EVENT_TYPES } from './events.js';
 import type { AppEvent, EventType } from './events.js';
+import { JsonlLog } from './JsonlLog.js';
 
 export class TransitionError extends Error {
   constructor(message: string) {
@@ -27,53 +28,30 @@ export interface AppendInput {
   payload?: Record<string, unknown>;
 }
 
-// WHY 30s/45s: stale must comfortably exceed any real critical section
-// (sub-100ms today) so a live holder is never robbed, and timeout must
-// exceed stale so waiters steal a crashed holder's lock before giving up.
-const LOCK_STALE_MS = 30_000;
-const LOCK_TIMEOUT_MS = 45_000;
-
-interface ReadCache {
-  /** Bytes consumed up to (and including) the last complete line's newline. */
-  offset: number;
-  events: AppEvent[];
-  corruptLines: number;
-}
-
 export class EventStore {
-  private readonly filePath: string;
-  private readonly lockPath: string;
-  // WHY a parsed-event cache: every operation used to re-read and re-parse
-  // the whole log (M1 review finding). Caching parsed events keyed on byte
-  // offset makes reads O(new bytes). Only complete lines advance the
-  // offset, so a partial tail from a crashed writer is re-examined on the
-  // next read instead of being half-consumed.
-  private cache: ReadCache | null = null;
+  private readonly log: JsonlLog<AppEvent>;
 
   constructor(filePath = 'data/events.jsonl') {
-    this.filePath = filePath;
-    this.lockPath = filePath + '.lock';
+    this.log = new JsonlLog<AppEvent>(filePath, validateEvent);
   }
 
   readAll(): { events: AppEvent[]; corruptLines: number } {
-    const c = this.ensureFresh();
-    return { events: [...c.events], corruptLines: c.corruptLines };
+    const { records, corruptLines } = this.log.read();
+    return { events: records, corruptLines };
   }
 
   projection(): Projection {
     // WHY fold per call: callers get snapshot semantics (a handed-out
     // projection never mutates when new events land). The expensive part,
-    // file IO and JSON parsing, is what the cache removes.
+    // file IO and JSON parsing, is what JsonlLog's cache removes.
     const proj = new Projection();
-    for (const e of this.ensureFresh().events) proj.apply(e);
+    for (const e of this.log.read().records) proj.apply(e);
     return proj;
   }
 
   /**
    * Validate, guard, and append one event. Throws TransitionError when the
    * projection rejects the transition (e.g. duplicate submitted).
-   * WHY read-fold-append under one lock: the guard is a read-modify-append
-   * race without it, exactly the v1 bug class this layer exists to kill.
    */
   append(input: AppendInput): AppEvent {
     return this.appendGroup([input])[0]!;
@@ -90,14 +68,9 @@ export class EventStore {
   }
 
   /**
-   * All-or-nothing append of correlated events under one lock. Later
-   * events are validated against a rolling projection that already
-   * includes the earlier ones, so submitted+confirmed can land as a pair.
-   *
-   * Honesty note on atomicity: the group goes to disk as ONE write
-   * syscall, which makes a half-landed group extremely unlikely, not
-   * impossible (a truncated tail line is quarantined as corrupt on the
-   * next read). Consumers needing hard completeness check cid + size.
+   * All-or-nothing append of correlated events under one lock. Later events
+   * are validated against a rolling projection that already includes the
+   * earlier ones, so submitted+confirmed can land as a pair.
    */
   appendGroup(inputs: AppendInput[], cid?: string): AppEvent[] {
     if (inputs.length === 0) throw new Error('appendGroup: empty group');
@@ -110,12 +83,11 @@ export class EventStore {
       }
     }
 
-    return this.withLock(() => {
-      const c = this.ensureFresh();
+    return this.log.append((records) => {
       const proj = new Projection();
-      for (const e of c.events) proj.apply(e);
+      for (const e of records) proj.apply(e);
 
-      let seq = c.events[c.events.length - 1]?.seq ?? 0;
+      let seq = records[records.length - 1]?.seq ?? 0;
       const ts = new Date().toISOString();
       const events: AppEvent[] = [];
       for (const input of inputs) {
@@ -133,146 +105,7 @@ export class EventStore {
         events.push(event);
       }
 
-      this.appendLines(events.map((e) => JSON.stringify(e)));
-      return events;
+      return { lines: events.map((e) => JSON.stringify(e)), value: events };
     });
   }
-
-  private ensureFresh(): ReadCache {
-    if (!fs.existsSync(this.filePath)) {
-      this.cache = null;
-      return { offset: 0, events: [], corruptLines: 0 };
-    }
-    const size = fs.statSync(this.filePath).size;
-    let c = this.cache;
-    // size < offset means the file was replaced or truncated underneath
-    // us, which append-only writers never do: rebuild from scratch.
-    if (!c || size < c.offset) c = { offset: 0, events: [], corruptLines: 0 };
-    if (size === c.offset) {
-      this.cache = c;
-      return c;
-    }
-
-    const fd = fs.openSync(this.filePath, 'r');
-    let chunk: string;
-    try {
-      const buf = Buffer.alloc(size - c.offset);
-      fs.readSync(fd, buf, 0, buf.length, c.offset);
-      chunk = buf.toString('utf8');
-    } finally {
-      fs.closeSync(fd);
-    }
-
-    const lastNewline = chunk.lastIndexOf('\n');
-    if (lastNewline === -1) {
-      // Only a partial tail so far; consume nothing.
-      this.cache = c;
-      return c;
-    }
-    const complete = chunk.slice(0, lastNewline);
-    for (const line of complete.split('\n')) {
-      if (line.trim() === '') continue;
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(line);
-      } catch {
-        c.corruptLines++;
-        continue;
-      }
-      const event = validateEvent(parsed);
-      if (event) c.events.push(event);
-      else c.corruptLines++;
-    }
-    c.offset += Buffer.byteLength(complete, 'utf8') + 1;
-    this.cache = c;
-    return c;
-  }
-
-  private appendLines(lines: string[]): void {
-    fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
-    // WHY the newline probe: a crashed writer can leave a partial line with
-    // no trailing newline; appending straight onto it would swallow these
-    // events into the corrupt line. A leading newline quarantines the damage.
-    let prefix = '';
-    if (fs.existsSync(this.filePath)) {
-      const stat = fs.statSync(this.filePath);
-      if (stat.size > 0) {
-        const fd = fs.openSync(this.filePath, 'r');
-        try {
-          const buf = Buffer.alloc(1);
-          fs.readSync(fd, buf, 0, 1, stat.size - 1);
-          if (buf.toString('utf8') !== '\n') prefix = '\n';
-        } finally {
-          fs.closeSync(fd);
-        }
-      }
-    }
-    fs.appendFileSync(this.filePath, prefix + lines.join('\n') + '\n');
-  }
-
-  // WHY an owner token: release must only remove a lock this instance
-  // holds, and a stale steal must be winnable by exactly one contender.
-  // The 2026-06-11 review caught both races in the token-less version:
-  // double-steal, and a slow holder releasing the thief's lock.
-  private readonly ownerToken = `${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-  private withLock<T>(fn: () => T): T {
-    this.acquireLock();
-    try {
-      return fn();
-    } finally {
-      this.releaseLock();
-    }
-  }
-
-  private acquireLock(): void {
-    fs.mkdirSync(path.dirname(this.lockPath), { recursive: true });
-    const start = Date.now();
-    for (;;) {
-      try {
-        // mkdir is atomic: exactly one process can create the directory.
-        fs.mkdirSync(this.lockPath);
-        fs.writeFileSync(path.join(this.lockPath, 'owner'), this.ownerToken);
-        return;
-      } catch {
-        this.tryStealStaleLock();
-        if (Date.now() - start > LOCK_TIMEOUT_MS) {
-          throw new Error(`Could not acquire lock ${this.lockPath} within ${LOCK_TIMEOUT_MS}ms`);
-        }
-        sleepSync(25);
-      }
-    }
-  }
-
-  private releaseLock(): void {
-    try {
-      const owner = fs.readFileSync(path.join(this.lockPath, 'owner'), 'utf8');
-      // If the token differs, our hold exceeded LOCK_STALE_MS and the lock
-      // was legitimately stolen; removing it would hand a third writer a
-      // free pass. Leave it to its new owner.
-      if (owner === this.ownerToken) fs.rmSync(this.lockPath, { recursive: true, force: true });
-    } catch {
-      // Lock already gone; nothing to release.
-    }
-  }
-
-  private tryStealStaleLock(): void {
-    try {
-      const stat = fs.statSync(this.lockPath);
-      if (Date.now() - stat.mtimeMs <= LOCK_STALE_MS) return;
-      // Atomic rename: exactly one contender wins; the loser's rename
-      // throws and it goes back to the wait loop.
-      const trash = `${this.lockPath}.stale-${this.ownerToken}`;
-      fs.renameSync(this.lockPath, trash);
-      fs.rmSync(trash, { recursive: true, force: true });
-    } catch {
-      // Someone else stole it first, or it vanished; back to waiting.
-    }
-  }
-}
-
-/** Synchronous sleep without spinning the CPU; keeps append() sync for callers. */
-function sleepSync(ms: number): void {
-  const arr = new Int32Array(new SharedArrayBuffer(4));
-  Atomics.wait(arr, 0, 0, ms);
 }

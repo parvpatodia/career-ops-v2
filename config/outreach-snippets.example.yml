@@ -1,0 +1,50 @@
+# Outreach self-claims, human-approved. Copy to config/outreach-snippets.yml
+# (gitignored) and EDIT every line so it is true and sounds like you.
+#
+# Contract: the cold-email drafter states a fact about you ONLY by quoting one of
+# these snippets verbatim, and the DraftGate proves the quoted text is in the
+# body. Recipient-specific personalization is written fresh per email; the claims
+# about you cannot be fabricated. An empty file means the gate abstains every
+# draft (the safe default), so fill this in before going live.
+#
+# Style (the StyleLinter enforces it): no em dashes, no filler (leverage, robust,
+# crucial, seamless, utilize, ...), no forced enthusiasm (excited, passionate).
+#
+# Keys are <segment>.<intro|detail|ask|coop>. The drafter builds each email as:
+# greeting, your personalization + a company-relevance line, intro, detail,
+# ask/coop, "I have attached my resume", then common.signature.
+
+snippets:
+  - key: researcher.intro
+    text: "I'm a master's student in AI at Northeastern University in Silicon Valley, working on computer vision, pose estimation, and policy learning."
+  - key: researcher.detail
+    text: "I built a Vision Transformer from scratch in PyTorch, with patch embedding, multi-head self-attention, and encoder blocks and no pretrained modules, and I work on diffusion policies for manipulation."
+  - key: researcher.ask
+    text: "I'd value fifteen minutes to hear how you think about this; I want to understand it deeply before I build on it."
+
+  - key: phd_student.intro
+    text: "I'm an MS AI student at Northeastern University in Silicon Valley working in the same space you are."
+  - key: phd_student.detail
+    text: "I built a Vision Transformer from scratch in PyTorch and work on diffusion policies and pose estimation, and I learn fastest by talking to people doing the research."
+  - key: phd_student.ask
+    text: "Would you be open to a short call about your work and how you got into this area?"
+
+  - key: industry.intro
+    text: "I'm a master's student in AI at Northeastern University in Silicon Valley, graduating May 2027 with a 3.9 GPA, and I build AI systems end to end."
+  - key: industry.detail
+    text: "I wrote a Vision Transformer from scratch in PyTorch for satellite change detection, built Laksh.ai for markerless basketball pose estimation using RTMPose and ChromaDB, and shipped TaskRoute, an LLM routing engine on FastAPI. Before my master's I was an autonomous-vehicle test engineer at Venti Technologies and a site reliability engineer at United Overseas Bank."
+  - key: industry.coop
+    text: "I'm looking for a Fall 2026 co-op or internship starting in August, ideally in the Bay Area, and I'd value twenty minutes to hear how your team works."
+
+  - key: recruiter.intro
+    text: "I'm an MS in AI student at Northeastern University in Silicon Valley, graduating May 2027 with a 3.9 GPA, focused on computer vision and ML systems."
+  - key: recruiter.detail
+    text: "I have shipped a from-scratch Vision Transformer in PyTorch, Laksh.ai for markerless pose estimation, and TaskRoute for LLM routing, and I have held engineering roles at United Overseas Bank and Venti Technologies. I am on F-1 status with CPT authorization and need no sponsorship for an internship."
+  - key: recruiter.coop
+    text: "I'm targeting a Fall 2026 co-op starting in August and would like to be considered for relevant openings on your team."
+
+  - key: common.signature
+    text: |-
+      Parv Patodia
+      MS Artificial Intelligence, Northeastern University, Silicon Valley
+      linkedin.com/in/parvpatodia | github.com/parvpatodia
