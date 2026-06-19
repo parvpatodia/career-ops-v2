@@ -7,7 +7,7 @@
  */
 
 import type { HunterClient } from '../HunterClient.js';
-import type { Candidate } from '../types.js';
+import type { Candidate, Segment } from '../types.js';
 
 export interface CompanyTarget {
   /** Company display name, e.g. "Figure AI". */
@@ -20,7 +20,28 @@ export interface CompanyTarget {
   focus?: string;
 }
 
-const RECRUITER = /recruit|talent|sourcer|people ops|people operations|human resources|\bhr\b|hiring|university relations/i;
+// Recruiting / talent / HR: the people who actually hire interns.
+const RECRUITER = /\b(recruit|recruiter|recruiting|talent|sourcer|hr|human resources|people operations|people ops|university relations|campus|early career)\b/i;
+// Explicit non-targets: cold-emailing these about a co-op is noise.
+const IRRELEVANT = /\b(administrative|admin assistant|executive assistant|office manager|office administrator|receptionist|finance|financial|accountant|accounting|controller|bookkeep|payroll|sales|account executive|account manager|business development|marketing|brand|communications|public relations|legal|counsel|attorney|paralegal|facilities|procurement|customer success|customer support|community manager)\b/i;
+// High-precision technical and leadership signals worth reaching out to.
+const RELEVANT = /\b(engineer|engineering|software|swe|machine learning|ml|ai|artificial intelligence|research|scientist|robotic|robotics|perception|autonomy|autonomous|computer vision|deep learning|founder|co-?founder|cto|chief technology|ceo|chief executive|developer|hardware|firmware|embedded|technical staff|member of technical|nlp|llm)\b/i;
+
+/**
+ * Classify a Hunter position into an outreach segment, or null to SKIP. Order
+ * matters: recruiting wins first, then explicit non-targets are dropped, then
+ * technical/leadership roles are kept. Anything else (unknown or ambiguous
+ * title, or no title at all) is skipped, because emailing a stranger we cannot
+ * place is exactly the noise Parv asked to stop. Conservative by design.
+ */
+export function classifyRole(position?: string): Segment | null {
+  const p = position?.trim();
+  if (!p) return null;
+  if (RECRUITER.test(p)) return 'recruiter';
+  if (IRRELEVANT.test(p)) return null;
+  if (RELEVANT.test(p)) return 'industry';
+  return null;
+}
 
 export class CompanySourcer {
   constructor(private readonly hunter: HunterClient) {}
@@ -35,9 +56,10 @@ export class CompanySourcer {
     const out: Candidate[] = [];
     for (const e of emails) {
       if (!e.value || !e.value.includes('@')) continue;
-      const name = [e.firstName, e.lastName].filter(Boolean).join(' ').trim() || e.value;
       const position = e.position?.trim();
-      const segment = position && RECRUITER.test(position) ? 'recruiter' : 'industry';
+      const segment = classifyRole(position);
+      if (!segment) continue; // skip admins, finance, sales, and unknown roles
+      const name = [e.firstName, e.lastName].filter(Boolean).join(' ').trim() || e.value;
       out.push({
         name,
         segment,
@@ -46,9 +68,8 @@ export class CompanySourcer {
         email: e.value,
         emailConfidence: e.confidence,
         sourceUrl: `https://${target.domain}`,
-        hook: position
-          ? `your work as ${position} at ${target.company}`
-          : `the team at ${target.company}`,
+        // segment is non-null only when position is known, so the hook always has a role.
+        hook: `your work as ${position} at ${target.company}`,
         focus: target.focus,
       });
     }

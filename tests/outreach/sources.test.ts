@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CompanySourcer } from '../../src/outreach/sources/CompanySourcer.js';
+import { CompanySourcer, classifyRole } from '../../src/outreach/sources/CompanySourcer.js';
 import { ArxivSourcer, parseArxivFeed } from '../../src/outreach/sources/ArxivSourcer.js';
 import { HunterClient, type HunterFetch } from '../../src/outreach/HunterClient.js';
 
@@ -8,22 +8,49 @@ function hunterReturning(body: unknown): HunterClient {
   return new HunterClient({ apiKey: 'k', fetchFn });
 }
 
+describe('classifyRole (relevance filter)', () => {
+  it('keeps technical and leadership roles as industry', () => {
+    for (const t of ['ML Engineer', 'Software Engineer', 'Research Scientist', 'Director of Network Engineering', 'Head of AI', 'CTO', 'Founder', 'Member of Technical Staff', 'Robotics Engineer']) {
+      expect(classifyRole(t)).toBe('industry');
+    }
+  });
+  it('routes recruiting and HR to recruiter', () => {
+    for (const t of ['Technical Recruiter', 'Talent Acquisition', 'University Relations', 'HR Business Partner', 'Campus Recruiter']) {
+      expect(classifyRole(t)).toBe('recruiter');
+    }
+  });
+  it('skips admins, finance, sales, and other non-targets', () => {
+    for (const t of ['Administrative Assistant', 'Executive Assistant', 'Office Manager', 'Staff Accountant', 'Account Executive', 'Sales Director', 'Marketing Manager', 'Legal Counsel', 'Director of Partnerships']) {
+      expect(classifyRole(t)).toBeNull();
+    }
+  });
+  it('skips a missing or unknown role rather than guessing', () => {
+    expect(classifyRole(undefined)).toBeNull();
+    expect(classifyRole('')).toBeNull();
+    expect(classifyRole('Program Manager')).toBeNull(); // ambiguous: skip
+  });
+  it('does not false-match a banned token inside a word (email/retail)', () => {
+    expect(classifyRole('Retail Associate')).toBeNull();
+  });
+});
+
 describe('CompanySourcer', () => {
-  it('maps domain-search emails to candidates and segments recruiters apart', async () => {
+  it('maps relevant emails to candidates, segments recruiters apart, and drops irrelevant roles', async () => {
     const hunter = hunterReturning({
       data: {
         emails: [
           { value: 'eng@figure.ai', type: 'personal', confidence: 90, first_name: 'Sam', last_name: 'Lee', position: 'ML Engineer' },
           { value: 'jobs@figure.ai', type: 'personal', confidence: 80, first_name: 'Dana', last_name: 'Ng', position: 'Technical Recruiter' },
+          { value: 'admin@figure.ai', type: 'personal', confidence: 99, first_name: 'Pat', last_name: 'Ito', position: 'Administrative Assistant' },
+          { value: 'noidea@figure.ai', type: 'personal', confidence: 70, first_name: 'No', last_name: 'Role' }, // no position
         ],
       },
     });
     const candidates = await new CompanySourcer(hunter).source({ company: 'Figure AI', domain: 'figure.ai' });
-    expect(candidates).toHaveLength(2);
+    expect(candidates.map((c) => c.email)).toEqual(['eng@figure.ai', 'jobs@figure.ai']); // admin + no-role dropped
     expect(candidates[0]!.segment).toBe('industry');
-    expect(candidates[0]!.email).toBe('eng@figure.ai');
-    expect(candidates[1]!.segment).toBe('recruiter'); // "Recruiter" position
-    expect(candidates[1]!.hook).toContain('Figure AI');
+    expect(candidates[1]!.segment).toBe('recruiter');
+    expect(candidates[0]!.hook).toContain('Figure AI');
   });
 });
 

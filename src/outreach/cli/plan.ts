@@ -25,6 +25,7 @@ import { ArxivSourcer, type ArxivQuery } from '../sources/ArxivSourcer.js';
 import { Drafter } from '../Drafter.js';
 import { SnippetBook } from '../SnippetBook.js';
 import { OutreachStore } from '../OutreachStore.js';
+import { Notifier } from '../../applier/Notifier.js';
 import type { Candidate, EmailDraft, LinkedInDraft } from '../types.js';
 
 function arg(flag: string): string | undefined {
@@ -149,7 +150,15 @@ async function main(): Promise<void> {
   }
   if (dms.length) {
     fs.mkdirSync('data/outreach', { recursive: true });
-    fs.writeFileSync(path.join('data/outreach', `linkedin-${date}.md`), renderPack(date, dms));
+    const packPath = path.join('data/outreach', `linkedin-${date}.md`);
+    fs.writeFileSync(packPath, renderPack(date, dms));
+    // Ping Parv: the DMs are his to copy-paste, so he wants to know they are ready.
+    new Notifier().notify({
+      kind: 'batch_complete',
+      title: 'Outreach: LinkedIn DMs ready',
+      message: `${dms.length} DM(s) for ${date}. Open ${packPath}, copy, and send.`,
+      urgent: false,
+    });
   }
 
   console.log(`Wrote ${drafts.length} email draft(s) to ${draftsDir} and ${dms.length} LinkedIn DM(s).`);
