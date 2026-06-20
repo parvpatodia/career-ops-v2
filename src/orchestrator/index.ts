@@ -17,6 +17,8 @@
  *   npm run run -- --preflight        read-only: classify each Ready job AUTO
  *                                     (hands-off submittable) vs ATTENDED (needs
  *                                     you). Scans only, never fills or submits.
+ *                                     Add --learn to record each unknown question
+ *                                     to the answer inbox for one-time approval.
  *   npm run run -- --stats            queue breakdown, no browser.
  *
  * HARD RULES (AGENTS.md): submit happens ONLY with --approve AND only after an
@@ -131,6 +133,10 @@ async function main(): Promise<void> {
   const useTailor = args.includes('--tailor');
   const useAttended = args.includes('--attended');
   const usePreflight = args.includes('--preflight');
+  // --learn (with --preflight): record each unknown question to the AnswerInbox
+  // as pending, so a human can approve it once and it is learned forever. Only
+  // records the QUESTION — never an answer (no fabrication; invariant 7).
+  const useLearn = args.includes('--learn');
   const batchIdx = args.indexOf('--batch');
   const batchSize = batchIdx !== -1 ? parseInt(args[batchIdx + 1] ?? '5', 10) : 5;
   const jobIdx = args.indexOf('--job');
@@ -212,9 +218,12 @@ async function main(): Promise<void> {
     // Scans + builds the payload only. NEVER fills, NEVER submits. Tells you
     // which forms --approve can take hands-off and which need --attended.
     if (usePreflight) {
-      console.log('Preflight (read-only): AUTO = predicted hands-off submittable via --approve; ATTENDED = needs you.\n');
+      console.log('Preflight (read-only): AUTO = predicted hands-off submittable via --approve; ATTENDED = needs you.');
+      if (useLearn) console.log('--learn: recording each unknown question to the answer inbox (questions only, never answers).');
+      console.log('');
       let auto = 0;
       let attended = 0;
+      let flagged = 0;
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         process.stdout.write(`[${i + 1}/${queue.length}] ${app.company} — ${app.role}\n`);
@@ -245,7 +254,11 @@ async function main(): Promise<void> {
             // Name WHAT needs a human, so the AnswerKB can be grown (mission:
             // intervention trends to zero as approved answers accumulate).
             if (schema.captcha) console.log(`         · captcha: ${schema.captcha.kind} (you solve it)`);
-            for (const r of payload.reasons) console.log(`         · unknown: ${r.label.replace(/\s+/g, ' ').slice(0, 80)}`);
+            for (const r of payload.reasons) {
+              console.log(`         · unknown: ${r.label.replace(/\s+/g, ' ').slice(0, 80)}`);
+              // flag() dedups by normalized question + skips already-learned ones.
+              if (useLearn && inbox.flag(r.label, ctx, r.why)) flagged++;
+            }
             for (const u of schema.unmapped.filter((u) => u.required)) console.log(`         · unmapped(${u.widget}): ${u.label.replace(/\s+/g, ' ').slice(0, 70)}`);
             console.log(`       (${payload.intents.length} field(s) WOULD fill + verify automatically)\n`);
           }
@@ -256,7 +269,13 @@ async function main(): Promise<void> {
           await opened.session.close();
         }
       }
-      console.log(`═══ Preflight: ${auto} AUTO (--approve hands-off), ${attended} ATTENDED (--attended). ═══\n`);
+      console.log(`═══ Preflight: ${auto} AUTO (--approve hands-off), ${attended} ATTENDED (--attended). ═══`);
+      if (useLearn) {
+        console.log(`Flagged ${flagged} new question(s) to the answer inbox (data/pending-answers.json).`);
+        console.log(`Approve them once (MCP resolve_answer, or config/answers.learned.yml); they auto-fill next run.\n`);
+      } else {
+        console.log('');
+      }
       return;
     }
 
