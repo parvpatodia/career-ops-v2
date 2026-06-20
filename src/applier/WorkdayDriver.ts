@@ -21,12 +21,20 @@ import type { WorkdayPageDriver } from './WorkdayAdapter.js';
 import type { WorkdayRawField } from './WorkdaySchemaMapper.js';
 import type { FieldIntent, FormField } from './IntentPayload.js';
 import { fillControl, readControl } from './DomControls.js';
+import { detectCaptcha } from './CaptchaDetector.js';
+import type { CaptchaSignal } from './CaptchaDetector.js';
 
 export class WorkdayDriver implements WorkdayPageDriver {
   constructor(private readonly page: Page) {}
 
   private sel(automationId: string): string {
     return `[data-automation-id="${automationId}"]`;
+  }
+
+  /** Workday forms can gate submit behind a captcha; detect it so the
+   *  autonomous path hands off instead of blind-submitting (invariant 6). */
+  hasCaptcha(): Promise<CaptchaSignal | null> {
+    return detectCaptcha(this.page);
   }
 
   async isAuthWall(): Promise<boolean> {
