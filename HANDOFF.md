@@ -1,6 +1,27 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-19 (attended mode + captcha routing + preflight).
+> Read at session start (CLAUDE.md load order). Last updated 2026-06-20 (captcha-everywhere + leak fix + live email + --learn).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-06-20)
+- **Greenhouse option-leak FIXED**: `discoverBuiltinFields` was discovering each multi-select
+  checkbox option (Austin TX, Summer, ...) as a phantom required text question. Tenstorrent
+  People Ops dropped 14 -> 6 real unknowns. Pure `filterBuiltins` (excludes checkbox/radio), tested.
+- **Captcha detection now on ALL three FormSources** (Greenhouse, Generic, AND Workday — the
+  last was missed initially; adversarial review caught it). Workday driver gained optional
+  `hasCaptcha()`. So `--approve` cannot blind-submit into a captcha on any supported ATS.
+- **Email tracking is LIVE**: the Gmail app password is already in the vault; `npm run inbox`
+  connected and scanned 2782 emails/30d, matched 2. Added `npm run inbox -- --check` (read-only
+  login test + precise "user set, password missing" diagnosis).
+- **`npm run run -- --preflight --learn`**: records each unknown question to the AnswerInbox
+  (data/pending-answers.json, gitignored) for one-time human approval; grows the AnswerKB so
+  intervention drops. Questions only, never fabricated answers.
+- **Honest ceiling on the current queue**: 5 Ready jobs, ALL classify ATTENDED (captcha +/or
+  genuine human-choice questions). 0 AUTO. So NO application is autonomously submittable right
+  now; a real submission needs either an attended session (Parv at the keyboard) or new
+  captcha-free postings from a fresh scan. The 6 Tenstorrent unknowns (transcript upload, two
+  multi-selects, internship length, 40-hours option, export-control attestation) are genuine
+  human touchpoints — answering them is forbidden to automate (invariant 1/7).
+- 506 tests; demos green (demo:captcha 5/5, demo:integration, demo:autopilot).
 
 ## Latest (2026-06-19) — the HONEST submission paths
 Fully-autonomous, zero-human submission is impossible on captcha-protected forms by policy
