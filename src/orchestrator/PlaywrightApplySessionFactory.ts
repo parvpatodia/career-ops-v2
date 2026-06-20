@@ -31,6 +31,7 @@ import { ApplicationAdapter } from '../applier/ApplicationAdapter.js';
 import type { AtsFormSource } from '../applier/ApplicationAdapter.js';
 import { GreenhouseFormSource } from '../applier/GreenhouseFormSource.js';
 import { GenericFormSource } from '../applier/GenericFormSource.js';
+import { bringToFront } from '../applier/browserLaunch.js';
 import type { SubmitDriver } from '../applier/Autopilot.js';
 import type { Application } from '../types.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
@@ -65,6 +66,9 @@ async function buildSession(
     await page.close().catch(() => {});
     await context.close().catch(() => {});
   };
+  // Surface this window to the user on a human touchpoint (captcha/flagged field)
+  // so they never have to click the Script-Editor notification to find it.
+  const focus = (): Promise<void> => bringToFront(page);
   try {
     await page.goto(navigateUrl, { waitUntil: 'domcontentloaded', timeout: gotoTimeoutMs });
     // The Greenhouse/Lever React forms AND their reCAPTCHA render AFTER
@@ -92,7 +96,7 @@ async function buildSession(
       source = generic;
       submit = generic;
     }
-    return { adapter: new ApplicationAdapter(source, answers), submit, source, close };
+    return { adapter: new ApplicationAdapter(source, answers), submit, source, focus, close };
   } catch (err) {
     await close();
     throw err;

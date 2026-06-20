@@ -33,7 +33,7 @@
 import 'dotenv/config';
 import { createInterface } from 'readline/promises';
 import { stdin, stdout } from 'process';
-import { chromium } from 'playwright';
+import { launchChrome } from '../applier/browserLaunch.js';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
 import { AnswerKB, CompositeAnswerSource } from '../applier/AnswerKB.js';
@@ -187,8 +187,11 @@ async function main(): Promise<void> {
       new AnswerGenerator(profileLoader!),
     ]);
 
-  const headless = process.env.CAREER_OPS_HEADLESS === '1';
-  const browser = await chromium.launch({ headless });
+  // Attended mode is interactive: it MUST be headed so Parv can see the form and
+  // solve the captcha. Other modes honor CAREER_OPS_HEADLESS (default: headed).
+  const headless = useAttended ? false : process.env.CAREER_OPS_HEADLESS === '1';
+  const { browser, usingChrome } = await launchChrome({ headless });
+  log.info(usingChrome ? 'Using your Google Chrome' : 'Chrome not found — fell back to bundled Chromium');
   const greenhouseProvider = new GreenhouseBoardJobProvider();
   const sessions = new PlaywrightApplySessionFactory({
     browser,
@@ -282,7 +285,7 @@ async function main(): Promise<void> {
     // ── Attended mode: system fills + verifies what it can, you finish + submit ──
     if (useAttended) {
       const rl = process.stdin.isTTY ? createInterface({ input: stdin, output: stdout }) : null;
-      console.log(`Attended: I fill + verify what I safely can in the visible browser; you complete the flagged items, solve any captcha, and click Submit.\n`);
+      console.log(`Attended (Google Chrome): I fill + verify what I safely can, then bring the Chrome window to the front for you. Solve any captcha + finish flagged fields THERE and click Submit. (Ignore the macOS banner — it opens Script Editor, not the browser.)\n`);
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id})`);
@@ -298,7 +301,12 @@ async function main(): Promise<void> {
           const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
           printAttended(res);
           if (res.kind === 'filled' && rl) {
-            await rl.question('  → Finish the flagged items + captcha in the browser, click Submit, then press Enter (s to skip): ');
+            // Bring the Chrome window to the front so the captcha/flagged fields
+            // are right in front of Parv — no need to click the (Script-Editor)
+            // notification, which never opened the browser.
+            await opened.session.focus?.();
+            console.log('  → Chrome is now in front. Solve the captcha + finish any flagged field there.');
+            await rl.question('  → When done in the browser, click Submit, then press Enter (s to skip): ');
             const did = await rl.question('  → Did you submit it? (y/n): ');
             if (did.trim().toLowerCase() === 'y') {
               store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
