@@ -21,7 +21,22 @@
   captcha-free postings from a fresh scan. The 6 Tenstorrent unknowns (transcript upload, two
   multi-selects, internship length, 40-hours option, export-control attestation) are genuine
   human touchpoints — answering them is forbidden to automate (invariant 1/7).
-- 506 tests; demos green (demo:captcha 5/5, demo:integration, demo:autopilot).
+- **Scan-timing FIXED**: buildSession now settles the page (capped networkidle) before
+  scanning — the React form + reCAPTCHA render after domcontentloaded, and a racing scan
+  was flip-flopping (one --approve saw "no captcha, 1 unknown"; preflight saw "captcha, 5").
+  After the fix, all 5 Ready jobs consistently detect reCAPTCHA.
+- **`npm run source -- --top N`**: tailors only the N highest-scoring fresh jobs (score-ranked
+  bounded run; the expensive M6 tailor runs only on the best).
+- **Autonomous --approve demonstrated on the 5 board-API jobs: 0 submitted, 0 false records** —
+  all 5 route to auth_required (reCAPTCHA) or needs_input (unknown questions). The accuracy
+  contract held; nothing incorrect reached an employer.
+- **Sourcing integrity caveat**: a fresh scan returns ~279 jobs but 267 are scraper-sourced with
+  STUB JDs (<160 chars) and `postedAt` = scrape-time (not a real posting date) — they fail
+  invariant 9 (freshness) + the no-stub-JD-scoring lesson, so they are NOT auto-submittable.
+  Only the ~12 structured board-API jobs (Greenhouse/Lever) carry real dates + full question
+  sets, and those are all captcha-gated. Net: NO autonomous submission is possible with
+  integrity right now; a real submission needs an attended session (Parv solves the captcha).
+- 507 tests; demos green (demo:captcha 5/5, demo:integration 6, demo:autopilot 2).
 
 ## Latest (2026-06-19) — the HONEST submission paths
 Fully-autonomous, zero-human submission is impossible on captcha-protected forms by policy
