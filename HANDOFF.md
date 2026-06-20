@@ -36,6 +36,13 @@
   Only the ~12 structured board-API jobs (Greenhouse/Lever) carry real dates + full question
   sets, and those are all captcha-gated. Net: NO autonomous submission is possible with
   integrity right now; a real submission needs an attended session (Parv solves the captcha).
+- **Chrome + captcha UX FIXED**: the run CLI now launches Parv's real Google Chrome
+  (channel 'chrome', fallback Chromium), attended mode is forced headed, and on a human
+  touchpoint the Chrome window is raised to the front (page.bringToFront + osascript
+  activate). The macOS notification banner opens Script Editor (not the browser), so the
+  captcha flow no longer depends on clicking it — the window surfaces itself. Verified live:
+  real Chrome 147, attended filled+verified 12 fields on a Tenstorrent form, flagged the
+  reCAPTCHA, no submit. THE captcha path is `npm run run -- --attended` in a real terminal.
 - 507 tests; demos green (demo:captcha 5/5, demo:integration 6, demo:autopilot 2).
 
 ## Latest (2026-06-19) — the HONEST submission paths
