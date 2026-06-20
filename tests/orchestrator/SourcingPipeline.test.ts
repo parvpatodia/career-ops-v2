@@ -100,6 +100,25 @@ describe('SourcingPipeline', () => {
     expect(orch.calls).toEqual([]); // dry run never tailors/queues
   });
 
+  it('topN tailors only the highest-scoring fresh jobs (bounded, score-ranked)', async () => {
+    const jobs: Job[] = [
+      job('mid', 'ML Intern', daysAgo(3)),
+      job('best', 'ML Intern', daysAgo(3)),
+      job('worst', 'ML Intern', daysAgo(3)),
+    ];
+    const scores: Record<string, number> = { best: 95, mid: 80, worst: 60 };
+    const evalByScore = (j: Job): EvaluationResult => ({ ...evalFor(j), score: scores[j.id]!, shouldApply: true });
+    const orch = new FakeOrchestrator();
+    const s = await new SourcingPipeline({
+      freshness: new FreshnessFilter(), term: new TermFilter(), evaluate: evalByScore, orchestrator: orch,
+    }).run(jobs, { topN: 2 });
+
+    // Only the 2 highest scores tailored, in descending score order; "worst" skipped.
+    expect(orch.calls).toEqual(['best', 'mid']);
+    expect(orch.calls).not.toContain('worst');
+    expect(s.queued).toBe(2);
+  });
+
   it('an unparseable posting date counts as stale, never reaches tailoring', async () => {
     const jobs: Job[] = [job('nodate', 'ML Intern', 'not-a-date')];
     const orch = new FakeOrchestrator();

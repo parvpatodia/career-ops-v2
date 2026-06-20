@@ -47,7 +47,7 @@ export class SourcingPipeline {
 
   constructor(private readonly deps: SourcingDeps) {}
 
-  async run(jobs: Job[], opts: { dryRun?: boolean } = {}): Promise<SourcingSummary> {
+  async run(jobs: Job[], opts: { dryRun?: boolean; topN?: number } = {}): Promise<SourcingSummary> {
     const { freshness, term, evaluate, orchestrator } = this.deps;
 
     const { fresh, stale, unknown } = freshness.filter(jobs);
@@ -65,9 +65,16 @@ export class SourcingPipeline {
       outcomes: [],
     };
 
-    for (const job of matched) {
-      const evaluation = evaluate(job);
+    // Evaluate every fresh, on-term job (deterministic + cheap). With topN, tailor
+    // the highest-scoring first and cap the run (invariant 10: select the best
+    // intern/co-op roles when bounded); otherwise keep input order (unchanged
+    // default). The expensive step (M6 tailor + PDF) thus runs only on the best N.
+    let work = matched.map((job) => ({ job, evaluation: evaluate(job) }));
+    if (opts.topN && opts.topN > 0) {
+      work = [...work].sort((a, b) => b.evaluation.score - a.evaluation.score).slice(0, opts.topN);
+    }
 
+    for (const { job, evaluation } of work) {
       // Dry run: preview the score gate without tailoring (no PDF render, no
       // queue write). `queued` counts would-queue jobs by shouldApply alone; it
       // does NOT consult idempotency, so an already-submitted job shows as
