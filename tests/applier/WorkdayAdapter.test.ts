@@ -48,11 +48,14 @@ class FakeDriver implements WorkdayPageDriver {
 
   constructor(
     private readonly fields: WorkdayRawField[],
-    private readonly cfg: { authWall?: boolean; sabotage?: string; unreadable?: Set<string> } = {}
+    private readonly cfg: { authWall?: boolean; sabotage?: string; unreadable?: Set<string>; captcha?: boolean } = {}
   ) {}
 
   async isAuthWall(): Promise<boolean> {
     return this.cfg.authWall ?? false;
+  }
+  async hasCaptcha(): Promise<{ kind: 'recaptcha' } | null> {
+    return this.cfg.captcha ? { kind: 'recaptcha' } : null;
   }
   async scan(): Promise<WorkdayRawField[]> {
     this.scanCount++;
@@ -109,6 +112,18 @@ describe('WorkdayAdapter', () => {
     if (outcome.kind === 'verified') expect(outcome.verdict.pass).toBe(true);
     expect(driver.fillCount).toBe(3);
     expect(eventTypes()).toContain('fill_verified');
+    expect(eventTypes()).not.toContain('submitted');
+  });
+
+  it('routes a Workday captcha to auth_required and fills NOTHING', async () => {
+    // The captcha gap the adversarial review caught: Workday is a live submit
+    // target, so its FormSource must surface a captcha so the adapter hands off
+    // BEFORE filling (invariant 6), exactly like Greenhouse/Generic.
+    const driver = new FakeDriver(PERSONAL, { captcha: true });
+    const outcome = await new WorkdayAdapter(driver, KNOWN, { appId: APP_ID, recorder }).run(CTX);
+
+    expect(outcome.kind).toBe('auth_required');
+    expect(driver.fillCount).toBe(0);
     expect(eventTypes()).not.toContain('submitted');
   });
 

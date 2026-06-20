@@ -19,6 +19,7 @@ import type { Verifier } from './Verifier.js';
 import type { SubmissionRecorder } from './SubmissionRecorder.js';
 import { ApplicationAdapter } from './ApplicationAdapter.js';
 import type { AtsFormSource, NormalizedSchema, ApplicationOutcome } from './ApplicationAdapter.js';
+import type { CaptchaSignal } from './CaptchaDetector.js';
 
 /** Back-compat alias: the Workday outcome is the generic application outcome. */
 export type WorkdayOutcome = ApplicationOutcome;
@@ -32,6 +33,9 @@ export interface WorkdayPageDriver {
   scan(): Promise<WorkdayRawField[]>;
   fill(intent: FieldIntent): Promise<void>;
   readBack(field: FormField): Promise<string | null>;
+  /** A captcha on the page (a human touchpoint), or null. Optional so stub
+   *  drivers need not implement it; the real WorkdayDriver does (invariant 6). */
+  hasCaptcha?(): Promise<CaptchaSignal | null>;
 }
 
 /** Adapts a Workday page driver + the DOM mapper to the ATS-agnostic source. */
@@ -49,10 +53,12 @@ export class WorkdayFormSource implements AtsFormSource {
 
   async scanSchema(): Promise<NormalizedSchema> {
     const s = this.mapper.map(await this.driver.scan());
+    const captcha = (await this.driver.hasCaptcha?.()) ?? null;
     return {
       fields: s.fields.map((f) => f.field),
       eeo: s.eeo.map((e) => ({ id: e.automationId, label: e.label })),
       unmapped: s.unmapped.map((u) => ({ id: u.automationId, label: u.label, required: u.required, widget: u.widget })),
+      ...(captcha ? { captcha } : {}),
     };
   }
 
