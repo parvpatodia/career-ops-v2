@@ -12,7 +12,8 @@
  *   npm run source                  process today's scan cache
  *   npm run source -- --all-days    process every cached scan file
  *   npm run source -- --dry-run     preview the gates without tailoring/queueing
- *   npm run source -- --limit 20    cap how many jobs to tailor this run
+ *   npm run source -- --limit 20    cap raw inputs (discovery order) before gates
+ *   npm run source -- --top 10      tailor only the 10 HIGHEST-SCORING fresh jobs
  *
  * Requires config/profile.yml + config/scoring.yml + cv/ (gitignored, present on
  * Parv's machine). The legacy `npm run pipeline` (v1 tailoring) remains as a
@@ -67,6 +68,8 @@ async function main(): Promise<void> {
   const allDays = args.includes('--all-days');
   const limitIdx = args.indexOf('--limit');
   const limit = limitIdx !== -1 ? parseInt(args[limitIdx + 1] ?? '0', 10) : 0;
+  const topIdx = args.indexOf('--top');
+  const topN = topIdx !== -1 ? parseInt(args[topIdx + 1] ?? '0', 10) : 0;
 
   let jobs = loadJobs(allDays);
   if (limit > 0) jobs = jobs.slice(0, limit);
@@ -99,8 +102,8 @@ async function main(): Promise<void> {
     orchestrator,
   });
 
-  console.log(`\nSourcing ${jobs.length} job(s)${dryRun ? '  [DRY RUN — no tailoring/queueing]' : '  [M6 tailor -> queue]'}\n`);
-  const s = await pipeline.run(jobs, { dryRun });
+  console.log(`\nSourcing ${jobs.length} job(s)${dryRun ? '  [DRY RUN — no tailoring/queueing]' : '  [M6 tailor -> queue]'}${topN > 0 ? `  [top ${topN} by score]` : ''}\n`);
+  const s = await pipeline.run(jobs, { dryRun, ...(topN > 0 ? { topN } : {}) });
 
   console.log('\n─── Summary ───');
   console.log(`  ${dryRun ? 'would queue' : 'queued'}        : ${s.queued}`);
