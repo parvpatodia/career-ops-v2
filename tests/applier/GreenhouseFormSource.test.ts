@@ -42,3 +42,56 @@ describe('GreenhouseFormSource.scanSchema', () => {
     expect(await new GreenhouseFormSource(stubPage, JOB).isAuthWall()).toBe(false);
   });
 });
+
+describe('GreenhouseFormSource.filterBuiltins (DOM builtin discovery)', () => {
+  const known = new Set(['question_111']); // already in the API schema
+
+  it('recovers a missing required text field and the Country react-select', () => {
+    const out = GreenhouseFormSource.filterBuiltins(
+      [
+        { id: 'country', label: 'Country', reactSelect: true, required: true, type: 'text' },
+        { id: 'preferred', label: 'Preferred name', reactSelect: false, required: true, type: 'text' },
+      ],
+      known
+    );
+    expect(out.map((f) => f.id).sort()).toEqual(['country', 'preferred']);
+    expect(out.find((f) => f.id === 'country')!.type).toBe('select');
+  });
+
+  it('does NOT leak multi-select checkbox/radio options as phantom fields', () => {
+    // The Tenstorrent bug: "Austin, TX" / "Summer" checkboxes were discovered
+    // as separate required text questions, inflating the unknown count.
+    const out = GreenhouseFormSource.filterBuiltins(
+      [
+        { id: 'opt_austin', label: 'Austin, TX', reactSelect: false, required: true, type: 'checkbox' },
+        { id: 'opt_summer', label: 'Summer', reactSelect: false, required: true, type: 'checkbox' },
+        { id: 'opt_full', label: 'Full-time', reactSelect: false, required: true, type: 'radio' },
+      ],
+      known
+    );
+    expect(out).toEqual([]);
+  });
+
+  it('skips API-known fields and recaptcha/search inputs', () => {
+    const out = GreenhouseFormSource.filterBuiltins(
+      [
+        { id: 'question_111', label: 'Work auth', reactSelect: true, required: true, type: 'text' },
+        { id: 'g-recaptcha-response', label: 'recaptcha', reactSelect: false, required: true, type: 'text' },
+        { id: 'search-input-x', label: 'Search', reactSelect: false, required: true, type: 'text' },
+      ],
+      known
+    );
+    expect(out).toEqual([]);
+  });
+
+  it('ignores non-required fields unless they are location fields', () => {
+    const out = GreenhouseFormSource.filterBuiltins(
+      [
+        { id: 'opt_note', label: 'Optional note', reactSelect: false, required: false, type: 'text' },
+        { id: 'loc_city', label: 'City', reactSelect: false, required: false, type: 'text' },
+      ],
+      known
+    );
+    expect(out.map((f) => f.id)).toEqual(['loc_city']);
+  });
+});

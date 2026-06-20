@@ -241,7 +241,13 @@ async function main(): Promise<void> {
             console.log(`     → AUTO — ${payload.intents.length} field(s) would fill + verify; re-run with --approve --job ${app.id}\n`);
           } else {
             attended++;
-            console.log(`     → ATTENDED — ${verdict.reasons.join('; ')}\n`);
+            console.log(`     → ATTENDED — ${verdict.reasons.join('; ')}`);
+            // Name WHAT needs a human, so the AnswerKB can be grown (mission:
+            // intervention trends to zero as approved answers accumulate).
+            if (schema.captcha) console.log(`         · captcha: ${schema.captcha.kind} (you solve it)`);
+            for (const r of payload.reasons) console.log(`         · unknown: ${r.label.replace(/\s+/g, ' ').slice(0, 80)}`);
+            for (const u of schema.unmapped.filter((u) => u.required)) console.log(`         · unmapped(${u.widget}): ${u.label.replace(/\s+/g, ' ').slice(0, 70)}`);
+            console.log(`       (${payload.intents.length} field(s) WOULD fill + verify automatically)\n`);
           }
         } catch (err) {
           attended++;

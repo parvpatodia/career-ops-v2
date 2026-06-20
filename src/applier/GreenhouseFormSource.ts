@@ -25,6 +25,15 @@ import { GreenhouseSchemaMapper } from './GreenhouseSchemaMapper.js';
 import { fillControl, readControl } from './DomControls.js';
 import { detectCaptcha } from './CaptchaDetector.js';
 
+/** A control discovered from the live DOM by discoverBuiltinFields' evaluate. */
+export interface RawBuiltin {
+  id: string;
+  label: string;
+  reactSelect: boolean;
+  required: boolean;
+  type: string;
+}
+
 export class GreenhouseFormSource implements AtsFormSource {
   readonly ats = 'greenhouse';
   private readonly mapper: GreenhouseSchemaMapper;
@@ -99,10 +108,24 @@ export class GreenhouseFormSource implements AtsFormSource {
         }
         return out;
       })
-      .catch(() => [] as Array<{ id: string; label: string; reactSelect: boolean; required: boolean; type: string }>);
+      .catch(() => [] as RawBuiltin[]);
 
+    return GreenhouseFormSource.filterBuiltins(raw, known);
+  }
+
+  /**
+   * Pure filter over the DOM-discovered controls. Extracted from the browser
+   * evaluate so the safety-critical decision (what counts as a fillable builtin)
+   * is unit-tested. Discovery exists ONLY to recover required text/select fields
+   * the questions API omits (e.g. the location Country); a checkbox/radio is an
+   * OPTION inside a question group ("check all that apply"), so discovering it
+   * leaks every option as a phantom unknown question (the Tenstorrent bug:
+   * "Austin, TX", "Summer", ... counted as separate questions).
+   */
+  static filterBuiltins(raw: RawBuiltin[], known: Set<string>): FormField[] {
     return raw
       .filter((f) => f.id && f.label && !known.has(f.id))
+      .filter((f) => f.type !== 'checkbox' && f.type !== 'radio')
       .filter((f) => !/recaptcha|search-input/i.test(f.id))
       .filter((f) => f.required || /\b(country|location|city|state)\b/i.test(f.label))
       .map((f) => ({ id: f.id, label: f.label, type: (f.reactSelect ? 'select' : 'text') as FormField['type'], required: true }));
