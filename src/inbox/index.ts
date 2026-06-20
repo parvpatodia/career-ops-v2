@@ -12,12 +12,13 @@
  *   OUTLOOK_APP_PASSWORD=xxxxxxxxxxxxxxxx
  *
  * Usage: npm run inbox  [--days 30]
+ *        npm run inbox -- --check   verify each account's IMAP login (no reconcile)
  */
 
 import 'dotenv/config';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { EmailTracker } from './EmailTracker.js';
-import { fetchRecentHeaders, accountsFromEnv } from './ImapClient.js';
+import { fetchRecentHeaders, accountsFromEnv, diagnoseAccounts, checkConnection } from './ImapClient.js';
 import { SecretVault, CredentialStore } from '../secrets/SecretVault.js';
 import { OutreachStore } from '../outreach/OutreachStore.js';
 import { OutreachReconciler } from '../outreach/OutreachReconciler.js';
@@ -36,11 +37,35 @@ async function main(): Promise<void> {
   const daysIdx = args.indexOf('--days');
   const days = daysIdx !== -1 ? parseInt(args[daysIdx + 1] ?? '30', 10) : 30;
 
-  const accounts = accountsFromEnv(loadCreds());
+  const env = loadCreds();
+  const accounts = accountsFromEnv(env);
+
+  // --check: verify the IMAP login for each account, no reconcile. Makes the
+  // setup confirmable the moment an app password lands, with a precise message
+  // for the common "user set, password missing" half-configured state.
+  if (args.includes('--check')) {
+    const diag = diagnoseAccounts(env);
+    console.log(diag.length ? 'Email setup:\n  ' + diag.join('\n  ') : 'No email accounts set in .env or the vault.');
+    if (accounts.length === 0) {
+      console.log('\nNothing to test yet. Add a 16-char APP PASSWORD (not your login password):');
+      console.log('  npm run secrets -- set GMAIL_APP_PASSWORD "xxxxxxxxxxxxxxxx"   (or put it in .env)');
+      return;
+    }
+    console.log('\nTesting IMAP logins (read-only)...');
+    for (const a of accounts) {
+      const r = await checkConnection(a);
+      console.log(`  ${r.ok ? '✓' : '✗'} ${r.account} (${r.user}): ${r.detail}`);
+    }
+    return;
+  }
+
   if (accounts.length === 0) {
-    console.log('No email accounts configured. Add to .env (gitignored):');
+    console.log('No email accounts configured. Add to .env (gitignored) or the vault:');
+    const diag = diagnoseAccounts(env);
+    if (diag.length) console.log('  ' + diag.join('\n  '));
     console.log('  GMAIL_USER=...  GMAIL_APP_PASSWORD=...   (generate an app password with 2FA on)');
     console.log('  OUTLOOK_USER=... OUTLOOK_APP_PASSWORD=...');
+    console.log('Then verify: npm run inbox -- --check');
     return;
   }
   console.log(`Reconciling from: ${accounts.map((a) => `${a.account} (${a.user})`).join(', ')}  [last ${days}d]`);

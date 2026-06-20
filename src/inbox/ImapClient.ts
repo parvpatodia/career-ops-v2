@@ -64,3 +64,71 @@ export function accountsFromEnv(env: NodeJS.ProcessEnv = process.env): ImapAccou
   }
   return accts;
 }
+
+/**
+ * Per-provider setup state, so a half-configured account (user set, app password
+ * missing — exactly the common failure) gives a precise message instead of a
+ * silent "no accounts". Pure: unit-tested without a network.
+ */
+export function diagnoseAccounts(env: NodeJS.ProcessEnv = process.env): string[] {
+  const providers: ReadonlyArray<readonly [string, string, string]> = [
+    ['gmail', 'GMAIL_USER', 'GMAIL_APP_PASSWORD'],
+    ['outlook', 'OUTLOOK_USER', 'OUTLOOK_APP_PASSWORD'],
+  ];
+  const lines: string[] = [];
+  for (const [label, userKey, passKey] of providers) {
+    const hasUser = !!env[userKey];
+    const hasPass = !!env[passKey];
+    if (hasUser && hasPass) lines.push(`${label}: configured (${env[userKey]})`);
+    else if (hasUser && !hasPass) lines.push(`${label}: ${env[userKey]} set, ${passKey} MISSING — add a 16-char app password`);
+    else if (!hasUser && hasPass) lines.push(`${label}: ${passKey} set but ${userKey} MISSING`);
+  }
+  return lines;
+}
+
+/** Turn a raw IMAP/login error into an actionable one-liner. Pure. */
+export function describeImapError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  const m = raw.toLowerCase();
+  if (/auth|login|credential|invalid|password|asswd|denied/.test(m)) {
+    return 'login rejected — use a 16-char APP PASSWORD (not your account password); 2-Step Verification must be on';
+  }
+  if (/enotfound|econnrefused|etimedout|timeout|network|getaddrinfo|socket/.test(m)) {
+    return 'cannot reach the mail server — check the network/host';
+  }
+  return raw.slice(0, 140);
+}
+
+export interface ConnCheck {
+  account: string;
+  user: string;
+  ok: boolean;
+  detail: string;
+}
+
+/** Read-only login test: connect, open INBOX, report message count, log out. */
+export async function checkConnection(acct: ImapAccount): Promise<ConnCheck> {
+  const client = new ImapFlow({
+    host: acct.host,
+    port: 993,
+    secure: true,
+    auth: { user: acct.user, pass: acct.password },
+    logger: false,
+  });
+  try {
+    await client.connect();
+    const lock = await client.getMailboxLock('INBOX');
+    let count = 0;
+    try {
+      const mbox = client.mailbox as { exists?: number } | false;
+      count = mbox && typeof mbox === 'object' ? mbox.exists ?? 0 : 0;
+    } finally {
+      lock.release();
+    }
+    await client.logout().catch(() => {});
+    return { account: acct.account, user: acct.user, ok: true, detail: `connected, ${count} message(s) in INBOX` };
+  } catch (err) {
+    await client.logout().catch(() => {});
+    return { account: acct.account, user: acct.user, ok: false, detail: describeImapError(err) };
+  }
+}
