@@ -67,6 +67,13 @@ async function buildSession(
   };
   try {
     await page.goto(navigateUrl, { waitUntil: 'domcontentloaded', timeout: gotoTimeoutMs });
+    // The Greenhouse/Lever React forms AND their reCAPTCHA render AFTER
+    // domcontentloaded; scanning too early under-detects required questions and
+    // the captcha (a racing scan could miss a human touchpoint and over-trust the
+    // form). Let the page settle before any source is built/scanned. Capped +
+    // catch: analytics-heavy pages may never reach true idle. (file:// fixtures
+    // settle instantly, so demos/tests are unaffected.)
+    await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => {});
 
     // Construct the portal's source + submit surface; the source is exposed on
     // the session so the attended (partial-fill) flow can drive it directly.
