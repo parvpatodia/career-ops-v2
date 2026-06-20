@@ -54,6 +54,10 @@ export interface ApplySession {
   /** The raw form source, for the attended (partial-fill) flow. Set by the real
    *  Playwright factory; omitted by stub factories used in autonomous tests. */
   source?: AtsFormSource;
+  /** Bring this session's browser window to the front so a human touchpoint
+   *  (captcha, flagged field) is right in front of the user. Set by the real
+   *  Playwright factory; omitted by stub factories. Best-effort. */
+  focus?: () => Promise<void>;
   /** Tear down the browser/page. Always called, even on a thrown apply. */
   close(): Promise<void>;
 }

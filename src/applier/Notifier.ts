@@ -88,8 +88,10 @@ export class Notifier {
   captcha(company: string): void {
     this.notify({
       kind: 'captcha',
+      // Do NOT tell Parv to click the banner: an osascript notification opens
+      // Script Editor, not the browser. Attended mode raises the Chrome window.
       title: 'Career-Ops: captcha',
-      message: `${company}: solve the captcha, the autopilot will resume.`,
+      message: `${company}: switch to the Chrome window and solve the captcha (don't click this banner).`,
       urgent: true,
     });
   }
