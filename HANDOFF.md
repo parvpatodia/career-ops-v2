@@ -1,6 +1,34 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-20 (captcha-everywhere + leak fix + live email + --learn).
+> Read at session start (CLAUDE.md load order). Last updated 2026-06-22 (--auto hybrid loop + Jack-and-Jill decision).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-06-22)
+- **`npm run run -- --auto` = THE everyday command (the hybrid loop)**: per Ready job it runs the
+  SAME gated autonomous path as --approve (orch.apply: fill -> independent verify -> submit ONLY
+  on a green verdict). If a job is captcha-free + verifies, it submits hands-off. If it stops at a
+  captcha (auth_required) or an unknown question (needs_input), the two designed human touchpoints
+  (already notified), it brings your real Chrome window to the front, fills what's safe, and WAITS
+  while you solve + submit, then resumes the loop. Headed Chrome; needs a real TTY for the takeover
+  (piped/non-TTY just reports and continues). Submit stays in ONE place (the Autopilot); the takeover
+  never auto-submits. Verified live: launched your Chrome, ran Scale AI autonomously, hit reCAPTCHA,
+  routed auth_required, 0 submitted / 0 false records.
+- **Honest ceiling unchanged**: today all 5 Ready jobs are reCAPTCHA-gated, so --auto pauses on each
+  for you to solve the captcha (it is NOT 100% hands-off; captchas are a hard human touchpoint by
+  invariant 6). When fresh captcha-free postings appear, --auto submits them hands-off. "Accuracy"
+  here = it never submits a field it could not independently verify; on any mismatch/unknown it
+  abstains. It is not "fills every form perfectly."
+- **The macOS notification CANNOT deep-link to the page** (osascript banners are attributed to
+  Script Editor; clicking opens Script Editor). The fix is NOT the banner: --auto/--attended raise
+  the live Chrome window themselves on a touchpoint. Don't tell the user to click the banner.
+- **Jack and Jill (app.jackandjill.ai)**: Parv chose USE AS A JOB SOURCE (2026-06-22), scan its
+  recommended internships into the queue; apply on the real ATS pages (Greenhouse/Lever/etc.), NOT
+  through JnJ. BLOCKED on access: it is behind Parv's login, no public API, and automating a 3rd-party
+  AI-agent platform has ToS risk. NEXT: Parv provides a sample of the JnJ recommended listings
+  (export/paste/screenshot, or an authenticated tab to read), then build a small importer that
+  normalizes {company,title,url,postedAt,jd} into data/daily_log so `npm run source` handles them.
+  Not started (no data shape yet).
+- 507 tests; typecheck clean. Adversarial diff review: 0 correctness bugs; fixed --auto+--tailor
+  silent-drop (now warns) + new-prose em dashes before commit.
 
 ## Latest (2026-06-20)
 - **Greenhouse option-leak FIXED**: `discoverBuiltinFields` was discovering each multi-select
