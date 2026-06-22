@@ -10,6 +10,12 @@
  *   npm run run -- --approve          submit each job that verifies green (the
  *                                     "click of a button"); still gated on a
  *                                     verified verdict by the Autopilot.
+ *   npm run run -- --auto             hybrid loop: submit captcha-free verified
+ *                                     forms hands-off; on a captcha or an unknown
+ *                                     question, notify + bring the live Chrome
+ *                                     window to the front + wait while you finish
+ *                                     and submit, then resume. Headed; needs a TTY
+ *                                     for the takeover. THE everyday command.
  *   npm run run -- --tailor           re-tailor each job with the M6 Tailor
  *                                     (verify-or-abstain) before applying.
  *   npm run run -- --batch 10         how many Ready jobs to process (default 5).
@@ -46,7 +52,7 @@ import type { AnswerContext } from '../applier/AnswerGenerator.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Orchestrator } from './Orchestrator.js';
-import type { ApplyGateResult } from './Orchestrator.js';
+import type { ApplyGateResult, ApplySessionFactory } from './Orchestrator.js';
 import { PlaywrightApplySessionFactory } from './PlaywrightApplySessionFactory.js';
 import { GreenhouseBoardJobProvider } from './GreenhouseBoardJobFetcher.js';
 import { Tailor } from '../tailor/Tailor.js';
@@ -109,6 +115,56 @@ function reportApply(app: Application, result: ApplyGateResult): void {
   }
 }
 
+/**
+ * Attended takeover for ONE application: open a VISIBLE Chrome session, fill +
+ * verify only what is safe (AttendedFiller), bring the window to the front, and
+ * wait while Parv solves the captcha / answers the flagged questions and clicks
+ * Submit. Marks the app Applied only if Parv confirms he submitted. Returns
+ * whether it was marked Applied. Shared by --attended (every job) and --auto
+ * (only on a human touchpoint). NEVER auto-submits: the human owns the click.
+ */
+async function attendedTakeover(
+  app: Application,
+  sessions: ApplySessionFactory,
+  answers: () => AnswerSource,
+  essaySource: EssayAnswerSource,
+  store: ApplicationStore,
+  rl: ReturnType<typeof createInterface> | null
+): Promise<boolean> {
+  const opened = await sessions.open(app, answers());
+  if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); return false; }
+  if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); return false; }
+  const ctx: AnswerContext = {
+    company: app.company, role: app.role, resumeVariant: app.resumeVariant,
+    ...(app.jd ? { jd: app.jd } : {}),
+  };
+  await essaySource.prewarm(ctx).catch(() => {});
+  try {
+    const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
+    printAttended(res);
+    if (res.kind === 'filled' && rl) {
+      // Bring the real Chrome window to the front so the captcha/flagged fields
+      // are right in front of Parv; the macOS banner only opens Script Editor.
+      await opened.session.focus?.();
+      console.log('  → Chrome is now in front. Solve the captcha + finish any flagged field there.');
+      await rl.question('  → When done in the browser, click Submit, then press Enter (s to skip): ');
+      const did = await rl.question('  → Did you submit it? (y/n): ');
+      if (did.trim().toLowerCase() === 'y') {
+        store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+        console.log('  ✓ marked Applied. `npm run inbox` will confirm from the email.');
+        return true;
+      }
+    } else if (res.kind === 'filled') {
+      console.log('  (non-interactive: review above; re-run in a terminal to complete + submit.)');
+    }
+  } catch (err) {
+    console.log(`  ⚠️  fill error: ${(err as Error).message}`);
+  } finally {
+    await opened.session.close();
+  }
+  return false;
+}
+
 function printStats(store: ApplicationStore): void {
   const apps = store.getAll();
   const byStatus: Record<string, number> = {};
@@ -132,7 +188,14 @@ async function main(): Promise<void> {
   const useApprove = args.includes('--approve');
   const useTailor = args.includes('--tailor');
   const useAttended = args.includes('--attended');
+  const useAuto = args.includes('--auto');
   const usePreflight = args.includes('--preflight');
+  // --tailor only takes effect on the default apply path (orch.advance). The
+  // attended/auto paths submit the queue's already-M6-tailored resume directly,
+  // so a passed --tailor would be silently dropped: warn instead of surprising.
+  if (useTailor && (useAuto || useAttended)) {
+    log.warn('--tailor is not applied in --auto/--attended; the queue resume (already M6-tailored by `npm run source`) is used as-is. Run `npm run source` to refresh tailoring first.');
+  }
   // --learn (with --preflight): record each unknown question to the AnswerInbox
   // as pending, so a human can approve it once and it is learned forever. Only
   // records the QUESTION — never an answer (no fabrication; invariant 7).
@@ -187,9 +250,9 @@ async function main(): Promise<void> {
       new AnswerGenerator(profileLoader!),
     ]);
 
-  // Attended mode is interactive: it MUST be headed so Parv can see the form and
-  // solve the captcha. Other modes honor CAREER_OPS_HEADLESS (default: headed).
-  const headless = useAttended ? false : process.env.CAREER_OPS_HEADLESS === '1';
+  // Attended AND auto are interactive on a touchpoint: they MUST be headed so Parv
+  // can see the form and solve the captcha. Other modes honor CAREER_OPS_HEADLESS.
+  const headless = (useAttended || useAuto) ? false : process.env.CAREER_OPS_HEADLESS === '1';
   const { browser, usingChrome } = await launchChrome({ headless });
   log.info(usingChrome ? 'Using your Google Chrome' : 'Chrome not found — fell back to bundled Chromium');
   const greenhouseProvider = new GreenhouseBoardJobProvider();
@@ -208,12 +271,18 @@ async function main(): Promise<void> {
     essays: essaySource, // async LLM essay pre-warm before each fill
   });
 
-  const approval: BatchApproval | undefined = useApprove
-    ? { approvedBy: 'parv', approvedAt: new Date().toISOString(), note: 'run --approve' }
+  // --auto implies approval: its whole point is to submit the captcha-free,
+  // verified subset hands-off. The Autopilot still gates every submit on an
+  // independent verified verdict, so the approval only authorizes, never forces.
+  const approval: BatchApproval | undefined = (useApprove || useAuto)
+    ? { approvedBy: 'parv', approvedAt: new Date().toISOString(), note: useAuto ? 'run --auto' : 'run --approve' }
     : undefined;
 
-  console.log(`\nProcessing ${queue.length} application(s)  [${useApprove ? 'APPROVE→submit verified' : 'fill+verify, no submit'}${useTailor ? ', re-tailor' : ''}]`);
-  if (!useApprove) console.log('Forms will be filled and verified, then STOPPED. Re-run with --approve to submit.\n');
+  // The specialized branches (preflight/attended/auto) print their own banner.
+  if (!usePreflight && !useAttended && !useAuto) {
+    console.log(`\nProcessing ${queue.length} application(s)  [${useApprove ? 'APPROVE→submit verified' : 'fill+verify, no submit'}${useTailor ? ', re-tailor' : ''}]`);
+    if (!useApprove) console.log('Forms will be filled and verified, then STOPPED. Re-run with --approve to submit.\n');
+  }
 
   let submitted = 0;
   try {
@@ -289,41 +358,41 @@ async function main(): Promise<void> {
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id})`);
-        const opened = await sessions.open(app, answers());
-        if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); continue; }
-        if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); continue; }
-        const ctx: AnswerContext = {
-          company: app.company, role: app.role, resumeVariant: app.resumeVariant,
-          ...(app.jd ? { jd: app.jd } : {}),
-        };
-        await essaySource.prewarm(ctx).catch(() => {});
-        try {
-          const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
-          printAttended(res);
-          if (res.kind === 'filled' && rl) {
-            // Bring the Chrome window to the front so the captcha/flagged fields
-            // are right in front of Parv — no need to click the (Script-Editor)
-            // notification, which never opened the browser.
-            await opened.session.focus?.();
-            console.log('  → Chrome is now in front. Solve the captcha + finish any flagged field there.');
-            await rl.question('  → When done in the browser, click Submit, then press Enter (s to skip): ');
-            const did = await rl.question('  → Did you submit it? (y/n): ');
-            if (did.trim().toLowerCase() === 'y') {
-              store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
-              submitted++;
-              console.log('  ✓ marked Applied. `npm run inbox` will confirm from the email.');
-            }
-          } else if (res.kind === 'filled') {
-            console.log('  (non-interactive: review above; re-run in a terminal to complete + submit.)');
-          }
-        } catch (err) {
-          console.log(`  ⚠️  fill error: ${(err as Error).message}`);
-        } finally {
-          await opened.session.close();
-        }
+        if (await attendedTakeover(app, sessions, answers, essaySource, store, rl)) submitted++;
       }
       rl?.close();
       console.log(`\n═══ Attended done. Marked applied this run: ${submitted}/${queue.length}. ═══\n`);
+      return;
+    }
+
+    // ── Auto (hybrid): hands-off where it can, hands you the wheel where it must ──
+    // Per Ready job, run the SAME gated autonomous path as --approve (orch.apply
+    // with approval). If it submits, done. If it stops at a captcha (auth_required)
+    // or an unknown question (needs_input), the two designed human touchpoints
+    // (already notified by the Autopilot), bring the live Chrome window to the
+    // front and wait while Parv finishes + submits, then resume the loop. This is
+    // the "autonomous until a human is needed, then surface the page + resume"
+    // command. WHY a fresh session for the takeover: orch.apply closes its page on
+    // return, so the takeover reopens a visible session on the SAME app (a few
+    // seconds' reload, only on the jobs a human handles anyway). Submit stays in
+    // ONE place (the Autopilot); the takeover never auto-submits.
+    if (useAuto) {
+      const rl = process.stdin.isTTY ? createInterface({ input: stdin, output: stdout }) : null;
+      console.log(`Auto (hybrid, Google Chrome): I submit captcha-free verified forms hands-off; on a captcha or an unknown question I notify you, bring the Chrome window to the front, and wait while you finish + submit, then continue. (Ignore the macOS banner: it opens Script Editor, not the browser.)\n`);
+      for (let i = 0; i < queue.length; i++) {
+        const app = queue[i]!;
+        console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
+        const result = await orch.apply(app, approval ? { approval } : {});
+        reportApply(app, result);
+        if (result.phase === 'submitted') { submitted++; continue; }
+        if (result.phase === 'auth_required' || result.phase === 'needs_input') {
+          if (!rl) { console.log('  (non-interactive: re-run in a terminal so I can hand you the live form to finish this one.)'); continue; }
+          console.log('  ↳ Human touchpoint: handing you the live form.');
+          if (await attendedTakeover(app, sessions, answers, essaySource, store, rl)) submitted++;
+        }
+      }
+      rl?.close();
+      console.log(`\n═══ Auto done. Submitted or applied this run: ${submitted}/${queue.length}. ═══\n`);
       return;
     }
 
