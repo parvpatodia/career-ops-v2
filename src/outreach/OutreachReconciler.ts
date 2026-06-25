@@ -9,6 +9,7 @@ import { OutreachInboxMatcher } from './OutreachInboxMatcher.js';
 import type { OutreachStore } from './OutreachStore.js';
 import type { EmailHeader } from '../inbox/EmailMatcher.js';
 import type { ImapAccount } from '../inbox/ImapClient.js';
+import type { NotifySink } from '../applier/Notifier.js';
 
 export type FetchHeaders = (acct: ImapAccount) => Promise<EmailHeader[]>;
 
@@ -24,7 +25,10 @@ export class OutreachReconciler {
 
   constructor(
     private readonly store: OutreachStore,
-    private readonly fetch: FetchHeaders
+    private readonly fetch: FetchHeaders,
+    // Pinged when a NEW reply lands. A reply is the payoff of outreach, so Parv
+    // should hear about it the moment the reconcile finds it, not by reading a log.
+    private readonly notify?: NotifySink
   ) {}
 
   async run(accounts: ImapAccount[]): Promise<OutreachReconcileSummary> {
@@ -51,6 +55,7 @@ export class OutreachReconciler {
     const bounced = new Set(proj.all().filter((s) => s.bounced).map((s) => s.contactId));
 
     let repliesRecorded = 0;
+    const replyFroms: string[] = [];
     for (const r of replies) {
       if (replied.has(r.contactId)) continue;
       this.store.append({
@@ -60,6 +65,7 @@ export class OutreachReconciler {
       });
       replied.add(r.contactId);
       repliesRecorded++;
+      replyFroms.push(r.from);
     }
 
     let bouncesRecorded = 0;
@@ -72,6 +78,15 @@ export class OutreachReconciler {
       });
       bounced.add(b.contactId);
       bouncesRecorded++;
+    }
+
+    if (replyFroms.length > 0 && this.notify) {
+      this.notify({
+        kind: 'unknown_question', // closest existing kind: "Answer needed" — a reply awaits your response
+        title: `Outreach: ${replyFroms.length} repl${replyFroms.length === 1 ? 'y' : 'ies'}`,
+        message: `From ${replyFroms.join(', ')}. Reply to keep it warm.`,
+        urgent: true,
+      });
     }
 
     return { emailsScanned: emails.length, repliesRecorded, bouncesRecorded, unmatchedBounces };
