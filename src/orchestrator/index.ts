@@ -163,18 +163,29 @@ async function attendedTakeover(
       // Records Applied only on an observed confirmation; a timeout leaves the
       // job Ready (verify-or-abstain: never claim a submit we cannot observe).
       await opened.session.focus?.();
-      console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
-      const conf = await waitForConfirmation({
-        readConfirmation: () => opened.session.submit.readConfirmation(),
-        timeoutMs: autoResume.timeoutMs,
-        intervalMs: autoResume.intervalMs,
-      });
-      if (conf) {
-        store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
-        console.log(`  ✅ confirmed + marked Applied: ${conf.slice(0, 80)}`);
-        return true;
+      // FALSE-POSITIVE GUARD: Greenhouse/Generic readConfirmation has a loose
+      // body-text + URL fallback that can read "confirmed" on a page that was
+      // NOT submitted. Polling starts on the still-unsubmitted form, so we only
+      // trust a null -> confirmed TRANSITION. If the page already reads confirmed
+      // before the human acts, the signal is unreliable here: do NOT auto-mark
+      // (never claim a submit we cannot observe, invariant 1), hand it back.
+      const baseline = await opened.session.submit.readConfirmation().catch(() => null);
+      if (baseline && baseline.trim().length > 0) {
+        console.log('  ⚠️  this form reads as "submitted" before you even act, so I can\'t reliably auto-detect your submit — left Ready; complete + verify it yourself.');
+      } else {
+        console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
+        const conf = await waitForConfirmation({
+          readConfirmation: () => opened.session.submit.readConfirmation(),
+          timeoutMs: autoResume.timeoutMs,
+          intervalMs: autoResume.intervalMs,
+        });
+        if (conf) {
+          store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+          console.log(`  ✅ confirmed + marked Applied: ${conf.slice(0, 80)}`);
+          return true;
+        }
+        console.log(`  ⏳ no confirmation within ${Math.round(autoResume.timeoutMs / 60_000)}m — left Ready; the loop resurfaces it next cycle.`);
       }
-      console.log(`  ⏳ no confirmation within ${Math.round(autoResume.timeoutMs / 60_000)}m — left Ready; the loop resurfaces it next cycle.`);
     } else if (res.kind === 'filled' && rl) {
       // Interactive (--attended): bring the Chrome window to the front; the macOS
       // banner only opens Script Editor, so the window itself is the handoff.
