@@ -25,6 +25,7 @@ import { ArxivSourcer, type ArxivQuery } from '../sources/ArxivSourcer.js';
 import { Drafter } from '../Drafter.js';
 import { SnippetBook } from '../SnippetBook.js';
 import { OutreachStore } from '../OutreachStore.js';
+import { pickFresh } from '../selectCandidates.js';
 import { Notifier } from '../../applier/Notifier.js';
 import type { Candidate, EmailDraft, LinkedInDraft } from '../types.js';
 
@@ -83,26 +84,11 @@ async function main(): Promise<void> {
     }
   }
 
-  // 2. Pick up to emailLimit emailable candidates, marking `seen` ONLY for the
-  //    ones we actually keep. WHY a capped loop, not filter().slice(): a filter
-  //    with a seen-mutating predicate marks every candidate it inspects before
-  //    the slice, so company contacts past the cap would be flagged seen and
-  //    then silently dropped from the LinkedIn pool too (contacted on neither
-  //    channel). Marking only the kept ones leaves the rest available below.
+  // 2. Pick emailable candidates (dedup + suppression + cap). The selection logic
+  //    lives in a tested module (pickFresh) because it shipped a dedup bug once.
   const seen = new Set<string>();
-  const takeFresh = (pool: Candidate[], limit: number, needEmail: boolean): Candidate[] => {
-    const picked: Candidate[] = [];
-    for (const c of pool) {
-      if (picked.length >= limit) break;
-      if (needEmail && !c.email) continue;
-      const id = Drafter.contactId(c);
-      if (seen.has(id) || store.isSuppressed(id)) continue;
-      seen.add(id);
-      picked.push(c);
-    }
-    return picked;
-  };
-  const emailable = takeFresh(companyCandidates, emailLimit, true);
+  const isSuppressed = (id: string) => store.isSuppressed(id);
+  const emailable = pickFresh(companyCandidates, { limit: emailLimit, needEmail: true, seen, isSuppressed });
 
   // 3. Verify each address so the gate's "valid" check has real data.
   if (hunter) {
@@ -131,7 +117,7 @@ async function main(): Promise<void> {
   // 5. Build the LinkedIn pack from researchers and any company contacts not
   //    already emailed above (their ids are in `seen`, so they are excluded here,
   //    which prevents emailing AND DMing the same person).
-  const linkedinPool = takeFresh([...researchers, ...companyCandidates], linkedinLimit, false);
+  const linkedinPool = pickFresh([...researchers, ...companyCandidates], { limit: linkedinLimit, needEmail: false, seen, isSuppressed });
   const dms: LinkedInDraft[] = linkedinPool.map((c) => drafter.linkedin(c));
 
   // 6. Write artifacts (unless dry-run).
