@@ -7,6 +7,7 @@
 
 import type { Job, ScanQuery } from '../types.js';
 import { Scanner } from './Scanner.js';
+import { resolveContinuationCompany } from './continuationCompany.js';
 
 const README_URL =
   'https://raw.githubusercontent.com/SimplifyJobs/Summer2026-Internships/dev/README.md';
@@ -30,6 +31,7 @@ export class SWEListScanner extends Scanner {
     // Split on <tr> boundaries and process each row
     const rows = html.split(/<tr>/i).slice(1); // first element is content before first <tr>
 
+    let lastCompany = ''; // carries a real company name onto its "↳" continuation rows
     for (const row of rows) {
       // Extract all <td>...</td> cells
       const cells: string[] = [];
@@ -44,9 +46,12 @@ export class SWEListScanner extends Scanner {
 
       const [companyCell, roleCell, locationCell, applyCell, ageCell] = cells as [string, string, string, string, string];
 
-      // Extract company name (strip emoji, <strong>, <a> tags)
-      const company = this.stripHtml(companyCell).replace(/^[🔥\s]+/, '').trim();
-      if (!company) continue;
+      // Extract company; a "↳" company cell continues the previous row's company.
+      const parsedCompany = this.stripHtml(companyCell).replace(/^[🔥\s]+/, '').trim();
+      const resolved = resolveContinuationCompany(parsedCompany, lastCompany);
+      lastCompany = resolved.lastCompany;
+      if (!resolved.company) continue;
+      const company = resolved.company;
 
       // Role is plain text (may have ↳ for sub-roles under same company)
       const role = this.stripHtml(roleCell).trim();
