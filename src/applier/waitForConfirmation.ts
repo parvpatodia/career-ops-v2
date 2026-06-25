@@ -45,3 +45,30 @@ export async function waitForConfirmation(deps: WaitForConfirmationDeps): Promis
     await sleep(deps.intervalMs);
   }
 }
+
+export type TransitionResult =
+  | { kind: 'confirmed'; confirmation: string }
+  | { kind: 'unreliable' }
+  | { kind: 'timeout' };
+
+/**
+ * Confirm a submission by a null -> confirmed TRANSITION only.
+ *
+ * WHY: in the --auto background resume, polling starts on the still-UNSUBMITTED
+ * form. Greenhouse/Generic readConfirmation has a loose body-text + URL fallback
+ * that can read "confirmed" on a page that was never submitted (marketing copy,
+ * a careers URL containing "success"/"thank"). Trusting that would FALSELY mark
+ * the job Applied (invariant 1: never claim a submit we cannot observe).
+ *
+ * So we read a BASELINE first: if the page already reads confirmed before the
+ * human acts, the signal is unreliable here -> 'unreliable' (the caller hands it
+ * back, never auto-marks). Otherwise we poll for the real submit -> 'confirmed'
+ * on the first confirmation, or 'timeout'. Pure over injectable now/sleep, so the
+ * guard is unit-tested without a browser.
+ */
+export async function confirmViaTransition(deps: WaitForConfirmationDeps): Promise<TransitionResult> {
+  const baseline = await deps.readConfirmation().catch(() => null);
+  if (baseline && baseline.trim().length > 0) return { kind: 'unreliable' };
+  const conf = await waitForConfirmation(deps);
+  return conf ? { kind: 'confirmed', confirmation: conf } : { kind: 'timeout' };
+}

@@ -48,7 +48,7 @@ import { EssayAnswerSource } from '../applier/EssayAnswerSource.js';
 import { GeminiClient } from '../applier/GeminiClient.js';
 import { AttendedFiller } from '../applier/AttendedFiller.js';
 import type { AttendedResult } from '../applier/AttendedFiller.js';
-import { waitForConfirmation } from '../applier/waitForConfirmation.js';
+import { confirmViaTransition } from '../applier/waitForConfirmation.js';
 import type { AnswerContext } from '../applier/AnswerGenerator.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
@@ -158,32 +158,27 @@ async function attendedTakeover(
     const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
     printAttended(res);
     if (res.kind === 'filled' && autoResume) {
-      // Background resume (no TTY): surface the window, then WATCH the live page
-      // for the REAL ATS confirmation (the human's submit) instead of prompting.
-      // Records Applied only on an observed confirmation; a timeout leaves the
-      // job Ready (verify-or-abstain: never claim a submit we cannot observe).
+      // Background resume (no TTY): surface the window, then confirm a real submit
+      // by a null -> confirmed TRANSITION only. confirmViaTransition reads a
+      // baseline first and refuses to trust a page that already reads "confirmed"
+      // while UNSUBMITTED (Greenhouse/Generic's loose body+URL fallback), so a job
+      // is marked Applied only on an OBSERVED submit (invariant 1: never claim a
+      // submit we cannot observe). Unit-tested in waitForConfirmation.test.ts.
       await opened.session.focus?.();
-      // FALSE-POSITIVE GUARD: Greenhouse/Generic readConfirmation has a loose
-      // body-text + URL fallback that can read "confirmed" on a page that was
-      // NOT submitted. Polling starts on the still-unsubmitted form, so we only
-      // trust a null -> confirmed TRANSITION. If the page already reads confirmed
-      // before the human acts, the signal is unreliable here: do NOT auto-mark
-      // (never claim a submit we cannot observe, invariant 1), hand it back.
-      const baseline = await opened.session.submit.readConfirmation().catch(() => null);
-      if (baseline && baseline.trim().length > 0) {
+      console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
+      const outcome = await confirmViaTransition({
+        readConfirmation: () => opened.session.submit.readConfirmation(),
+        timeoutMs: autoResume.timeoutMs,
+        intervalMs: autoResume.intervalMs,
+      });
+      if (outcome.kind === 'confirmed') {
+        store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+        console.log(`  ✅ confirmed + marked Applied: ${outcome.confirmation.slice(0, 80)}`);
+        return true;
+      }
+      if (outcome.kind === 'unreliable') {
         console.log('  ⚠️  this form reads as "submitted" before you even act, so I can\'t reliably auto-detect your submit — left Ready; complete + verify it yourself.');
       } else {
-        console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
-        const conf = await waitForConfirmation({
-          readConfirmation: () => opened.session.submit.readConfirmation(),
-          timeoutMs: autoResume.timeoutMs,
-          intervalMs: autoResume.intervalMs,
-        });
-        if (conf) {
-          store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
-          console.log(`  ✅ confirmed + marked Applied: ${conf.slice(0, 80)}`);
-          return true;
-        }
         console.log(`  ⏳ no confirmation within ${Math.round(autoResume.timeoutMs / 60_000)}m — left Ready; the loop resurfaces it next cycle.`);
       }
     } else if (res.kind === 'filled' && rl) {
