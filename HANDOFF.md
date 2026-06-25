@@ -22,13 +22,14 @@
 - **The macOS notification CANNOT deep-link to the page** (osascript banners are attributed to
   Script Editor; clicking opens Script Editor). The fix is NOT the banner: --auto/--attended raise
   the live Chrome window themselves on a touchpoint. Don't tell the user to click the banner.
-- **Jack and Jill (app.jackandjill.ai)**: Parv chose USE AS A JOB SOURCE (2026-06-22), scan its
-  recommended internships into the queue; apply on the real ATS pages (Greenhouse/Lever/etc.), NOT
-  through JnJ. BLOCKED on access: it is behind Parv's login, no public API, and automating a 3rd-party
-  AI-agent platform has ToS risk. NEXT: Parv provides a sample of the JnJ recommended listings
-  (export/paste/screenshot, or an authenticated tab to read), then build a small importer that
-  normalizes {company,title,url,postedAt,jd} into data/daily_log so `npm run source` handles them.
-  Not started (no data shape yet).
+- **Jack and Jill (app.jackandjill.ai)**: USE AS A JOB SOURCE (Parv 2026-06-22). PARTIALLY DONE
+  without needing JnJ access (7af2589): 3 of the 6 saved companies post on public Greenhouse boards,
+  added to config/greenhouse-boards.yml with tokens verified live — wayve, togetherai, flyzipline
+  (Zipline). A fresh scan now yields e.g. Together AI "Frontier Agents Intern (Fall 2026)". Remaining
+  2 (Applied Intuition, pony.ai) are NOT on Greenhouse/Lever under any obvious token (likely Ashby/
+  custom) — would need an Ashby BOARD scanner (none exists; only an Ashby FormSource for applying) or
+  their direct links. Reading the live JnJ board itself stayed blocked (Control_Chrome content-read
+  broken; Claude-in-Chrome extension never connected). Apply on the real ATS pages, never through JnJ.
 - 514 tests; typecheck clean. Adversarial diff review: 0 correctness bugs; fixed --auto+--tailor
   silent-drop (now warns) + new-prose em dashes before commit.
 - **`--auto` resume FALSE-POSITIVE guard (78883a0)**: the no-TTY auto-resume polls readConfirmation
