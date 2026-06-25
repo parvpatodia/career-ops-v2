@@ -13,9 +13,9 @@
  *   npm run run -- --auto             hybrid loop: submit captcha-free verified
  *                                     forms hands-off; on a captcha or an unknown
  *                                     question, notify + bring the live Chrome
- *                                     window to the front + wait while you finish
- *                                     and submit, then resume. Headed; needs a TTY
- *                                     for the takeover. THE everyday command.
+ *                                     window to the front + WATCH the page for
+ *                                     your submit, then resume. Headed; no TTY
+ *                                     needed (auto-detects). THE everyday command.
  *   npm run run -- --tailor           re-tailor each job with the M6 Tailor
  *                                     (verify-or-abstain) before applying.
  *   npm run run -- --batch 10         how many Ready jobs to process (default 5).
@@ -48,6 +48,7 @@ import { EssayAnswerSource } from '../applier/EssayAnswerSource.js';
 import { GeminiClient } from '../applier/GeminiClient.js';
 import { AttendedFiller } from '../applier/AttendedFiller.js';
 import type { AttendedResult } from '../applier/AttendedFiller.js';
+import { waitForConfirmation } from '../applier/waitForConfirmation.js';
 import type { AnswerContext } from '../applier/AnswerGenerator.js';
 import { ProfileLoader } from '../applier/ProfileLoader.js';
 import { Notifier } from '../applier/Notifier.js';
@@ -64,6 +65,15 @@ import type { Application } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('run');
+
+// --auto background resume: after the window is surfaced for a captcha/field, the
+// loop watches the live page for the REAL ATS confirmation (the human's submit)
+// rather than prompting in the terminal, so it needs no TTY and pops the window
+// only at a touchpoint. Give a human ~5 min to solve + submit; poll every 4s.
+const AUTO_RESUME_TIMEOUT_MS = process.env.CAREER_OPS_RESUME_TIMEOUT_MS
+  ? Math.max(5_000, parseInt(process.env.CAREER_OPS_RESUME_TIMEOUT_MS, 10))
+  : 5 * 60_000;
+const AUTO_RESUME_POLL_MS = 4_000;
 
 function printAttended(res: AttendedResult): void {
   if (res.kind === 'auth_required') {
@@ -129,7 +139,8 @@ async function attendedTakeover(
   answers: () => AnswerSource,
   essaySource: EssayAnswerSource,
   store: ApplicationStore,
-  rl: ReturnType<typeof createInterface> | null
+  rl: ReturnType<typeof createInterface> | null,
+  autoResume?: { timeoutMs: number; intervalMs: number }
 ): Promise<boolean> {
   const opened = await sessions.open(app, answers());
   if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); return false; }
@@ -142,9 +153,27 @@ async function attendedTakeover(
   try {
     const res = await new AttendedFiller(opened.session.source, answers()).fill(ctx, app.pdfPath);
     printAttended(res);
-    if (res.kind === 'filled' && rl) {
-      // Bring the real Chrome window to the front so the captcha/flagged fields
-      // are right in front of Parv; the macOS banner only opens Script Editor.
+    if (res.kind === 'filled' && autoResume) {
+      // Background resume (no TTY): surface the window, then WATCH the live page
+      // for the REAL ATS confirmation (the human's submit) instead of prompting.
+      // Records Applied only on an observed confirmation; a timeout leaves the
+      // job Ready (verify-or-abstain: never claim a submit we cannot observe).
+      await opened.session.focus?.();
+      console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
+      const conf = await waitForConfirmation({
+        readConfirmation: () => opened.session.submit.readConfirmation(),
+        timeoutMs: autoResume.timeoutMs,
+        intervalMs: autoResume.intervalMs,
+      });
+      if (conf) {
+        store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+        console.log(`  ✅ confirmed + marked Applied: ${conf.slice(0, 80)}`);
+        return true;
+      }
+      console.log(`  ⏳ no confirmation within ${Math.round(autoResume.timeoutMs / 60_000)}m — left Ready; the loop resurfaces it next cycle.`);
+    } else if (res.kind === 'filled' && rl) {
+      // Interactive (--attended): bring the Chrome window to the front; the macOS
+      // banner only opens Script Editor, so the window itself is the handoff.
       await opened.session.focus?.();
       console.log('  → Chrome is now in front. Solve the captcha + finish any flagged field there.');
       await rl.question('  → When done in the browser, click Submit, then press Enter (s to skip): ');
@@ -377,8 +406,7 @@ async function main(): Promise<void> {
     // seconds' reload, only on the jobs a human handles anyway). Submit stays in
     // ONE place (the Autopilot); the takeover never auto-submits.
     if (useAuto) {
-      const rl = process.stdin.isTTY ? createInterface({ input: stdin, output: stdout }) : null;
-      console.log(`Auto (hybrid, Google Chrome): I submit captcha-free verified forms hands-off; on a captcha or an unknown question I notify you, bring the Chrome window to the front, and wait while you finish + submit, then continue. (Ignore the macOS banner: it opens Script Editor, not the browser.)\n`);
+      console.log(`Auto (hybrid, Google Chrome): I submit captcha-free verified forms hands-off. On a captcha or an unknown question I surface the Chrome window and WATCH the page for your submit (no terminal prompt), then continue. The window comes to the front only when you are needed. (Ignore the macOS banner: it opens Script Editor, not the browser.)\n`);
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
@@ -386,12 +414,14 @@ async function main(): Promise<void> {
         reportApply(app, result);
         if (result.phase === 'submitted') { submitted++; continue; }
         if (result.phase === 'auth_required' || result.phase === 'needs_input') {
-          if (!rl) { console.log('  (non-interactive: re-run in a terminal so I can hand you the live form to finish this one.)'); continue; }
-          console.log('  ↳ Human touchpoint: handing you the live form.');
-          if (await attendedTakeover(app, sessions, answers, essaySource, store, rl)) submitted++;
+          console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
+          const ok = await attendedTakeover(app, sessions, answers, essaySource, store, null, {
+            timeoutMs: AUTO_RESUME_TIMEOUT_MS,
+            intervalMs: AUTO_RESUME_POLL_MS,
+          });
+          if (ok) submitted++;
         }
       }
-      rl?.close();
       console.log(`\n═══ Auto done. Submitted or applied this run: ${submitted}/${queue.length}. ═══\n`);
       return;
     }
