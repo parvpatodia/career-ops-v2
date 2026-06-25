@@ -99,6 +99,26 @@ describe('OutreachReconciler', () => {
     expect(summary.repliesRecorded).toBe(0);
   });
 
+  it('pings the notify sink when a new reply lands, but not otherwise', async () => {
+    store.append({ type: 'email_sent', contactId: alexId, payload: { to: ALEX } });
+    const notes: string[] = [];
+    const sink = (n: { title: string }) => notes.push(n.title);
+
+    await new OutreachReconciler(store, async () => [header({ from: `Alex <${ALEX}>`, subject: 'Re: hi' })], sink).run(accounts);
+    expect(notes.some((t) => /repl/i.test(t))).toBe(true);
+
+    // A second run finds the same reply (already recorded) -> no new ping.
+    notes.length = 0;
+    await new OutreachReconciler(store, async () => [header({ from: ALEX, subject: 'Re: hi' })], sink).run(accounts);
+    expect(notes).toHaveLength(0);
+  });
+
+  it('does not ping on unrelated inbound mail', async () => {
+    const notes: string[] = [];
+    await new OutreachReconciler(store, async () => [header({ from: 'news@x.com', subject: 'digest' })], (n) => notes.push(n.title)).run(accounts);
+    expect(notes).toHaveLength(0);
+  });
+
   it('records a bounce that names the address in the subject', async () => {
     store.append({ type: 'email_sent', contactId: alexId, payload: { to: ALEX } });
     const fetch = async () => [header({ from: 'mailer-daemon@x.com', subject: `Undeliverable: ${ALEX}` })];

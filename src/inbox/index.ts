@@ -22,6 +22,7 @@ import { fetchRecentHeaders, accountsFromEnv, diagnoseAccounts, checkConnection 
 import { SecretVault, CredentialStore } from '../secrets/SecretVault.js';
 import { OutreachStore } from '../outreach/OutreachStore.js';
 import { OutreachReconciler } from '../outreach/OutreachReconciler.js';
+import { Notifier } from '../applier/Notifier.js';
 
 /** Email creds from the encrypted vault override .env (vault is the secure source). */
 function loadCreds(): NodeJS.ProcessEnv {
@@ -80,8 +81,14 @@ async function main(): Promise<void> {
   if (summary.updates.length === 0) console.log('  (no status changes)');
 
   // Outreach reconcile: replies suppress future cold emails, bounces mark dead
-  // addresses. Same inbox fetch, separate log (data/outreach.jsonl).
-  const outreach = new OutreachReconciler(new OutreachStore(), (acct) => fetchRecentHeaders(acct, days));
+  // addresses. Same inbox fetch, separate log (data/outreach.jsonl). A new reply
+  // fires a desktop notification so Parv can respond fast.
+  const notifier = new Notifier();
+  const outreach = new OutreachReconciler(
+    new OutreachStore(),
+    (acct) => fetchRecentHeaders(acct, days),
+    (n) => notifier.notify(n)
+  );
   const o = await outreach.run(accounts);
   console.log(`\nOutreach reconcile: ${o.repliesRecorded} replies, ${o.bouncesRecorded} bounces` +
     (o.unmatchedBounces ? `, ${o.unmatchedBounces} bounce(s) needing a manual check` : ''));
