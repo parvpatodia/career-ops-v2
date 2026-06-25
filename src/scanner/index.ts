@@ -8,6 +8,7 @@ import { SWEListScanner } from './SWEListScanner.js';
 import { NewGradScanner } from './NewGradScanner.js';
 import { GreenhouseBoardScanner } from './GreenhouseBoardScanner.js';
 import { LeverBoardScanner } from './LeverBoardScanner.js';
+import { AshbyBoardScanner } from './AshbyBoardScanner.js';
 import { LinkedInScanner } from './LinkedInScanner.js';
 import { HandshakeScanner } from './HandshakeScanner.js';
 import { WellfoundScanner } from './WellfoundScanner.js';
@@ -26,6 +27,8 @@ const SCANNERS: Record<string, () => Scanner> = {
   greenhouse: () => GreenhouseBoardScanner.fromConfig(),
   // Primary: free, no auth, real createdAt dates, full JDs, commitment tag
   lever: () => LeverBoardScanner.fromConfig(),
+  // Primary: free, no auth, real publishedAt dates, full JDs, employmentType tag
+  ashby: () => AshbyBoardScanner.fromConfig(),
   // Primary: free, no auth, high volume
   swelist: () => new SWEListScanner(),       // Summer 2026 internships (GitHub)
   newgrad: () => new NewGradScanner(),        // Full-time new grad roles (GitHub)

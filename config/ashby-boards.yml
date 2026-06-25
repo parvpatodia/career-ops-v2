@@ -1,0 +1,23 @@
+# Ashby boards scanned via the public posting API (no auth, no browser):
+#   GET https://api.ashbyhq.com/posting-api/job-board/<slug>
+# Each entry is the org slug in jobs.ashbyhq.com/<slug>. A dead/renamed slug
+# costs one warning and is skipped. Verify a slug before adding by opening
+# https://jobs.ashbyhq.com/<slug> (or curling the API above).
+companies:
+  - gen-digital   # verified 2026-06-25; 9 intern roles incl. Data Scientist Intern
+
+# Invariant 10: intern/co-op focus for Summer/Fall 2026. The scanner also keeps a
+# posting when employmentType is Intern even if the title omits it.
+title_include:
+  - intern
+  - internship
+  - co-op
+  - coop
+
+title_exclude:
+  - senior
+  - staff
+  - principal
+  - director
+  - manager
+  - lead
