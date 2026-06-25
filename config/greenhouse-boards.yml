@@ -17,6 +17,10 @@ boards:
   - trueanomalyinc
   - underdogfantasy
   - vestwell
+  # Jack-and-Jill saved targets (tokens verified against the live boards API 2026-06-25):
+  - wayve         # 120 jobs, wayve.firststage.co
+  - togetherai    # 58 jobs, job-boards.greenhouse.io/togetherai
+  - flyzipline    # 268 jobs incl. Fall-2026 interns, www.zipline.com/open-roles
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026.
 title_include:
