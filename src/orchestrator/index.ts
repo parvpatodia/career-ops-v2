@@ -70,9 +70,13 @@ const log = new Logger('run');
 // loop watches the live page for the REAL ATS confirmation (the human's submit)
 // rather than prompting in the terminal, so it needs no TTY and pops the window
 // only at a touchpoint. Give a human ~5 min to solve + submit; poll every 4s.
-const AUTO_RESUME_TIMEOUT_MS = process.env.CAREER_OPS_RESUME_TIMEOUT_MS
-  ? Math.max(5_000, parseInt(process.env.CAREER_OPS_RESUME_TIMEOUT_MS, 10))
-  : 5 * 60_000;
+// WHY Number.isFinite: a malformed env value -> parseInt NaN -> Math.max(x,NaN)
+// is NaN, and a NaN timeout makes waitForConfirmation poll forever (now()>=NaN is
+// always false). Fall back to the default rather than hang the takeover.
+const AUTO_RESUME_TIMEOUT_MS = (() => {
+  const parsed = parseInt(process.env.CAREER_OPS_RESUME_TIMEOUT_MS ?? '', 10);
+  return Number.isFinite(parsed) ? Math.max(5_000, parsed) : 5 * 60_000;
+})();
 const AUTO_RESUME_POLL_MS = 4_000;
 
 function printAttended(res: AttendedResult): void {
