@@ -68,6 +68,13 @@ const BANNED: ReadonlyArray<{ label: string; re: RegExp }> = [
   { label: 'thrilled', re: /\bthrilled\b/gi },
   { label: 'happy to', re: /\bhappy to\b/gi },
   { label: 'glad to', re: /\bglad to\b/gi },
+  // Parv's profile.yml never_use list (beyond the shared filler above), plus the
+  // single most notorious cold-email AI-tell. The linter is the gate that enforces
+  // his writing rules, so it encodes all of them, not just the global set.
+  { label: 'I believe', re: /\bi believe\b/gi },
+  { label: 'I am writing to', re: /\bi am writing to\b/gi },
+  { label: 'drive impact', re: /\bdriv(?:e|es|ing) impact\b/gi },
+  { label: 'finds you well', re: /\bfinds? you well\b/gi },
 ];
 
 export class StyleLinter {

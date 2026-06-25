@@ -42,6 +42,13 @@ describe('StyleLinter', () => {
     expect(r.ok).toBe(true);
   });
 
+  it("enforces Parv's profile never_use list and the classic cold-email tell", () => {
+    expect(linter.lint('I believe this is a fit').ok).toBe(false);
+    expect(linter.lint('I am writing to ask about a role').ok).toBe(false);
+    expect(linter.lint('work that drives impact').ok).toBe(false);
+    expect(linter.lint('I hope this email finds you well').violations[0]!.label).toBe('finds you well');
+  });
+
   it('reports every violation, sorted by position', () => {
     const r = linter.lint('This crucial, robust, seamless system.');
     expect(r.violations.map((v) => v.label)).toEqual(['crucial', 'robust', 'seamless']);
