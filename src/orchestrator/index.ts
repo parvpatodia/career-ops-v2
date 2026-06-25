@@ -62,6 +62,8 @@ import { IntentPayloadBuilder } from '../applier/IntentPayload.js';
 import type { AnswerSource } from '../applier/IntentPayload.js';
 import type { BatchApproval } from '../applier/Autopilot.js';
 import type { Application } from '../types.js';
+import { SubmissionRecorder } from '../applier/SubmissionRecorder.js';
+import { appIdFor } from '../store/events.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('run');
@@ -173,6 +175,20 @@ async function attendedTakeover(
       });
       if (outcome.kind === 'confirmed') {
         store.update(app.id, { status: 'Applied', appliedAt: new Date().toISOString() });
+        // Persist the OBSERVED ATS confirmation as a `confirmed` event (proof).
+        // store.update already appended `submitted`, satisfying the projection's
+        // confirmed-requires-submitted rule. Best-effort: the Applied status is
+        // already durable, so a confirmation-append hiccup must not undo it.
+        try {
+          const appId = appIdFor(app.company, app.role);
+          new SubmissionRecorder(store.eventStore()).recordConfirmation(
+            appId,
+            `auto-${appId}-${Date.now()}`,
+            outcome.confirmation
+          );
+        } catch (err) {
+          console.log(`  (Applied recorded; confirmation-event append skipped: ${(err as Error).message})`);
+        }
         console.log(`  ✅ confirmed + marked Applied: ${outcome.confirmation.slice(0, 80)}`);
         return true;
       }
