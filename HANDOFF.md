@@ -31,6 +31,21 @@
   Not started (no data shape yet).
 - 514 tests; typecheck clean. Adversarial diff review: 0 correctness bugs; fixed --auto+--tailor
   silent-drop (now warns) + new-prose em dashes before commit.
+- **`--auto` resume FALSE-POSITIVE guard (78883a0)**: the no-TTY auto-resume polls readConfirmation
+  on the still-UNSUBMITTED form; Greenhouse/Generic's loose body+URL fallback could read "confirmed"
+  pre-submit and falsely mark Applied. Now only a null->confirmed TRANSITION counts (baseline read
+  first; if the page already reads confirmed before you act, it abstains and hands it back). Found by
+  adversarial review.
+- **24/7 sourcing loop is LIVE (launchd)**: `~/Library/LaunchAgents/com.parv.careerops.sourcing.plist`
+  runs `scripts/sourcing-loop.sh` every 3h (scan -> source --top 10 -> expire), keeping the Ready
+  queue fresh + M6-tailored. SOURCES ONLY, never submits (captcha submit stays a human touchpoint via
+  `npm run run -- --auto`). Logs: `batch/logs/sourcing-loop.{out,err}`. Disable with
+  `launchctl bootout gui/$(id -u)/com.parv.careerops.sourcing`.
+- **CAPTCHA REALITY (verified 2026-06-25)**: probed every distinct ATS in the queue at its exact apply
+  URL, headless. Greenhouse (Scale AI/Tenstorrent/Unity) + Ashby (Gen Digital) each have a VISIBLE
+  256x60 reCAPTCHA v2 checkbox; PlusAI (Lever) has hCaptcha. NOT invisible v3. The captcha caution is
+  correct: every form needs a human checkbox, none are hands-off submittable. (A v2 checkbox often
+  auto-passes for a logged-in human, which is why it can feel like "no captcha".)
 
 ## Latest (2026-06-20)
 - **Greenhouse option-leak FIXED**: `discoverBuiltinFields` was discovering each multi-select
