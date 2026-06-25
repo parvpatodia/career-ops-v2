@@ -26,6 +26,7 @@ import { Drafter } from '../Drafter.js';
 import { SnippetBook } from '../SnippetBook.js';
 import { OutreachStore } from '../OutreachStore.js';
 import { pickFresh } from '../selectCandidates.js';
+import { assessHunterBudget } from '../budget.js';
 import { Notifier } from '../../applier/Notifier.js';
 import type { Candidate, EmailDraft, LinkedInDraft } from '../types.js';
 
@@ -61,10 +62,32 @@ async function main(): Promise<void> {
   const hunter = apiKey ? new HunterClient({ apiKey }) : null;
   const store = new OutreachStore();
   const drafter = new Drafter(SnippetBook.fromYaml());
+  const notifier = new Notifier();
+
+  // 0. Pre-flight Hunter budget: turn silent credit exhaustion (email half drops
+  //    to zero, loop still "succeeds" on arXiv) into a visible ping.
+  let skipCompanies = false;
+  if (hunter) {
+    try {
+      const status = assessHunterBudget(await hunter.account(), targets.companies?.length ?? 0, emailLimit);
+      if (status.level !== 'ok') {
+        console.log(status.message);
+        notifier.notify({
+          kind: status.level === 'exhausted' ? 'error' : 'batch_complete',
+          title: `Hunter credits ${status.level}`,
+          message: status.message,
+          urgent: status.level === 'exhausted',
+        });
+        if (status.level === 'exhausted') skipCompanies = true; // every domain-search would fail
+      }
+    } catch {
+      // account check is best-effort; proceed and let per-company errors handle it
+    }
+  }
 
   // 1. Source company contacts (real emails) and arXiv researchers (hooks only).
   const companyCandidates: Candidate[] = [];
-  if (hunter) {
+  if (hunter && !skipCompanies) {
     const sourcer = new CompanySourcer(hunter);
     for (const t of targets.companies ?? []) {
       try {
@@ -139,7 +162,7 @@ async function main(): Promise<void> {
     const packPath = path.join('data/outreach', `linkedin-${date}.md`);
     fs.writeFileSync(packPath, renderPack(date, dms));
     // Ping Parv: the DMs are his to copy-paste, so he wants to know they are ready.
-    new Notifier().notify({
+    notifier.notify({
       kind: 'batch_complete',
       title: 'Outreach: LinkedIn DMs ready',
       message: `${dms.length} DM(s) for ${date}. Open ${packPath}, copy, and send.`,
