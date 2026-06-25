@@ -7,6 +7,7 @@
 
 import type { Job, ScanQuery } from '../types.js';
 import { Scanner } from './Scanner.js';
+import { resolveContinuationCompany } from './continuationCompany.js';
 
 const README_URL =
   'https://raw.githubusercontent.com/SimplifyJobs/New-Grad-Positions/dev/README.md';
@@ -28,6 +29,7 @@ export class NewGradScanner extends Scanner {
     const keywords = (query.keywords ?? []).map((k) => k.toLowerCase());
     const rows = html.split(/<tr>/i).slice(1);
 
+    let lastCompany = ''; // carries a real company name onto its "↳" continuation rows
     for (const row of rows) {
       const cells: string[] = [];
       const cellRe = /<td>([\s\S]*?)<\/td>/gi;
@@ -37,8 +39,11 @@ export class NewGradScanner extends Scanner {
       if (cells.length !== 5) continue;
       const [companyCell, roleCell, locationCell, applyCell, ageCell] = cells as [string, string, string, string, string];
 
-      const company = this.stripHtml(companyCell).replace(/^[🔥\s]+/, '').trim();
-      if (!company) continue;
+      const parsedCompany = this.stripHtml(companyCell).replace(/^[🔥\s]+/, '').trim();
+      const resolved = resolveContinuationCompany(parsedCompany, lastCompany);
+      lastCompany = resolved.lastCompany;
+      if (!resolved.company) continue;
+      const company = resolved.company;
 
       const role = this.stripHtml(roleCell).trim();
       if (!role || role === '↳') continue;
