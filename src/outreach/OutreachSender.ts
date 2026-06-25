@@ -78,6 +78,18 @@ export class OutreachSender {
         continue;
       }
 
+      // The body says "I have attached my resume", so a missing attachment would
+      // make the email lie to a stranger. Resolve it first and abstain if a draft
+      // that promises a resume has no file on disk, rather than send a false claim.
+      const attachments = this.attachmentsFor(draft);
+      if (draft.resumeVariant && attachments.length === 0) {
+        const reason = `resume attachment missing (expected parv-${draft.resumeVariant}.pdf); not sending an email that claims an attachment it lacks`;
+        this.store.append({ type: 'email_abstained', contactId: draft.contactId, payload: { to: draft.to, reasons: [reason] } });
+        summary.abstained.push({ draft, reasons: [reason] });
+        this.notify?.({ kind: 'error', title: 'Outreach: resume missing', message: `${draft.to}: ${reason}`, urgent: true });
+        continue;
+      }
+
       // Durable intent receipt, written before the irreversible SMTP call.
       this.store.append({
         type: 'email_verified',
@@ -85,7 +97,7 @@ export class OutreachSender {
         payload: { to: draft.to, status: draft.emailStatus, fromAccount: draft.fromAccount },
       });
 
-      const result = await this.mailer.send(draft, this.attachmentsFor(draft));
+      const result = await this.mailer.send(draft, attachments);
       if (result.confirmed) {
         // tryAppend, not append: between the gate's suppression read and here, a
         // concurrent reconciler could record a bounce/opt-out for this contact,

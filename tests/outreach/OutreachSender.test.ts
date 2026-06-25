@@ -122,4 +122,28 @@ describe('OutreachSender', () => {
     expect(summary.sent).toHaveLength(0); // cap already used by the seeded send
     expect(summary.capSkipped).toHaveLength(1);
   });
+
+  it('abstains (never sends) when a draft promises a resume but the file is missing', async () => {
+    const calls: string[] = [];
+    const sender = new OutreachSender({ gate: makeGate(), mailer: fakeMailer(confirmAll, calls), store, resumeDir: path.join(dir, 'no-resumes') });
+    const d = draftTo('eng@startup.ai');
+    d.resumeVariant = 'ai'; // body says "attached", but no parv-ai.pdf exists
+    const summary = await sender.sendBatch([d]);
+    expect(summary.sent).toHaveLength(0);
+    expect(calls).toHaveLength(0); // never reached SMTP
+    expect(summary.abstained[0]!.reasons.join(' ')).toMatch(/resume attachment missing/);
+    expect(store.readAll().events.map((e) => e.type)).toEqual(['email_abstained']);
+  });
+
+  it('sends when the promised resume file is present', async () => {
+    const resumeDir = path.join(dir, 'resumes');
+    fs.mkdirSync(resumeDir, { recursive: true });
+    fs.writeFileSync(path.join(resumeDir, 'parv-ai.pdf'), '%PDF-1.4 fake');
+    const sender = new OutreachSender({ gate: makeGate(), mailer: fakeMailer(confirmAll), store, resumeDir });
+    const d = draftTo('eng2@startup.ai');
+    d.resumeVariant = 'ai';
+    const summary = await sender.sendBatch([d]);
+    expect(summary.sent).toHaveLength(1);
+    expect(store.readAll().events.map((e) => e.type)).toEqual(['email_verified', 'email_sent']);
+  });
 });
