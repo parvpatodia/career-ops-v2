@@ -1,5 +1,5 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-22 (--auto hybrid loop + Jack-and-Jill decision).
+> Read at session start (CLAUDE.md load order). Last updated 2026-06-25 (--auto resume now watches the page, no TTY).
 > Branch: feat/v2-foundation. MODE: BUILD.
 
 ## Latest (2026-06-22)
@@ -7,11 +7,13 @@
   SAME gated autonomous path as --approve (orch.apply: fill -> independent verify -> submit ONLY
   on a green verdict). If a job is captcha-free + verifies, it submits hands-off. If it stops at a
   captcha (auth_required) or an unknown question (needs_input), the two designed human touchpoints
-  (already notified), it brings your real Chrome window to the front, fills what's safe, and WAITS
-  while you solve + submit, then resumes the loop. Headed Chrome; needs a real TTY for the takeover
-  (piped/non-TTY just reports and continues). Submit stays in ONE place (the Autopilot); the takeover
-  never auto-submits. Verified live: launched your Chrome, ran Scale AI autonomously, hit reCAPTCHA,
-  routed auth_required, 0 submitted / 0 false records.
+  (already notified), it brings your real Chrome window to the front, fills what's safe, and then
+  WATCHES the live page for the real ATS confirmation (your submit) — no terminal prompt, no TTY
+  needed (waitForConfirmation, ~5 min default, override with CAREER_OPS_RESUME_TIMEOUT_MS). It marks
+  Applied ONLY on an observed confirmation; on timeout the job stays Ready and resurfaces next cycle
+  (verify-or-abstain: never claim a submit we cannot observe). Submit stays in ONE place (the
+  Autopilot); the takeover never auto-submits. Verified live: launched your Chrome, ran Scale AI
+  autonomously, hit reCAPTCHA, routed auth_required, 0 submitted / 0 false records.
 - **Honest ceiling unchanged**: today all 5 Ready jobs are reCAPTCHA-gated, so --auto pauses on each
   for you to solve the captcha (it is NOT 100% hands-off; captchas are a hard human touchpoint by
   invariant 6). When fresh captcha-free postings appear, --auto submits them hands-off. "Accuracy"
@@ -27,7 +29,7 @@
   (export/paste/screenshot, or an authenticated tab to read), then build a small importer that
   normalizes {company,title,url,postedAt,jd} into data/daily_log so `npm run source` handles them.
   Not started (no data shape yet).
-- 507 tests; typecheck clean. Adversarial diff review: 0 correctness bugs; fixed --auto+--tailor
+- 514 tests; typecheck clean. Adversarial diff review: 0 correctness bugs; fixed --auto+--tailor
   silent-drop (now warns) + new-prose em dashes before commit.
 
 ## Latest (2026-06-20)
