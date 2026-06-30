@@ -52,7 +52,7 @@ export class OutreachSender {
     this.mailer = deps.mailer;
     this.store = deps.store;
     this.notify = deps.notify;
-    this.dailyCap = deps.dailyCap ?? 5;
+    this.dailyCap = deps.dailyCap ?? 10;
     this.resumeDir = deps.resumeDir ?? 'output/resumes';
     this.clock = deps.clock ?? (() => new Date());
   }

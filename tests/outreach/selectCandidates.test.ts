@@ -44,6 +44,17 @@ describe('pickFresh', () => {
     expect(second.map((c) => c.email)).toEqual(['b@x', 'c@x']); // a@x already used; b,c still available
   });
 
+  it('caps picks per org with maxPerOrg, spreading across companies', () => {
+    const pool = [
+      cand({ email: 'a1@x', org: 'A' }), cand({ email: 'a2@x', org: 'A' }), cand({ email: 'a3@x', org: 'A' }),
+      cand({ email: 'b1@x', org: 'B' }), cand({ email: 'b2@x', org: 'B' }),
+      cand({ email: 'c1@x', org: 'C' }),
+    ];
+    const r = pickFresh(pool, { limit: 10, needEmail: true, seen: new Set(), isSuppressed: () => false, maxPerOrg: 2, idOf });
+    const byOrg = r.reduce<Record<string, number>>((m, c) => { m[c.org] = (m[c.org] ?? 0) + 1; return m; }, {});
+    expect(byOrg).toEqual({ A: 2, B: 2, C: 1 }); // A's 3rd skipped; batch spans 3 orgs
+  });
+
   it('defaults idOf to Drafter.contactId', () => {
     const r = pickFresh([cand({ email: 'a@x.com' })], { limit: 5, needEmail: true, seen: new Set(), isSuppressed: () => false });
     expect(r).toHaveLength(1);

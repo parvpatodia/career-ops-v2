@@ -23,6 +23,9 @@ export interface PickFreshOptions {
   seen: Set<string>;
   /** True if the contact was already sent/replied/bounced/opted-out. */
   isSuppressed: (contactId: string) => boolean;
+  /** Cap how many picks share the same `org`, so a batch spans several companies
+   *  instead of emptying one. Omit for no per-org limit. */
+  maxPerOrg?: number;
   /** Stable contact id. Defaults to Drafter.contactId (email key, else profile). */
   idOf?: (c: Candidate) => string;
 }
@@ -37,11 +40,17 @@ export interface PickFreshOptions {
 export function pickFresh(pool: readonly Candidate[], opts: PickFreshOptions): Candidate[] {
   const idOf = opts.idOf ?? Drafter.contactId;
   const picked: Candidate[] = [];
+  const perOrg = new Map<string, number>();
   for (const c of pool) {
     if (picked.length >= opts.limit) break;
     if (opts.needEmail && !c.email) continue;
     const id = idOf(c);
     if (opts.seen.has(id) || opts.isSuppressed(id)) continue;
+    if (opts.maxPerOrg !== undefined) {
+      const used = perOrg.get(c.org) ?? 0;
+      if (used >= opts.maxPerOrg) continue; // org quota reached; leave them unmarked for another day
+      perOrg.set(c.org, used + 1);
+    }
     opts.seen.add(id);
     picked.push(c);
   }
