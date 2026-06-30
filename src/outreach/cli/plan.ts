@@ -63,6 +63,7 @@ async function main(): Promise<void> {
   const store = new OutreachStore();
   const drafter = new Drafter(SnippetBook.fromYaml());
   const notifier = new Notifier();
+  const isSuppressed = (id: string) => store.isSuppressed(id);
 
   // 0. Pre-flight Hunter budget: turn silent credit exhaustion (email half drops
   //    to zero, loop still "succeeds" on arXiv) into a visible ping.
@@ -86,6 +87,11 @@ async function main(): Promise<void> {
   }
 
   // 1. Source company contacts (real emails) and arXiv researchers (hooks only).
+  //    Source companies top-to-bottom and STOP once we already have enough fresh
+  //    (not-suppressed, not-dup) emailable contacts to fill the cap. WHY: every
+  //    company costs one Hunter search; once the day's 5 are found, querying the
+  //    rest of a long list just burns the free-tier budget. Already-emailed
+  //    contacts are suppressed, so on later days this naturally sources deeper.
   const companyCandidates: Candidate[] = [];
   if (hunter && !skipCompanies) {
     const sourcer = new CompanySourcer(hunter);
@@ -95,6 +101,8 @@ async function main(): Promise<void> {
       } catch (err) {
         console.log(`  ${t.company}: ${(err as Error).message}`);
       }
+      const freshSoFar = pickFresh(companyCandidates, { limit: emailLimit, needEmail: true, seen: new Set(), isSuppressed }).length;
+      if (freshSoFar >= emailLimit) break;
     }
   }
   const arxiv = new ArxivSourcer();
@@ -110,7 +118,6 @@ async function main(): Promise<void> {
   // 2. Pick emailable candidates (dedup + suppression + cap). The selection logic
   //    lives in a tested module (pickFresh) because it shipped a dedup bug once.
   const seen = new Set<string>();
-  const isSuppressed = (id: string) => store.isSuppressed(id);
   const emailable = pickFresh(companyCandidates, { limit: emailLimit, needEmail: true, seen, isSuppressed });
 
   // 3. Verify each address so the gate's "valid" check has real data.
