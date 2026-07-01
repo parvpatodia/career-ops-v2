@@ -51,11 +51,11 @@ function loadTargets(file: string): Targets {
 async function main(): Promise<void> {
   const date = arg('--date') ?? new Date().toISOString().slice(0, 10);
   const dryRun = process.argv.includes('--dry-run');
-  const emailLimit = arg('--emails') ? parseInt(arg('--emails')!, 10) : 10;
+  const emailLimit = arg('--emails') ? parseInt(arg('--emails')!, 10) : 5;
   const linkedinLimit = arg('--linkedin') ? parseInt(arg('--linkedin')!, 10) : 5;
-  // Cap emails per company so the daily batch spans several companies (10 emails,
-  // <=4 per company => at least 3 companies a day) rather than emptying one.
-  const maxPerOrg = arg('--per-company') ? parseInt(arg('--per-company')!, 10) : 4;
+  // Cap emails per company so the daily batch spans several companies (5 emails,
+  // <=2 per company => at least 3 companies a day) rather than emptying one.
+  const maxPerOrg = arg('--per-company') ? parseInt(arg('--per-company')!, 10) : 2;
   const targets = loadTargets(arg('--targets') ?? 'config/outreach-targets.yml');
 
   const apiKey = process.env.HUNTER_API_KEY;
