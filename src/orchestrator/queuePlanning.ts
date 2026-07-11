@@ -20,6 +20,28 @@ export function isIneligible(app: Application): boolean {
   return INELIGIBLE_KEYWORDS.some((kw) => haystack.includes(kw));
 }
 
+// The roles Parv targets (his degree + projects): AI / ML / software / robotics /
+// autonomy / physical intelligence. Matched by WORD-BOUNDARY patterns so short
+// tokens cannot false-match ( \bai\b never matches "training"/"email"/"retail" ).
+// The watcher and sourcing use this so alerts + the queue stay on-field: the ROLE
+// matters, not the company (a Marketing/Accounting/Aerodynamics intern is dropped).
+export const RELEVANT_ROLE_PATTERNS: readonly RegExp[] = [
+  /\bmachine learning\b/i, /\bml\b/i, /\bmlops\b/i,
+  /\bai\b/i, /\bartificial intelligence\b/i, /\bdeep learning\b/i,
+  /\breinforcement learning\b/i, /\bgenerative\b/i, /\bfoundation model/i, /\bllm\b/i,
+  /\bsoftware engineer/i, /\bsoftware develop/i, /\bswe\b/i, /\bsde\b/i,
+  /\b(?:ml|ai) engineer/i, /\bresearch engineer/i, /\bresearch scientist/i, /\bapplied scientist/i,
+  /\brobotics?\b/i, /\bperception\b/i, /\bautonomous\b/i, /\bautonomy\b/i, /\bself[ -]?driving\b/i,
+  /\bcomputer vision\b/i, /\bnlp\b/i, /\bnatural language\b/i,
+  /\bdata scientist/i, /\bdata engineer/i,
+  /\bphysical intelligence\b/i, /\bembodied\b/i, /\bmotion planning\b/i,
+];
+
+/** True when the job TITLE is in Parv's field (AI/ML/SWE/robotics/AV/...). */
+export function isRelevantRole(title: string): boolean {
+  return RELEVANT_ROLE_PATTERNS.some((p) => p.test(title ?? ''));
+}
+
 /** What the read-only preflight observes about one scanned form. */
 export interface TriageInput {
   hasCaptcha: boolean;

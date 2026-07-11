@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isIneligible, jobFromApp, parseNotes, triageForm } from '../../src/orchestrator/queuePlanning.js';
+import { isIneligible, isRelevantRole, jobFromApp, parseNotes, triageForm } from '../../src/orchestrator/queuePlanning.js';
 import type { Application } from '../../src/types.js';
 
 function app(overrides: Partial<Application> = {}): Application {
@@ -96,5 +96,37 @@ describe('triageForm (AUTO vs ATTENDED)', () => {
   it('reports every blocking reason', () => {
     const v = triageForm({ hasCaptcha: true, requiredUnmapped: 1, unknownQuestions: 1, fillableFields: 0 });
     expect(v.reasons).toHaveLength(4);
+  });
+});
+
+describe('isRelevantRole', () => {
+  it('keeps AI/ML/SWE/robotics/AV roles in Parv\'s field', () => {
+    for (const t of [
+      'Machine Learning Engineer Intern', 'AI Research Scientist', 'Software Engineer, New Grad',
+      'Software Developer Co-op', 'Robotics Perception Intern', 'Autonomous Vehicle Engineer',
+      'Deep Learning Research Engineer', 'Data Scientist Intern', 'Applied Scientist, NLP',
+      'Computer Vision Engineer', 'Reinforcement Learning Intern', 'Self-Driving Software Intern',
+    ]) {
+      expect(isRelevantRole(t)).toBe(true);
+    }
+  });
+
+  it('drops off-field roles (the ROLE matters, not the company)', () => {
+    for (const t of [
+      'Aerodynamics Intern', 'Accounting Intern', 'Marketing Intern', 'Sales Development Rep',
+      'Recruiting Coordinator', 'Mechanical Design Intern', 'Financial Analyst Intern',
+    ]) {
+      expect(isRelevantRole(t)).toBe(false);
+    }
+  });
+
+  it('word boundaries prevent short-token false matches (ai/ml/swe)', () => {
+    // "ai"/"ml" appear INSIDE these words but must not match.
+    expect(isRelevantRole('Training Program Coordinator')).toBe(false); // "training" contains ai
+    expect(isRelevantRole('Email Marketing Specialist')).toBe(false);   // "email" contains ai
+    expect(isRelevantRole('Film Production Intern')).toBe(false);       // "film" contains ml? no; sanity
+    // but real standalone tokens match:
+    expect(isRelevantRole('AI Engineer')).toBe(true);
+    expect(isRelevantRole('ML Infrastructure Intern')).toBe(true);
   });
 });
