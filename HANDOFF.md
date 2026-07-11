@@ -1,6 +1,27 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-06-25 (--auto resume now watches the page, no TTY).
+> Read at session start (CLAUDE.md load order). Last updated 2026-07-11 (new-posting watcher: be first to apply).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-07-11) — "be first to apply" watcher (Tsenta-parity, free)
+- **`npm run watch`** (src/watch/): scans the FAST no-auth sources (Greenhouse/Lever/Ashby board
+  APIs + SWEList/NewGrad) via the new cache-bypassing `Scanner.scanFresh`, diffs a persisted
+  seen-set (data/watch-seen.json), and fires an INSTANT desktop notification for each genuinely-new,
+  F-1-eligible posting + appends it to data/new-jobs.json (hot-list). Speed-to-apply is the edge
+  (first-come-first-served). `detectNewPostings` is pure + unit-tested (first run seeds silently;
+  later runs emit only the de-duped delta). NEVER applies — watch + alert only.
+- **LIVE via launchd**: `~/Library/LaunchAgents/com.parv.careerops.watch.plist` runs every 5 min
+  (RunAtLoad). 5 min (not "every minute") is the honest sustainable cadence — faster hammers the
+  public board APIs toward a ban that would break sourcing. Disable:
+  `launchctl bootout gui/$(id -u)/com.parv.careerops.watch`. Logs: batch/logs/watch.{out,err}.
+- Verified live: seeded 500, simulated delta -> detected 6 new -> 4 F-1-eligible alerted (2
+  clearance/citizen filtered) -> hot-list written (Workato/Later/Jump Trading intern roles).
+- **Tsenta parity**: career-ops already had the rest of Tsenta's free core (keyword résumé
+  tailoring/M6, full verify-or-abstain auto-apply, on-device, F-1 work-auth filtering, email
+  tracking); the watcher was the one missing piece (fast discovery "before LinkedIn indexes it").
+- OPEN / next: notifications are NOT clickable-to-open (osascript opens Script Editor); the apply
+  URL is in the banner text + data/new-jobs.json. True click-to-apply needs terminal-notifier
+  (`brew install terminal-notifier`) — offered, not installed. Two launchd loops now run:
+  `...sourcing` (3h, scan+source+expire) and `...watch` (5m, new-posting alerts).
 
 ## Latest (2026-06-22)
 - **`npm run run -- --auto` = THE everyday command (the hybrid loop)**: per Ready job it runs the
