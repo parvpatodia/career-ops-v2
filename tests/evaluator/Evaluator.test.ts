@@ -77,6 +77,39 @@ describe.skipIf(!HAS_CV)('Evaluator', () => {
     );
   });
 
+  it('CALIBRATION: an off-field role at a fresh Bay-Area sponsoring posting falls BELOW the apply threshold', () => {
+    // Same great context as BASE_JOB (fresh, Bay Area, sponsors F-1, intern) but
+    // the ROLE is off-field. Before calibration this floated to ~90; the role-fit
+    // multiplier must now drop it under min_to_apply so it is never queued.
+    const offField: Job = {
+      ...BASE_JOB,
+      title: 'Aerodynamics Intern',
+      jd: `Aerodynamics Intern. Requirements: fluid dynamics, CFD, wind tunnel testing,
+           aerospace structures. San Francisco Bay Area. We sponsor F-1 OPT and CPT.
+           Internship position, students welcome.`,
+    };
+    const off = evaluator.evaluate(offField);
+    const on = evaluator.evaluate(BASE_JOB);
+    expect(off.shouldApply).toBe(false);
+    expect(off.score).toBeLessThan(50);
+    expect(off.score).toBeLessThan(on.score - 30); // clearly separated from an on-field role
+  });
+
+  it('CALIBRATION: a generic title with an on-field JD is NOT penalized (no false-drop)', () => {
+    // "Research Intern" is not an in-field TITLE, but the JD is clearly ML — the
+    // JD-based signal must save it (role-fit 1.0), so it stays applyable.
+    const genericOnField: Job = {
+      ...BASE_JOB,
+      title: 'Research Intern',
+      jd: `Research Intern. You will work on machine learning and deep learning models,
+           training neural networks in PyTorch for computer vision. San Francisco.
+           We sponsor F-1 OPT. Students welcome.`,
+    };
+    const r = evaluator.evaluate(genericOnField);
+    expect(r.shouldApply).toBe(true);
+    expect(r.score).toBeGreaterThanOrEqual(50);
+  });
+
   it('includes reasoning string', () => {
     const result = evaluator.evaluate(BASE_JOB);
     expect(typeof result.reasoning).toBe('string');

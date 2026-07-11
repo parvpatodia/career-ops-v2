@@ -42,6 +42,48 @@ export function isRelevantRole(title: string): boolean {
   return RELEVANT_ROLE_PATTERNS.some((p) => p.test(title ?? ''));
 }
 
+// Titles that NAME a discipline outside Parv's field. A title is the reliable
+// signal of the ROLE (the JD is noisy with company context — an "Aerodynamics
+// Intern" at an autonomous-drone company has a JD full of "autonomous"/"software"
+// that describes the COMPANY, not the role). So an off-field TITLE is penalized
+// regardless of JD. On-field title patterns (RELEVANT_ROLE_PATTERNS) are checked
+// FIRST, so "Manufacturing Software Engineer" stays on-field.
+export const OFF_FIELD_TITLE_PATTERNS: readonly RegExp[] = [
+  /\baero(dynamic|space|nautical)/i, /\bmechanical\b/i, /\belectrical\b/i, /\bcivil\b/i,
+  /\bchemical\b/i, /\bstructural\b/i, /\bthermal\b/i, /\bmaterials\b/i, /\bmanufacturing engineer/i,
+  /\bindustrial engineer/i, /\bquality engineer/i,
+  /\baccount(ing|ant)\b/i, /\bfinance\b/i, /\bfinancial analyst\b/i, /\btax\b/i, /\baudit/i,
+  /\bmarketing\b/i, /\bsales\b/i, /\brecruit/i, /\bhuman resources\b/i, /\btalent\b/i,
+  /\blegal\b/i, /\battorney\b/i, /\bparalegal\b/i,
+  /\bclinical\b/i, /\bnurs(e|ing)\b/i, /\bbiolog/i, /\bchemist/i,
+  /\bcommunications\b/i, /\bgraphic design\b/i, /\bindustrial design\b/i,
+  /\bsupply chain\b/i, /\blogistics\b/i, /\boperations\b/i,
+];
+
+/**
+ * Role-fit MULTIPLIER for the score (scorer calibration): the ROLE must matter
+ * more than "fresh intern at a hot company". Title-primary, since the title names
+ * the role's field while the JD is noisy with company context:
+ *   - on-field TITLE (RELEVANT_ROLE_PATTERNS)         -> 1.0 (wins outright)
+ *   - off-field TITLE (names another discipline)      -> 0.35 (JD cannot rescue;
+ *       its field words are company context, not the role)
+ *   - neutral title -> fall back to the JD: >=2 field signals -> 1.0,
+ *       exactly 1 -> 0.7, none -> 0.35
+ * The 0.35 floor drops an off-field role below the apply threshold even when
+ * experience/location/timing are all maxed. Pure, so it is unit-tested. WHY a
+ * multiplier (not a 7th weighted term): it cannot be diluted by the other
+ * factors — a fresh posting at a famous company cannot float an off-field role.
+ */
+export function roleRelevance(title: string, jd: string): number {
+  const t = title ?? '';
+  if (isRelevantRole(t)) return 1.0;                                  // on-field title wins
+  if (OFF_FIELD_TITLE_PATTERNS.some((p) => p.test(t))) return 0.35;   // names a non-Parv discipline
+  const jdHits = RELEVANT_ROLE_PATTERNS.filter((p) => p.test(jd ?? '')).length; // neutral -> use JD
+  if (jdHits >= 2) return 1.0;
+  if (jdHits === 1) return 0.7;
+  return 0.35;
+}
+
 /** What the read-only preflight observes about one scanned form. */
 export interface TriageInput {
   hasCaptcha: boolean;
