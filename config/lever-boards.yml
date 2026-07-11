@@ -6,6 +6,8 @@ companies:
   # Verified live against the postings API 2026-07-11 (200, valid board).
   - plaid
   - mistral
+  - zoox          # 218 postings, jobs.lever.co/zoox (autonomous vehicles)
+  - palantir      # 273 postings, jobs.lever.co/palantir (data/AI SWE)
   # Removed 2026-07-11: ramp, brex, anduril all 404 on Lever now (moved ATS) —
   # they were 404-spamming the log and wasting a request every 5-min watch run.
 

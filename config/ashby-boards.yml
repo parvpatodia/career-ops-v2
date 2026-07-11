@@ -5,6 +5,18 @@
 # https://jobs.ashbyhq.com/<slug> (or curling the API above).
 companies:
   - gen-digital   # verified 2026-06-25; 9 intern roles incl. Data Scientist Intern
+  # AI / ML / robotics firms (identity + job count verified live 2026-07-11):
+  - skydio        # 113 jobs (autonomous drones / robotics)
+  - cohere        # 130 jobs (LLM / AI)
+  - perplexity    # 82 jobs (AI search)
+  - sierra        # 157 jobs (AI agents)
+  - harvey        # 343 jobs (AI, legal)
+  - baseten       # 72 jobs (ML infrastructure)
+  - modal         # 33 jobs (ML infrastructure)
+  - replit        # 99 jobs (AI dev tools)
+  - notion        # 141 jobs (SWE)
+  - ramp          # 127 jobs (SWE)
+  - benchling     # 51 jobs (SWE, life sciences)
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026. The scanner also keeps a
 # posting when employmentType is Intern even if the title omits it.
