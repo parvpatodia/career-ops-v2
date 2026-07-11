@@ -13,6 +13,7 @@
     "run": "tsx src/orchestrator/index.ts",
     "source": "tsx src/orchestrator/source.ts",
     "watch": "tsx src/watch/index.ts",
+    "ui": "tsx src/ui/server.ts",
     "audit:answers": "tsx scripts/audit-answers.ts",
     "inbox": "tsx src/inbox/index.ts",
     "outreach:account": "tsx src/outreach/cli/account.ts",
