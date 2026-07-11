@@ -2,6 +2,18 @@
 > Read at session start (CLAUDE.md load order). Last updated 2026-07-11 (new-posting watcher: be first to apply).
 > Branch: feat/v2-foundation. MODE: BUILD.
 
+## Latest (2026-07-11c) — scorer calibration (role-fit dominates)
+- **`roleRelevance(title, jd)` multiplier on the Evaluator score** (f6c8c4e): fixes the old bug where a
+  fresh intern posting at a famous company floored ~77-86 regardless of field (role-fit entered only
+  via skillMatch@30%, which defaulted to 0.75 "neutral" when the JD had no recognized skills; company
+  signal was a flat 0.70 stub). Now TITLE-primary (the title names the role's field; the JD is noisy
+  with company context): on-field title -> 1.0; OFF_FIELD_TITLE_PATTERNS (aero/mechanical/accounting/
+  finance/sales/legal/nursing/...) -> 0.35 and the JD can't rescue it; neutral title -> JD-based. The
+  multiplier can't be diluted by experience/location/timing, so off-field roles fall below the apply
+  threshold. Verified live: Zipline "Aerodynamics Intern" 86 -> 29 (apply=false); ML/SWE/CV roles
+  unaffected. Current Ready queue already all on-field (0 off-field to purge). 563 tests.
+- To tune aggressiveness: adjust the 0.35/0.7/1.0 tiers or OFF_FIELD_TITLE_PATTERNS in queuePlanning.
+
 ## Latest (2026-07-11b) — role focus + broad relevant coverage
 - **Role-relevance filter** (5663d84): `isRelevantRole(title)` in queuePlanning (word-boundary
   patterns for AI/ML/SWE/robotics/AV/physical-intelligence; \bai\b never matches "training"). The
