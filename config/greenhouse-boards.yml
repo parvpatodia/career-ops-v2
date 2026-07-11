@@ -21,6 +21,22 @@ boards:
   - wayve         # 120 jobs, wayve.firststage.co
   - togetherai    # 58 jobs, job-boards.greenhouse.io/togetherai
   - flyzipline    # 268 jobs incl. Fall-2026 interns, www.zipline.com/open-roles
+  # AI / ML / robotics / AV / big-tech firms (identity + job count verified live 2026-07-11):
+  - databricks    # 787 jobs, databricks.com
+  - waymo         # 378 jobs, careers.withwaymo.com (autonomous vehicles)
+  - nuro          # 95 jobs, nuro.ai (autonomous delivery robotics)
+  - figure        # 26 jobs, figure (humanoid robotics)
+  - samsara       # 311 jobs, samsara.com (IoT/CV/ML)
+  - verkada       # 289 jobs (computer vision / security ML)
+  - stripe        # 510 jobs, stripe (SWE)
+  - coinbase      # 131 jobs (SWE/ML)
+  - reddit        # 189 jobs (ML/SWE)
+  - discord       # 57 jobs (SWE)
+  - figma         # 171 jobs (SWE)
+  - instacart     # 140 jobs (ML/SWE)
+  - robinhood     # 113 jobs (SWE/ML)
+  - gitlab        # 151 jobs (SWE)
+  - brex          # 266 jobs (SWE)
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026.
 title_include:
