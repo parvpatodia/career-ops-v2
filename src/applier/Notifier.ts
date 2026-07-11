@@ -21,6 +21,7 @@ export type NotifyKind =
   | 'captcha'
   | 'abstain'
   | 'batch_complete'
+  | 'new_posting'
   | 'error';
 
 export interface Notification {
@@ -50,6 +51,7 @@ function kindLabel(kind: NotifyKind): string {
     case 'captcha': return 'Captcha — take over';
     case 'abstain': return 'Abstained — review';
     case 'batch_complete': return 'Batch complete';
+    case 'new_posting': return 'New job, apply fast';
     case 'error': return 'Error';
   }
 }
@@ -111,6 +113,16 @@ export class Notifier {
       title: 'Career-Ops: batch complete',
       message: summary,
       urgent: false,
+    });
+  }
+
+  /** A newly-posted job the watcher caught: apply fast to be among the first. */
+  newPosting(company: string, role: string, url: string): void {
+    this.notify({
+      kind: 'new_posting',
+      title: `New: ${truncate(company, 40)}`,
+      message: `${truncate(role, 60)} · apply fast: ${url}`,
+      urgent: true,
     });
   }
 

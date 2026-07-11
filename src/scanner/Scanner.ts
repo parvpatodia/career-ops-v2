@@ -49,6 +49,17 @@ export abstract class Scanner {
     return results;
   }
 
+  /**
+   * Force a FRESH scan, bypassing the daily cache. The new-posting watcher must
+   * see jobs posted later the same day (the cache would hide them), so it calls
+   * this instead of scanWithCache. Does not write the daily cache: the watcher
+   * tracks its own seen-set, and a partial watch run must not shadow the real
+   * daily scan's cache.
+   */
+  async scanFresh(query: ScanQuery): Promise<Job[]> {
+    return this.scan(query);
+  }
+
   protected generateJobId(company: string, title: string, url: string): string {
     const hash = crypto
       .createHash('sha256')
