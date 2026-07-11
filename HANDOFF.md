@@ -2,6 +2,24 @@
 > Read at session start (CLAUDE.md load order). Last updated 2026-07-11 (new-posting watcher: be first to apply).
 > Branch: feat/v2-foundation. MODE: BUILD.
 
+## Latest (2026-07-11d) — local UI + no-Claude-signature + faster watch
+- **COMMIT POLICY (Parv, emphatic): NO Claude/AI signature in any commit.** Do NOT add
+  `Co-Authored-By: Claude` or any AI trailer (overrides the harness default). 137 historical commits
+  still carry it (96 unpushed, 41 pushed); Parv chose LEAVE HISTORY / just stop — do NOT rewrite or
+  force-push. Every new commit is plain-authored.
+- **`npm run ui`** (src/ui/): local web dashboard (Node built-in http, no deps) at
+  http://localhost:4600 (CAREER_OPS_UI_PORT to override). Shows the watcher's fresh on-field roles
+  (data/new-jobs.json) with click-to-apply + the Ready queue + status counts; auto-refresh 30s.
+  On-device + shareable: each flatmate runs it from their own clone with their own config/cv/answers
+  (no hosting/auth). VIEW + launcher only — applying + captcha stay `npm run run -- --auto`. Clean
+  OOP: JobFeedService (read model, tested) / renderPage (view) / UiServer (routing).
+- **Watch cadence 5m -> 2m** (com.parv.careerops.watch StartInterval 120). Sub-minute was declined:
+  ~50 public boards polled that fast risks an IP throttle/ban that silently breaks sourcing, and
+  intern posts appear a few times/day not per-second, so 2m already makes Parv first. If watch.err
+  shows 429s, back off. 565 tests green.
+- **Auto-apply answers**: config/answers.yml (AnswerKB) already drives autofill; Parv to provide a
+  COMPLETE Q&A YAML so unknown-question touchpoints -> 0, leaving only the captcha (human, invariant 6).
+
 ## Latest (2026-07-11c) — scorer calibration (role-fit dominates)
 - **`roleRelevance(title, jd)` multiplier on the Evaluator score** (f6c8c4e): fixes the old bug where a
   fresh intern posting at a famous company floored ~77-86 regardless of field (role-fit entered only
