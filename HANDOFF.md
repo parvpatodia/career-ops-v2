@@ -18,10 +18,13 @@
 - **Tsenta parity**: career-ops already had the rest of Tsenta's free core (keyword résumé
   tailoring/M6, full verify-or-abstain auto-apply, on-device, F-1 work-auth filtering, email
   tracking); the watcher was the one missing piece (fast discovery "before LinkedIn indexes it").
-- OPEN / next: notifications are NOT clickable-to-open (osascript opens Script Editor); the apply
-  URL is in the banner text + data/new-jobs.json. True click-to-apply needs terminal-notifier
-  (`brew install terminal-notifier`) — offered, not installed. Two launchd loops now run:
-  `...sourcing` (3h, scan+source+expire) and `...watch` (5m, new-posting alerts).
+- CLICK-TO-APPLY built (46a8ef5): Notifier prefers terminal-notifier when installed — a new_posting
+  banner carries the apply URL and is clickable straight to the apply page (`-open`), with graceful
+  osascript fallback (URL in text) when absent. Activates automatically on `brew install
+  terminal-notifier` (not yet installed). Dead Lever slugs ramp/brex/anduril removed (226f202; they
+  404'd every run). Two launchd loops run: `...sourcing` (3h, scan+source+expire) and `...watch`
+  (5m, new-posting alerts). To add more watched companies: verified tokens in
+  config/{greenhouse,lever,ashby}-boards.yml.
 
 ## Latest (2026-06-22)
 - **`npm run run -- --auto` = THE everyday command (the hybrid loop)**: per Ready job it runs the
