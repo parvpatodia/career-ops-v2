@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Notifier, buildAppleScript } from '../../src/applier/Notifier.js';
+import { Notifier, buildAppleScript, buildTerminalNotifierArgs } from '../../src/applier/Notifier.js';
 import type { Notification } from '../../src/applier/Notifier.js';
 
 function recorder(): { sink: (n: Notification) => void; sent: Notification[] } {
@@ -63,5 +63,34 @@ describe('Notifier', () => {
   it('non-urgent notifications omit the sound', () => {
     const script = buildAppleScript({ kind: 'batch_complete', title: 't', message: 'm', urgent: false });
     expect(script).not.toContain('sound name');
+  });
+
+  it('newPosting is an urgent new_posting alert carrying the apply URL as openUrl', () => {
+    const r = recorder();
+    new Notifier(r.sink).newPosting('Wayve', 'Perception Intern', 'https://x.com/apply/1');
+    expect(r.sent).toHaveLength(1);
+    expect(r.sent[0]!.kind).toBe('new_posting');
+    expect(r.sent[0]!.urgent).toBe(true);
+    expect(r.sent[0]!.openUrl).toBe('https://x.com/apply/1');
+    expect(r.sent[0]!.message).toContain('Perception Intern');
+  });
+
+  it('buildTerminalNotifierArgs adds -open (clickable to apply) when openUrl is set', () => {
+    const args = buildTerminalNotifierArgs({
+      kind: 'new_posting', title: 'New: Wayve', message: 'Perception Intern',
+      urgent: true, openUrl: 'https://x.com/apply/1',
+    });
+    const openIdx = args.indexOf('-open');
+    expect(openIdx).toBeGreaterThan(-1);
+    expect(args[openIdx + 1]).toBe('https://x.com/apply/1');
+    expect(args).toContain('-message');
+    expect(args[args.indexOf('-message') + 1]).toBe('Perception Intern');
+    expect(args).toContain('-sound'); // urgent
+  });
+
+  it('buildTerminalNotifierArgs omits -open when there is no URL, and -sound when not urgent', () => {
+    const args = buildTerminalNotifierArgs({ kind: 'batch_complete', title: 't', message: 'm', urgent: false });
+    expect(args).not.toContain('-open');
+    expect(args).not.toContain('-sound');
   });
 });
