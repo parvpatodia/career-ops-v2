@@ -28,7 +28,7 @@ import { AshbyBoardScanner } from '../scanner/AshbyBoardScanner.js';
 import { SWEListScanner } from '../scanner/SWEListScanner.js';
 import { NewGradScanner } from '../scanner/NewGradScanner.js';
 import { detectNewPostings } from './detectNewPostings.js';
-import { INELIGIBLE_KEYWORDS } from '../orchestrator/queuePlanning.js';
+import { INELIGIBLE_KEYWORDS, isRelevantRole } from '../orchestrator/queuePlanning.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Logger } from '../utils/Logger.js';
 
@@ -96,9 +96,11 @@ async function main(): Promise<void> {
     return;
   }
 
-  const relevant = fresh.filter(eligible);
+  // The ROLE matters, not the company: only alert on new postings that are BOTH
+  // in Parv's field (AI/ML/SWE/robotics/AV) AND F-1-eligible.
+  const relevant = fresh.filter((j) => isRelevantRole(j.title) && eligible(j));
   if (relevant.length === 0) {
-    log.info(`Scanned ${all.length}; ${fresh.length} new, 0 F-1-eligible to alert.`);
+    log.info(`Scanned ${all.length}; ${fresh.length} new, 0 on-field + F-1-eligible to alert.`);
     return;
   }
 
@@ -119,7 +121,7 @@ async function main(): Promise<void> {
   const extra = relevant.length - Math.min(relevant.length, NOTIFY_CAP);
   if (extra > 0) notifier.batchComplete(`+${extra} more new postings — see ${HOTLIST_PATH}`);
 
-  log.info(`Scanned ${all.length}; ${fresh.length} new, alerted ${Math.min(relevant.length, NOTIFY_CAP)} (F-1-eligible), hot-list at ${HOTLIST_PATH}.`);
+  log.info(`Scanned ${all.length}; ${fresh.length} new, alerted ${Math.min(relevant.length, NOTIFY_CAP)} (on-field, F-1-eligible), hot-list at ${HOTLIST_PATH}.`);
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });
