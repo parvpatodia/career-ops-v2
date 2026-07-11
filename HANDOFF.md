@@ -2,6 +2,26 @@
 > Read at session start (CLAUDE.md load order). Last updated 2026-07-11 (new-posting watcher: be first to apply).
 > Branch: feat/v2-foundation. MODE: BUILD.
 
+## Latest (2026-07-11b) — role focus + broad relevant coverage
+- **Role-relevance filter** (5663d84): `isRelevantRole(title)` in queuePlanning (word-boundary
+  patterns for AI/ML/SWE/robotics/AV/physical-intelligence; \bai\b never matches "training"). The
+  WATCHER now alerts only on postings that are BOTH on-field AND F-1-eligible ("the role matters,
+  not the company"). Deliberately NOT applied to sourcing: a title-only filter would false-drop
+  generically-titled relevant roles; sourcing keeps its JD-based Evaluator (tighten via scorer
+  calibration, a judgment call, not a blunt title filter).
+- **Board coverage expanded** (198e1c9) to 28 verified AI/ML/robotics/AV firms (identity + job count
+  checked live against each API): GH += databricks, waymo, nuro, figure, samsara, verkada, stripe,
+  coinbase, reddit, discord, figma, instacart, robinhood, gitlab, brex; Lever += zoox, palantir;
+  Ashby += skydio, cohere, perplexity, sierra, harvey, baseten, modal, replit, notion, ramp,
+  benchling. ~50 boards now watched. NOTE: after expanding boards, RE-SEED the watcher
+  (`rm data/watch-seen.json`; next run seeds silently) so the new boards' backlog does not flood as
+  "new" — done 2026-07-11.
+- **terminal-notifier INSTALLED** → new-posting banners are now clickable-straight-to-apply (live).
+- **Apply is still human-gated (captcha).** All of Greenhouse/Lever/Ashby carry reCAPTCHA/hCaptcha,
+  so a 24/7 UNATTENDED apply loop would submit ~0 + pop windows uselessly. Deliberately NOT set up.
+  The real 24/7 flow: source (3h) + watch (5m) run autonomously; Parv applies via the clickable
+  alert → `npm run run -- --auto` (solves the captcha, auto-detects the confirmation). 556 tests.
+
 ## Latest (2026-07-11) — "be first to apply" watcher (Tsenta-parity, free)
 - **`npm run watch`** (src/watch/): scans the FAST no-auth sources (Greenhouse/Lever/Ashby board
   APIs + SWEList/NewGrad) via the new cache-bypassing `Scanner.scanFresh`, diffs a persisted
