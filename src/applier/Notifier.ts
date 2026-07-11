@@ -30,6 +30,13 @@ export interface Notification {
   message: string;
   /** Urgent notifications play a sound; digests are silent. */
   urgent: boolean;
+  /**
+   * If set AND terminal-notifier is installed, CLICKING the banner opens this
+   * URL (the apply page) — the "click the notification and start applying" flow.
+   * osascript banners cannot do this (they open Script Editor), so without
+   * terminal-notifier the URL is just shown in the message text.
+   */
+  openUrl?: string;
 }
 
 export type NotifySink = (n: Notification) => void;
@@ -56,10 +63,47 @@ function kindLabel(kind: NotifyKind): string {
   }
 }
 
-// WHY swallow errors: a notification is best-effort. If osascript is missing
-// (non-mac CI) or Notification Center is unavailable, the autopilot must keep
-// working, not crash on a failed banner.
-const osascriptSink: NotifySink = (n) => {
+/**
+ * Builds the terminal-notifier args. Pure + exported so the mapping is unit-
+ * tested without firing a banner. WHY -open: it makes the banner CLICKABLE —
+ * clicking opens the apply URL, the "click the notification and start applying"
+ * flow osascript cannot do. WHY -sender: attribute the banner to a real app so
+ * it is NOT labelled "Script Editor".
+ */
+export function buildTerminalNotifierArgs(n: Notification): string[] {
+  const args = ['-title', n.title, '-subtitle', kindLabel(n.kind), '-message', n.message];
+  if (n.urgent) args.push('-sound', 'Glass');
+  if (n.openUrl) args.push('-open', n.openUrl);
+  args.push('-sender', 'com.googlecode.iterm2'); // any installed app id; avoids the Script-Editor label
+  return args;
+}
+
+// Detect terminal-notifier ONCE per process; null = not yet checked.
+let terminalNotifier: boolean | null = null;
+function hasTerminalNotifier(): boolean {
+  if (terminalNotifier !== null) return terminalNotifier;
+  try {
+    execFileSync('which', ['terminal-notifier'], { stdio: 'ignore' });
+    terminalNotifier = true;
+  } catch {
+    terminalNotifier = false;
+  }
+  return terminalNotifier;
+}
+
+// WHY swallow errors: a notification is best-effort. If neither tool is present
+// (non-mac CI) or Notification Center is unavailable, the pipeline must keep
+// working, not crash on a failed banner. Prefer terminal-notifier (clickable +
+// proper attribution); fall back to osascript (shows the URL in the text).
+const defaultSink: NotifySink = (n) => {
+  if (hasTerminalNotifier()) {
+    try {
+      execFileSync('terminal-notifier', buildTerminalNotifierArgs(n), { stdio: 'ignore', timeout: 5_000 });
+      return;
+    } catch {
+      /* fall through to osascript */
+    }
+  }
   try {
     execFileSync('osascript', ['-e', buildAppleScript(n)], { stdio: 'ignore', timeout: 5_000 });
   } catch {
@@ -70,7 +114,7 @@ const osascriptSink: NotifySink = (n) => {
 export class Notifier {
   private readonly sent: Notification[] = [];
 
-  constructor(private readonly sink: NotifySink = osascriptSink) {}
+  constructor(private readonly sink: NotifySink = defaultSink) {}
 
   notify(n: Notification): void {
     this.sent.push(n);
@@ -123,6 +167,7 @@ export class Notifier {
       title: `New: ${truncate(company, 40)}`,
       message: `${truncate(role, 60)} · apply fast: ${url}`,
       urgent: true,
+      openUrl: url, // clickable-to-apply when terminal-notifier is installed
     });
   }
 
