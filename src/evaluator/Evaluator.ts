@@ -9,6 +9,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import { JobParser } from './JobParser.js';
 import { ResumeParser } from './ResumeParser.js';
+import { roleRelevance } from '../orchestrator/queuePlanning.js';
 import type { Job, EvaluationResult, ResumeVariant } from '../types.js';
 import { Logger } from '../utils/Logger.js';
 
@@ -60,7 +61,12 @@ export class Evaluator {
 
     // WHY: Hard block — if permanent auth is required, Parv cannot apply regardless of other scores.
     const blocked = parsedJob.visaMentioned === 'requires_permanent';
-    const score = blocked ? 0 : Math.round(rawScore * 100);
+    // Calibration (2026-07-11): the ROLE must dominate. A role outside Parv's
+    // field (AI/ML/SWE/robotics/AV) is penalized so a fresh posting at a famous
+    // company cannot float an off-field role (e.g. "Aerodynamics Intern") over
+    // the apply threshold. Uses title+JD so on-field JDs save generic titles.
+    const roleFit = roleRelevance(job.title, job.jd);
+    const score = blocked ? 0 : Math.round(rawScore * roleFit * 100);
 
     const topMatchingSkills = parsedJob.requiredSkills
       .filter((s) => this.resumeParser.hasSkill(parsedResume, s))

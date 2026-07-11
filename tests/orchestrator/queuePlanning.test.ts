@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { isIneligible, isRelevantRole, jobFromApp, parseNotes, triageForm } from '../../src/orchestrator/queuePlanning.js';
+import { isIneligible, isRelevantRole, roleRelevance, jobFromApp, parseNotes, triageForm } from '../../src/orchestrator/queuePlanning.js';
 import type { Application } from '../../src/types.js';
 
 function app(overrides: Partial<Application> = {}): Application {
@@ -128,5 +128,37 @@ describe('isRelevantRole', () => {
     // but real standalone tokens match:
     expect(isRelevantRole('AI Engineer')).toBe(true);
     expect(isRelevantRole('ML Infrastructure Intern')).toBe(true);
+  });
+});
+
+describe('roleRelevance (scorer calibration multiplier)', () => {
+  it('is 1.0 when the TITLE is on-field, regardless of JD', () => {
+    expect(roleRelevance('ML Engineer Intern', '')).toBe(1.0);
+    expect(roleRelevance('Software Engineer, New Grad', 'anything')).toBe(1.0);
+  });
+
+  it('saves a generic title when the JD has >=2 field signals (no false-drop)', () => {
+    expect(roleRelevance('Research Intern', 'machine learning and deep learning in PyTorch')).toBe(1.0);
+  });
+
+  it('is 0.7 for a single weak JD signal', () => {
+    expect(roleRelevance('Program Intern', 'some machine learning exposure helpful')).toBe(0.7);
+  });
+
+  it('is 0.35 when nothing on-field appears in title or JD (off-field penalty)', () => {
+    expect(roleRelevance('Aerodynamics Intern', 'fluid dynamics, CFD, wind tunnel testing')).toBe(0.35);
+    expect(roleRelevance('Accounting Intern', 'GAAP, bookkeeping, reconciliations')).toBe(0.35);
+  });
+
+  it('penalizes an OFF-FIELD title even when the JD is full of company-context field words', () => {
+    // The real Zipline case: an Aerodynamics role at an autonomous-drone company.
+    // The JD says "autonomous", "software", "machine learning" — but that is the
+    // COMPANY, not the role. Title-primary: off-field title wins over the JD.
+    expect(roleRelevance('Aerodynamics Intern (Fall 2026)',
+      'Join Zipline autonomous drones. Collaborate with software, perception, and machine learning teams. Fluid dynamics focus.')).toBe(0.35);
+    expect(roleRelevance('Mechanical Engineer Co-op',
+      'Work alongside our AI and robotics software teams on autonomous systems.')).toBe(0.35);
+    // ...but "Manufacturing SOFTWARE Engineer" stays on-field (on-field check wins first).
+    expect(roleRelevance('Manufacturing Software Engineer', '')).toBe(1.0);
   });
 });
