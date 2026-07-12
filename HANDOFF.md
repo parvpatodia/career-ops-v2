@@ -268,3 +268,28 @@ core runs the real entry point, not just demos.
 - Tailoring: src/tailor/*, src/pdf/PdfGenerator.ts, templates/cv-template.html, cv/ (gitignored).
 - Store: src/store/{EventStore,Projection,events,ViewWriter}.ts + src/tracker/ApplicationStore.ts.
 - Specs: docs/specs/M1..M7. Defect log + decisions: LESSONS.md.
+
+## 2026-07-11 (e) — AnswerKB fully populated + stale-term accuracy fix
+- **config/answers.yml (gitignored) is now fully populated** with Parv's approved answers:
+  term Fall 2026, 40h yes, duration 3-6 months, part-time-during-school yes, start Aug 17 2026,
+  end Dec 15 2026 (open to extend), relocate yes, preferred SF/San Jose, comp "Market rate",
+  how-heard LinkedIn, referred no, 1yr experience, criminal-history No, EEO Male/Asian/
+  Heterosexual/not-transgender/not-veteran/no-disability, pronouns he/him, preferred name Parv,
+  plus the pre-existing sponsorship/non-compete/consent/narrative/attestation entries.
+  Verified accurate through the REAL composite chain (AnswerKB→Essay→AnswerGenerator): the
+  audit reports 44/44 auto-answered, and the tricky ordering holds — "been convicted?"→No while
+  "consent to a criminal background check?"→Yes (criminal-history entry precedes consent).
+- **config/profile.yml (gitignored)**: target_roles.start_date 2026-05-11→2026-08-17 (past Summer
+  date corrected; endDate now auto-computes to 2026-12-15), terms→["Fall 2026"].
+- **Accuracy fix (committed 7594925, clean, no AI signature)**: AnswerGenerator hardcoded
+  "Summer 2026" for term/season/session — a now-EXPIRED season that would auto-fill onto a form
+  for any phrasing AnswerKB missed (invariant 1) and violated "no personal fact hardcoded in
+  source". Now derives from ProfileLoader.getApplicationDefaults().term (target_roles.terms[0],
+  default Fall 2026). Broadened AnswerKB term patterns (semester/session/cohort). +2 regression
+  tests in ProfileLoader.test.ts. Full suite 567 green, typecheck clean.
+- **Human touchpoints left by design**: essays (why-company/role) → EssayAnswerSource grounded on
+  profile/github/portfolio, never hardcoded; export-control/ITAR → AnswerGenerator flags for review
+  (invariant 7); comp as a numeric-only field → abstains (no fabricated number); captchas.
+- **Pipeline health**: both launchd loops loaded + exit 0 (sourcing 3h, watch 2min). Watch scans
+  508 postings/cycle. Queue: Applied 9 / Ready 5 / Closed 359. Board configs clean (dead Lever
+  anduril/ramp/brex removed earlier; anthropic Greenhouse verified live 200, prior fail was transient).
