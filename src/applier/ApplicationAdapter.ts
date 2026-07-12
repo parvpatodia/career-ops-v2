@@ -137,16 +137,37 @@ export class ApplicationAdapter {
       return { kind: 'abstained', reasons, eeo: schema.eeo, unmapped: schema.unmapped };
     }
 
-    for (const intent of payload.intents) await this.source.fill(intent);
+    // Fill + independent read-back. A DOM interaction (scroll/click/type) can
+    // THROW on a flaky or unexpected page: a hidden/detached element, a slow
+    // load, a Simplify-wrapped redirect. That is not a green fill, so per
+    // verify-or-abstain it must resolve to verify_failed (never submit, notify,
+    // move on), never propagate and crash the batch loop. WHY caught here: the
+    // adapter owns the fill; a thrown fill is the strongest form of "could not
+    // verify", identical in consequence to a read-back mismatch.
+    let verdict: VerifierVerdict;
+    try {
+      for (const intent of payload.intents) await this.source.fill(intent);
 
-    const readBacks: ReadBackValue[] = [];
-    for (const intent of payload.intents) {
-      readBacks.push({ fieldId: intent.field.id, actual: await this.source.readBack(intent.field) });
+      const readBacks: ReadBackValue[] = [];
+      for (const intent of payload.intents) {
+        readBacks.push({ fieldId: intent.field.id, actual: await this.source.readBack(intent.field) });
+      }
+      verdict = verifier.verify(payload.intents, readBacks);
+    } catch (err) {
+      const msg = (err as Error).message.replace(/\s+/g, ' ').slice(0, 120);
+      verdict = {
+        pass: false,
+        checks: payload.intents.map((intent) => ({
+          fieldId: intent.field.id,
+          label: intent.field.label,
+          expected: intent.value,
+          actual: `(fill error: ${msg})`,
+          pass: false,
+        })),
+      };
     }
-
-    const verdict = verifier.verify(payload.intents, readBacks);
     // Recorded for both outcomes: pass=false is the honest record of a fill
-    // that failed read-back, not a submission.
+    // that failed read-back (or threw), not a submission.
     this.record((r, appId) => r.recordFillVerified(appId, verdict));
 
     if (!verdict.pass) {

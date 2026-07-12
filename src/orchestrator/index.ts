@@ -436,16 +436,21 @@ async function main(): Promise<void> {
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
-        const result = await orch.apply(app, approval ? { approval } : {});
-        reportApply(app, result);
-        if (result.phase === 'submitted') { submitted++; continue; }
-        if (result.phase === 'auth_required' || result.phase === 'needs_input') {
-          console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
-          const ok = await attendedTakeover(app, sessions, answers, essaySource, store, null, {
-            timeoutMs: AUTO_RESUME_TIMEOUT_MS,
-            intervalMs: AUTO_RESUME_POLL_MS,
-          });
-          if (ok) submitted++;
+        // Per-job guard: one throwing job must never kill the hands-off loop.
+        try {
+          const result = await orch.apply(app, approval ? { approval } : {});
+          reportApply(app, result);
+          if (result.phase === 'submitted') { submitted++; continue; }
+          if (result.phase === 'auth_required' || result.phase === 'needs_input') {
+            console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
+            const ok = await attendedTakeover(app, sessions, answers, essaySource, store, null, {
+              timeoutMs: AUTO_RESUME_TIMEOUT_MS,
+              intervalMs: AUTO_RESUME_POLL_MS,
+            });
+            if (ok) submitted++;
+          }
+        } catch (err) {
+          console.log(`  ⚠️  ERROR — ${(err as Error).message.replace(/\s+/g, ' ').slice(0, 160)}. Skipped (not applied); continuing.`);
         }
       }
       console.log(`\n═══ Auto done. Submitted or applied this run: ${submitted}/${queue.length}. ═══\n`);
@@ -456,22 +461,30 @@ async function main(): Promise<void> {
       const app = queue[i]!;
       console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
 
-      let result: ApplyGateResult;
-      if (useTailor) {
-        const { job, evaluation } = jobFromApp(app);
-        const advanced = await orch.advance(job, evaluation, { apply: true, ...(approval ? { approval } : {}) });
-        if (advanced.tailor.phase === 'tailor_abstained') {
-          console.log(`  ⚠️  TAILOR ABSTAINED — ${advanced.tailor.reason}. Not applied.`);
-          continue;
+      // Per-job guard: a single job that throws (a flaky page, a browser hiccup)
+      // must never kill the batch. Report it and move to the next Ready job — a
+      // 24/7 apply loop cannot die on one bad form. Nothing is submitted on a
+      // throw (the submit gate is never reached), so no false success is recorded.
+      try {
+        let result: ApplyGateResult;
+        if (useTailor) {
+          const { job, evaluation } = jobFromApp(app);
+          const advanced = await orch.advance(job, evaluation, { apply: true, ...(approval ? { approval } : {}) });
+          if (advanced.tailor.phase === 'tailor_abstained') {
+            console.log(`  ⚠️  TAILOR ABSTAINED — ${advanced.tailor.reason}. Not applied.`);
+            continue;
+          }
+          if (!advanced.apply) { console.log(`  (tailored, not applied: ${advanced.tailor.phase})`); continue; }
+          result = advanced.apply;
+        } else {
+          result = await orch.apply(app, approval ? { approval } : {});
         }
-        if (!advanced.apply) { console.log(`  (tailored, not applied: ${advanced.tailor.phase})`); continue; }
-        result = advanced.apply;
-      } else {
-        result = await orch.apply(app, approval ? { approval } : {});
-      }
 
-      reportApply(app, result);
-      if (result.phase === 'submitted') submitted++;
+        reportApply(app, result);
+        if (result.phase === 'submitted') submitted++;
+      } catch (err) {
+        console.log(`  ⚠️  ERROR — ${(err as Error).message.replace(/\s+/g, ' ').slice(0, 160)}. Skipped (not applied); continuing.`);
+      }
     }
   } finally {
     await browser.close();
