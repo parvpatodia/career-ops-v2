@@ -293,3 +293,28 @@ core runs the real entry point, not just demos.
 - **Pipeline health**: both launchd loops loaded + exit 0 (sourcing 3h, watch 2min). Watch scans
   508 postings/cycle. Queue: Applied 9 / Ready 5 / Closed 359. Board configs clean (dead Lever
   anduril/ramp/brex removed earlier; anthropic Greenhouse verified live 200, prior fail was transient).
+
+## 2026-07-12 — apply-loop crash fix + Ready-queue quality finding
+- **Ran `npm run run --approve` on the 5 Ready jobs. Result: 0 submitted.** Not a captcha
+  problem and not an engine bug — all 5 Ready jobs are Simplify-wrapped aggregator links from
+  the SWEList/NewGrad list scrapers, resolving to non-submittable targets:
+  BrightAI (job-boards.greenhouse.io) → 404 dead posting; ByteDance ×2 (jobs.bytedance.com) →
+  custom ATS, no v2 form source; Blue River (bluerivertechnology.com embedded Greenhouse) →
+  unparseable board ref; Tesla (tesla.com) → custom ATS. The engine correctly abstained on all.
+- **Crash fixed (committed 974124f)**: the first run CRASHED the whole batch (exit 1) when Blue
+  River's fill threw a Playwright scrollIntoView timeout in GenericFormSource.fill and it
+  propagated unhandled through Autopilot → Orchestrator → main (job 5 never ran). Now
+  ApplicationAdapter.run catches fill/read-back throws → verify_failed (error surfaced in the
+  verdict; never submits, notifies, continues), and both CLI loops guard each job. Re-ran
+  headless: all 5 processed, Blue River → VERIFY FAILED, Tesla now reached, 0 submitted, exit 0.
+  +2 regression tests (ApplicationAdapter.resilience.test.ts). Suite 569 green.
+- **Queue integrity**: Applied stayed 9, Ready stayed 5 across both runs — no false success.
+- **Real bottleneck for autonomous submits**: the Ready queue must hold CLEAN board URLs
+  (job-boards.greenhouse.io/<token>/jobs/<id>, jobs.lever.co, jobs.ashbyhq.com) that the v2
+  FormSources can parse. The scan cache DOES have ~9 clean board-URL jobs recently; Applied=9
+  suggests those already got applied, leaving the aggregator residue in Ready. NEXT submittable
+  work comes from NEW clean board postings (the 2-min watch loop alerts on these first-come).
+- **Follow-ups worth a look (not done)**: (a) a UrlResolver that unwraps Simplify → canonical
+  ATS URL, and resolves an embedded gh_jid → job-boards.greenhouse.io, would make more list-
+  scraper jobs submittable; (b) mark the BrightAI 404 posting Closed (dead, not applicable).
+- 2026-07-12 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=1 (unhandled fill-throw crashed the apply batch) shipped_first_try=1 rework_commits=0. Fixed with engine-boundary abstain + per-job CLI guards + 2 regression tests; verified by a clean re-run (all 5 processed, exit 0).
