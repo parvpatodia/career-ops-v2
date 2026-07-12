@@ -320,7 +320,7 @@ export class AnswerGenerator {
 
     if (this.has(q, ['which season', 'which term', 'applying for the', 'internship term',
       'semester', 'apply for']) && !this.has(q, ['previous', 'past'])) {
-      return hi('Summer 2026');
+      return hi(def.term);
     }
 
     if (this.has(q, ['duration', 'internship length', 'how long', 'length of internship']) &&
@@ -345,7 +345,7 @@ export class AnswerGenerator {
 
     if (this.has(q, ['preferred location', 'work location', 'office location',
       'where do you want to work', 'city preference'])) {
-      return hi('San Jose, CA (Bay Area) — open to remote or hybrid');
+      return hi('San Jose, CA (Bay Area), open to remote or hybrid');
     }
 
     if (this.has(q, ['willing to relocate', 'open to relocation', 'relocation'])) {
@@ -448,7 +448,7 @@ export class AnswerGenerator {
     // ── Session / co-op term ──────────────────────────────────────────────
     if (this.has(q, ['session', 'co-op session', 'work term', 'work session',
       'upcoming term', 'which session', 'upcoming session'])) {
-      return hi('Summer 2026');
+      return hi(def.term);
     }
 
     // ── Cover letter (text field, not file upload) ────────────────────────

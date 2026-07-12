@@ -56,7 +56,8 @@ export interface Compensation {
 export interface ApplicationDefaults {
   howDidYouHear: string;
   aboutMeShort: string;
-  startDate: string;    // ISO date: "2026-05-11"
+  term: string;         // primary target term, e.g. "Fall 2026" (from target_roles.terms[0])
+  startDate: string;    // ISO date: "2026-08-17"
   endDate: string;      // ISO date: computed from startDate
   backgroundCheckConsent: boolean;
   drugTestConsent: boolean;
@@ -196,11 +197,16 @@ export class ProfileLoader {
   getApplicationDefaults(): ApplicationDefaults {
     const d = (this.raw['application_defaults'] ?? {}) as Record<string, unknown>;
     const tr = (this.raw['target_roles'] ?? {}) as Record<string, unknown>;
-    const startDate = String(tr['start_date'] ?? '2026-05-11');
+    const startDate = String(tr['start_date'] ?? '2026-08-17');
+    // WHY read the term from profile (not hardcode): AGENTS.md bars hardcoding a
+    // personal fact in source, and a hardcoded season silently goes stale.
+    const terms = Array.isArray(tr['terms']) ? (tr['terms'] as unknown[]).map(String) : [];
+    const term = terms[0] ?? 'Fall 2026';
 
     return {
       howDidYouHear: String(d['how_did_you_hear'] ?? 'LinkedIn'),
       aboutMeShort: String(d['about_me_short'] ?? ''),
+      term,
       startDate,
       endDate: ProfileLoader.computeEndDate(startDate),
       backgroundCheckConsent: Boolean(d['background_check_consent'] ?? true),

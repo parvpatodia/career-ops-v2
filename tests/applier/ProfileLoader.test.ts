@@ -153,6 +153,26 @@ describe('ProfileLoader', () => {
     fs.unlinkSync(f);
   });
 
+  // Regression: the target term must come from profile, never hardcoded in
+  // source (a hardcoded season silently goes stale, e.g. "Summer 2026").
+  it('reads term from target_roles.terms[0]', () => {
+    const withTerms = MINIMAL_PROFILE.replace(
+      'target_roles:\n  start_date: "2026-05-11"',
+      'target_roles:\n  start_date: "2026-08-17"\n  terms:\n    - "Fall 2026"\n    - "Spring 2027"'
+    );
+    const f = writeTemp(withTerms);
+    const loader = new ProfileLoader(f);
+    expect(loader.getApplicationDefaults().term).toBe('Fall 2026');
+    fs.unlinkSync(f);
+  });
+
+  it('defaults term to Fall 2026 when target_roles.terms is absent', () => {
+    const f = writeTemp(MINIMAL_PROFILE);   // MINIMAL_PROFILE has start_date but no terms
+    const loader = new ProfileLoader(f);
+    expect(loader.getApplicationDefaults().term).toBe('Fall 2026');
+    fs.unlinkSync(f);
+  });
+
   it.skipIf(!HAS_REAL_PROFILE)('real profile has correct name and email', () => {
     const loader = new ProfileLoader('config/profile.yml');
     const id = loader.getIdentity();
