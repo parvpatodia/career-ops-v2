@@ -1,60 +1,136 @@
-# answers.yml — Parv's human-approved application answers.
-# Copy to config/answers.yml (gitignored) and fill every FILL_ME.
+# answers.yml, Parv's human-approved application answers (QUESTIONS TEMPLATE).
 #
-# Rules:
-# - First matching entry wins: put specific patterns before generic ones.
-# - "match" patterns are case-insensitive substrings of the question label.
-# - "value" must be non-empty; for dropdowns it must EXACTLY equal one of
-#   the form's options (the system abstains and flags you otherwise).
-# - These are the ONLY answers allowed on legal/EEO/attestation questions.
+# HOW THIS WORKS
+#   - Personal facts (name, email, phone, address, LinkedIn/GitHub/portfolio,
+#     university, degree, GPA, graduation) come from config/profile.yml, NOT here.
+#     Résumé + cover-letter PDFs are auto-generated and attached. So this file is
+#     ONLY the other questions Greenhouse / Lever / Ashby forms ask.
+#   - Copy to config/answers.yml (gitignored) and replace every FILL_ME with a real
+#     value. NEVER leave a FILL_ME in the live file, it would be typed into the form
+#     verbatim. (Give the values to the assistant and it will write them in.)
+#
+# MATCHING RULES
+#   - First matching entry wins → put specific patterns BEFORE generic ones.
+#   - "match" = case-insensitive substrings of the question label.
+#   - "value" must be non-empty; for a dropdown it must EXACTLY equal one of the
+#     form's options, or the system abstains and flags you (never guesses).
+#   - Legal / EEO / attestation answers are used ONLY because you wrote them here.
 
 answers:
-  # ── Work authorization (asked on nearly every application) ──────────────
-  - match: ["authorized to work in the united states", "legally authorized to work", "authorized to work"]
-    value: "Yes"
-  - match: ["require sponsorship in the future", "future sponsorship"]
-    value: "Yes"
-  - match: ["require sponsorship", "require visa sponsorship", "need sponsorship"]
-    value: "No"   # F-1 CPT/OPT: no sponsorship needed NOW. Review per company if asked differently.
-  - match: ["visa status", "immigration status"]
+  # ═══ Work authorization (asked on nearly every application) ═══════════════
+  - match: ["are you legally authorized to work in the united states", "legally authorized to work", "authorized to work in the u", "authorized to work"]
+    value: "Yes"                     # F-1 with CPT/OPT is authorized to work now
+  - match: ["will you now or in the future require sponsorship", "now or in the future require", "require sponsorship in the future", "future sponsorship"]
+    value: "FILL_ME (Yes, F-1 will need sponsorship after OPT. Confirm your stance.)"
+  - match: ["require sponsorship", "require visa sponsorship", "need sponsorship", "need visa"]
+    value: "FILL_ME (No for CPT/OPT now vs Yes long-term, decide the safe default)"
+  - match: ["visa status", "immigration status", "work authorization status"]
     value: "F-1 student visa (CPT/OPT eligible)"
-
-  # ── Logistics ────────────────────────────────────────────────────────────
-  - match: ["how did you hear"]
-    value: "FILL_ME (e.g. Company careers page)"
-  - match: ["earliest start date", "available to start", "start date"]
-    value: "FILL_ME (e.g. May 2026)"
-  - match: ["willing to relocate", "open to relocation"]
+  - match: ["are you a u.s. citizen", "us citizen", "citizen or permanent resident"]
+    value: "No"
+  - match: ["can you provide proof of", "eligible to work", "right to work"]
     value: "Yes"
-  - match: ["work onsite", "in-person", "hybrid"]
-    value: "Yes"
-  - match: ["desired salary", "salary expectation", "compensation expectation", "hourly rate"]
-    value: "FILL_ME (e.g. Open / market rate)"
 
-  # ── Profile facts beyond profile.yml ─────────────────────────────────────
-  - match: ["years of experience", "years of relevant experience"]
-    value: "FILL_ME (pick ONE truth: 1 or 2 - v1 had both)"
-  - match: ["graduation date", "expected graduation"]
+  # ═══ Internship logistics (term / hours / duration) ═══════════════════════
+  - match: ["which term", "internship term", "term(s) are you targeting", "targeting"]
+    value: "FILL_ME (e.g. Fall 2026; must match the form's exact option text)"
+  - match: ["available to work 40 hours", "40 hours", "full-time hours", "full time during"]
+    value: "FILL_ME (e.g. Yes / 40 hours)"
+  - match: ["length of internship", "duration of internship", "internship duration", "how long", "how many months"]
+    value: "FILL_ME (e.g. 3-6 months)"
+  - match: ["available to work part-time during", "part-time during the school", "part time during"]
+    value: "FILL_ME (e.g. Yes / No)"
+  - match: ["earliest start date", "available to start", "when can you start", "start date"]
+    value: "FILL_ME (e.g. May 2026 / flexible)"
+  - match: ["end date", "available until", "through what date"]
+    value: "FILL_ME (e.g. December 2026 / flexible)"
+
+  # ═══ Location / work mode ═════════════════════════════════════════════════
+  - match: ["willing to relocate", "open to relocation", "able to relocate"]
+    value: "FILL_ME (Yes / No)"
+  - match: ["willing to work onsite", "work in-person", "on-site", "hybrid", "in office", "in-office"]
+    value: "FILL_ME (Yes / preference)"
+  - match: ["preferred location", "location preference", "which location", "office location"]
+    value: "FILL_ME (e.g. San Francisco Bay Area; must match an option)"
+  - match: ["remote", "work remotely"]
+    value: "FILL_ME (Yes / preference)"
+
+  # ═══ Compensation ═════════════════════════════════════════════════════════
+  - match: ["desired salary", "salary expectation", "expected salary", "compensation expectation", "hourly rate", "expected hourly", "desired compensation", "pay expectation"]
+    value: "FILL_ME (e.g. Open / market rate, or a number)"
+
+  # ═══ Logistics / screening ════════════════════════════════════════════════
+  - match: ["how did you hear about", "how did you find", "referral source"]
+    value: "FILL_ME (e.g. Company careers page / LinkedIn)"
+  - match: ["were you referred", "referred by", "referral name", "employee referral", "know anyone who works"]
+    value: "FILL_ME (No, or the referrer's name)"
+  - match: ["previously worked for", "previously employed by", "ever worked at", "former employee", "current or former employee"]
+    value: "No"
+  - match: ["previously applied", "applied before", "applied to this"]
+    value: "FILL_ME (Yes / No)"
+  - match: ["at least 18", "18 years", "over 18"]
+    value: "Yes"
+  - match: ["years of experience", "years of relevant experience", "years of professional"]
+    value: "FILL_ME (pick ONE consistent number)"
+  - match: ["currently enrolled", "current student", "enrolled in a degree"]
+    value: "Yes"
+  - match: ["expected graduation", "graduation date", "when do you graduate"]
     value: "May 2027"
-  - match: ["currently enrolled"]
+  - match: ["notice period", "when could you start if"]
+    value: "FILL_ME (e.g. Immediately / 2 weeks)"
+  - match: ["access to a computer", "own a laptop", "reliable internet"]
     value: "Yes"
-  - match: ["previously worked for", "previously employed by", "ever worked at"]
-    value: "No"
-  - match: ["referred by", "referral name", "know anyone"]
-    value: "No"
+  - match: ["pronouns"]
+    value: "FILL_ME (e.g. he/him / Decline)"
+  - match: ["preferred name", "what should we call you"]
+    value: "FILL_ME (e.g. Parv)"
 
-  # ── Legal / EEO / attestations: ONLY filled because YOU wrote these ─────
-  # Common safe choice is the decline option; change to your preference.
-  # Dropdown text must match the form's option exactly.
-  - match: ["do you have a disability", "disability status"]
+  # ═══ Free-text / essays (company-specific, the LLM essay source may draft
+  #     these; a value here is your grounded fallback, never fabricated) ══════
+  - match: ["why do you want to work", "why are you interested in", "what interests you about", "why this company", "why our company", "why do you want to join"]
+    value: "FILL_ME (2-3 grounded sentences you approve, or leave to the essay source)"
+  - match: ["why this role", "why are you a good fit", "what makes you a good", "why should we hire"]
+    value: "FILL_ME (grounded on your real projects)"
+  - match: ["tell us about yourself", "introduce yourself", "tell me about yourself"]
+    value: "FILL_ME"
+  - match: ["describe a project", "a project you are proud", "favorite project", "most interesting project", "technical project"]
+    value: "FILL_ME (a real project: AV planning / diffusion policy / pose estimation)"
+  - match: ["what are you looking for", "looking for in an internship", "career goals", "what do you hope to"]
+    value: "FILL_ME"
+  - match: ["greatest strength", "biggest weakness", "greatest weakness"]
+    value: "FILL_ME"
+  - match: ["have you used our product", "are you a user of", "use our platform"]
+    value: "FILL_ME"
+  - match: ["anything else", "additional information", "is there anything else", "what else should we know"]
+    value: "FILL_ME (optional, a short note, or omit this entry)"
+  - match: ["cover letter"]
+    value: "FILL_ME (a cover-letter PDF is attached; use this only for a text box)"
+
+  # ═══ Legal / attestations: used ONLY because YOU wrote them here ══════════
+  - match: ["export control", "itar", "ear compliance", "u.s. person for export"]
+    value: "FILL_ME (read the exact statement; only answer if you can truthfully)"
+  - match: ["been convicted", "criminal history", "criminal record", "felony"]
+    value: "FILL_ME (e.g. No)"
+  - match: ["consent to a background check", "background check", "background investigation"]
+    value: "FILL_ME (e.g. Yes)"
+  - match: ["drug test", "drug screen", "drug screening"]
+    value: "FILL_ME (e.g. Yes)"
+  - match: ["non-compete", "noncompete", "restrictive covenant"]
+    value: "FILL_ME (e.g. No)"
+  - match: ["i certify", "certify that", "i agree", "attest", "acknowledge that", "confirm that the information"]
+    value: "FILL_ME (e.g. I agree, only after reading)"
+
+  # ═══ Self-identification / EEO (voluntary, your choice; dropdown text must
+  #     match the form exactly, e.g. "I don't wish to answer") ════════════════
+  - match: ["disability status", "do you have a disability", "form cc-305"]
     value: "FILL_ME (e.g. I do not wish to answer)"
-  - match: ["veteran status", "protected veteran"]
+  - match: ["protected veteran", "veteran status"]
     value: "FILL_ME (e.g. I am not a protected veteran)"
   - match: ["gender identity"]
     value: "FILL_ME (e.g. Decline to self-identify)"
   - match: ["gender"]
     value: "FILL_ME (e.g. Male / Decline to self-identify)"
-  - match: ["hispanic or latino"]
+  - match: ["are you hispanic", "hispanic or latino"]
     value: "FILL_ME (e.g. No)"
   - match: ["race", "ethnicity"]
     value: "FILL_ME (e.g. Asian / Decline to self-identify)"
@@ -62,11 +138,7 @@ answers:
     value: "FILL_ME (e.g. Decline to self-identify)"
   - match: ["transgender"]
     value: "FILL_ME (e.g. Decline to self-identify)"
-  - match: ["been convicted", "criminal", "felony"]
-    value: "FILL_ME (e.g. No)"
-  - match: ["background check"]
-    value: "FILL_ME (e.g. Yes)"
-  - match: ["drug test", "drug screening"]
-    value: "FILL_ME (e.g. Yes)"
-  - match: ["i certify", "certify that", "i agree", "attest"]
-    value: "FILL_ME (e.g. I agree)"
+  - match: ["first-generation", "first generation college"]
+    value: "FILL_ME (optional)"
+  - match: ["lgbtq"]
+    value: "FILL_ME (e.g. Decline to self-identify)"
