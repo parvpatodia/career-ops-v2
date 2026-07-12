@@ -23,6 +23,7 @@
 
 import type { Browser } from 'playwright';
 import { UrlResolver } from '../applier/UrlResolver.js';
+import { UrlCanonicalizer } from '../applier/UrlCanonicalizer.js';
 import { PortalRouter } from './PortalRouter.js';
 import type { PortalKind } from './PortalRouter.js';
 import { WorkdayDriver } from '../applier/WorkdayDriver.js';
@@ -108,27 +109,38 @@ export interface PlaywrightFactoryOptions {
   greenhouseJob?: GreenhouseJobProvider;
   router?: PortalRouter;
   urlResolver?: UrlResolver;
+  canonicalizer?: UrlCanonicalizer;
   gotoTimeoutMs?: number;
 }
 
 export class PlaywrightApplySessionFactory implements ApplySessionFactory {
   private readonly router: PortalRouter;
   private readonly urlResolver: UrlResolver;
+  private readonly canonicalizer: UrlCanonicalizer;
 
   constructor(private readonly opts: PlaywrightFactoryOptions) {
     this.router = opts.router ?? new PortalRouter();
     this.urlResolver = opts.urlResolver ?? new UrlResolver();
+    this.canonicalizer = opts.canonicalizer ?? new UrlCanonicalizer();
   }
 
   async open(app: Application, answers: AnswerSource): Promise<OpenResult> {
-    const resolved = this.urlResolver.resolve(app.url);
+    // Strip Simplify/tracking params and resolve an embedded gh_jid to the
+    // first-party Greenhouse board URL BEFORE routing: the schema fetch and the
+    // DOM fill then both target a form the verified filler can submit, instead
+    // of an aggregator wrapper or an iframe embed. Never throws (worst case it
+    // returns the input URL), so the abstain paths below still hold.
+    const canonicalUrl = await this.canonicalizer.canonicalize(app.url);
+    const appForApply: Application = canonicalUrl === app.url ? app : { ...app, url: canonicalUrl };
+
+    const resolved = this.urlResolver.resolve(canonicalUrl);
     const support = this.router.support(resolved.ats);
     if (!support.supported) return { ok: false, unsupported: true, ats: resolved.ats };
 
     let kind = support.kind;
     let greenhouseJob: Record<string, unknown> | undefined;
     if (support.kind === 'greenhouse') {
-      const fetched = this.opts.greenhouseJob ? await this.opts.greenhouseJob(app) : null;
+      const fetched = this.opts.greenhouseJob ? await this.opts.greenhouseJob(appForApply) : null;
       if (fetched) {
         greenhouseJob = fetched;
       } else {
