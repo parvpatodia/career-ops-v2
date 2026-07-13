@@ -338,3 +338,24 @@ core runs the real entry point, not just demos.
 - **To finish Blue River**: run `npm run run -- --auto --job 400` in a terminal, then in the surfaced
   Chrome: set Country=United States + City, glance at the 2 essay answers, solve the reCAPTCHA, click
   Submit. The loop marks it Applied on the real ATS confirmation.
+
+## 2026-07-13 (b) — react-select fill support in DomControls
+- **Built (committed dd95f41)**: DomControls react-select fill now waits for the menu to render
+  (options.first().waitFor) so async typeaheads (city/location) populate, then selects ONLY a
+  confident match via the pure `confidentOptionIndex` (exact after stripping a trailing "+dialcode",
+  or a UNIQUE prefix); ambiguous → Escape, field left unset (never guesses). 7 new unit tests
+  (matcher + normalize + integration); suite 590 green; typecheck clean.
+- **Verified live on Blue River**: Country → selects "United States" (widget shows "+1"); City "San
+  Jose" → abstains (was wrongly picking "San Jose, Antique, Philippines"). Clean react-selects
+  (Yes/No, pronouns, degree) now fill AND verify green — the broad win.
+- **Two residual follow-ups (NOT done; flagged for decision)**:
+  1. Location answers need City+FULL STATE to confidently match the typeahead: probe showed
+     "San Jose, California" → selects "San Jose, California, United States", but "San Jose" and
+     "San Jose, CA" do not. A small AnswerGenerator tweak (emit "City, <Full State>") would make
+     City auto-fill.
+  2. Auto-VERIFY of divergent-display selects needs a Verifier change: a searchable select's
+     read-back legitimately differs from the typed intent (Country reads "+1"; City reads "San Jose,
+     California, United States"). Strict norm-equality flags these for a human even when correct. A
+     NARROW anchored-prefix acceptance (read-back starts with intent) would auto-verify them, but it
+     touches invariant 1 (LESSONS caution against loosening option matching) — needs Parv's sign-off.
+- 2026-07-13 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=1 (react-select fill: no async wait + exact-only match → null/wrong-city) shipped_first_try=1 rework_commits=0. Diagnosed live, fixed with wait + confident-match + safe abstain, 7 regression tests, live-verified.
