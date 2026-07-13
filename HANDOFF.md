@@ -318,3 +318,23 @@ core runs the real entry point, not just demos.
   ATS URL, and resolves an embedded gh_jid → job-boards.greenhouse.io, would make more list-
   scraper jobs submittable; (b) mark the BrightAI 404 posting Closed (dead, not applicable).
 - 2026-07-12 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=1 (unhandled fill-throw crashed the apply batch) shipped_first_try=1 rework_commits=0. Fixed with engine-boundary abstain + per-job CLI guards + 2 regression tests; verified by a clean re-run (all 5 processed, exit 0).
+
+## 2026-07-13 — gh_jid embed → /embed/job_app fill fix + Blue River apply attempt
+- **URL resolver extended (committed 613a391)**: UrlCanonicalizer now emits the bare
+  job-boards.greenhouse.io/embed/job_app?for=<token>&token=<id> form for a resolved gh_jid
+  embed (the /jobs/<id> board URL redirects back to the company iframe page for embed-configured
+  companies like Blue River). parseGreenhouseRef parses that form URL too. Suite 583 green.
+- **2 technical screening answers** (data leakage; nonsensical-predictions) added to config/answers.yml
+  (gitignored), Parv-reviewed + approved 2026-07-13.
+- **Blue River apply (`--auto --job 400`) result: FILLED, NOT SUBMITTED.** 7 fields filled + verified
+  (name, email, phone, resume, LinkedIn, work-auth); the 2 essay textareas typed (maxlength -1, no
+  truncation; read-back verify is flaky on the React textarea but content is correct); reCAPTCHA
+  present (human touchpoint). The 5-min attended window lapsed with no human submit → left Ready.
+  Queue unchanged (9 Applied / 5 Ready). Nothing sent to Blue River.
+- **Known remaining gap**: GreenhouseFormSource does NOT reliably fill the new Greenhouse React
+  `react-select` location widgets (Country/Location/City) — "Country got +1", City empty. These need
+  manual selection or a react-select-aware fill (click to open, type, pick option). This is the next
+  concrete autonomous-fill improvement; the resolver + embed-form work is done.
+- **To finish Blue River**: run `npm run run -- --auto --job 400` in a terminal, then in the surfaced
+  Chrome: set Country=United States + City, glance at the 2 essay answers, solve the reCAPTCHA, click
+  Submit. The loop marks it Applied on the real ATS confirmation.
