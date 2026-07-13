@@ -359,3 +359,21 @@ core runs the real entry point, not just demos.
      NARROW anchored-prefix acceptance (read-back starts with intent) would auto-verify them, but it
      touches invariant 1 (LESSONS caution against loosening option matching) — needs Parv's sign-off.
 - 2026-07-13 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=1 (react-select fill: no async wait + exact-only match → null/wrong-city) shipped_first_try=1 rework_commits=0. Diagnosed live, fixed with wait + confident-match + safe abstain, 7 regression tests, live-verified.
+
+## 2026-07-13 (c) — location auto-fill + Verifier comma-qualified select acceptance
+- **Committed a3f036e**: (1) AnswerGenerator answers a COMBINED location field (Greenhouse
+  "Location (City)"/candidate-location) with "City, <Full State>" ("San Jose, California") via a
+  US state abbrev->name map, placed before the plain-city branch (a bare "City" field still gets
+  just "San Jose"); (2) Verifier accepts an option read-back that is the intent plus a COMMA-
+  qualifier (typed "San Jose, California" -> "San Jose, California, United States"), anchored on
+  the comma so "United States" is NEVER satisfied by "United States Minor Outlying Islands"
+  (invariant 1). 7 new tests; suite 597 green; typecheck clean.
+- **Verified live (real chain: ProfileLoader->AnswerGenerator->DomControls->Verifier on the Blue
+  River embed form)**: candidate-location fills "San Jose, California, United States" -> VERIFY
+  PASS. Country still reads "+1" (phone dial-code widget) -> VERIFY FAIL (human glance); that is a
+  distinct phone-country selector, not the location typeahead, and is an accepted residual (the
+  field IS set to US; the form has a reCAPTCHA the human solves anyway).
+- **Net for a modern Greenhouse form**: standard fields + essays + Location (City) + clean
+  react-selects (Yes/No, pronouns, degree) now fill AND verify green autonomously; the human is
+  left with the reCAPTCHA (+ a glance at the phone-country "+1"). That is the ~90% ceiling.
+- 2026-07-13 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=0 (planned follow-ups #1+#2) shipped_first_try=1 rework_commits=0. Location answer specificity + narrow anchored Verifier acceptance; live-verified City fills+verifies; negative case (space-continuation) rejected.
