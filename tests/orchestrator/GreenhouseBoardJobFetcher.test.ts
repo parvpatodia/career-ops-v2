@@ -29,6 +29,11 @@ describe('parseGreenhouseRef', () => {
       .toEqual({ token: 'acme', jobId: '42' });
   });
 
+  it('parses the /embed/job_app form (for=token, token=jobId)', () => {
+    expect(parseGreenhouseRef('https://job-boards.greenhouse.io/embed/job_app?for=bluerivertech&token=7947246'))
+      .toEqual({ token: 'bluerivertech', jobId: '7947246' });
+  });
+
   it('returns null for non-Greenhouse / token-less URLs', () => {
     expect(parseGreenhouseRef('https://jobs.lever.co/globex/123')).toBeNull();
     expect(parseGreenhouseRef('https://careers.globex.com/apply?gh_jid=999')).toBeNull();

@@ -24,11 +24,26 @@ export interface GreenhouseRef {
 
 /**
  * Parse the board token + numeric job id from a Greenhouse application URL.
- * Handles boards.greenhouse.io and job-boards.greenhouse.io /{token}/jobs/{id}.
- * Custom domains (gh_jid= params) carry no board token, so they return null and
- * the caller abstains.
+ * Handles two first-party forms:
+ *  - {job-,}boards.greenhouse.io/{token}/jobs/{id}   (the posting page)
+ *  - {job-,}boards.greenhouse.io/embed/job_app?for={token}&token={id}
+ *    (the bare application form UrlCanonicalizer emits for embedded postings;
+ *    Greenhouse's param names are inverted: `for` is the board token, `token`
+ *    is the job id).
+ * Custom domains (a bare gh_jid= with no board token) return null and the
+ * caller abstains — UrlCanonicalizer resolves those to a form URL first.
  */
 export function parseGreenhouseRef(url: string): GreenhouseRef | null {
+  try {
+    const u = new URL(url);
+    if (/greenhouse\.io$/i.test(u.hostname) && /\/embed\/job_app\/?$/i.test(u.pathname)) {
+      const token = u.searchParams.get('for');
+      const jobId = u.searchParams.get('token');
+      if (token && jobId && /^\d+$/.test(jobId)) return { token, jobId };
+    }
+  } catch {
+    // Not a parseable absolute URL — fall through to the path regex.
+  }
   const m = url.match(/(?:job-)?boards\.greenhouse\.io\/([^/?#]+)\/jobs\/(\d+)/i);
   if (!m) return null;
   return { token: m[1]!, jobId: m[2]! };
