@@ -48,6 +48,31 @@ function flag(value: string, reason: string): Answer {
   return { value, confidence: 'low', needsReview: true, reason };
 }
 
+// US state abbreviation -> full name. WHY: a combined location typeahead
+// (Greenhouse "Location (City)") matches on "City, <Full State>" ("San Jose,
+// California"), not the postal abbreviation ("San Jose, CA" fails). Reference
+// data, not a personal fact — the state itself still comes from profile.yml.
+const US_STATE_NAMES: Record<string, string> = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas',
+  KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts',
+  MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana',
+  NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico',
+  NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma',
+  OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+  DC: 'District of Columbia',
+};
+
+/** Full state name from a postal abbreviation; passes through a full name or unknown. */
+export function fullStateName(state: string): string {
+  const s = (state ?? '').trim();
+  if (!s) return '';
+  return US_STATE_NAMES[s.toUpperCase()] ?? s;
+}
+
 // ── Generator ─────────────────────────────────────────────────────────────
 
 export class AnswerGenerator {
@@ -96,6 +121,15 @@ export class AnswerGenerator {
     if (this.has(q, ['street address', 'mailing address']) ||
         (this.hasWord(q, 'address') && !this.has(q, ['email', 'web', 'url']))) {
       return hi(id.address);
+    }
+
+    // A COMBINED location typeahead (Greenhouse "Location (City)",
+    // candidate-location) matches its option list on "City, <Full State>"
+    // ("San Jose, California"); a bare "San Jose" is ambiguous and abstains.
+    // Must precede the plain-city branch, which would otherwise catch it.
+    if (this.has(q, ['location (city)', 'candidate-location', 'current location', 'city and state', 'city, state', 'city/state'])) {
+      const full = fullStateName(id.state);
+      return hi(full && id.city ? `${id.city}, ${full}` : id.city);
     }
 
     if (this.hasWord(q, 'city') && !this.has(q, ['company', 'school', 'employer'])) {

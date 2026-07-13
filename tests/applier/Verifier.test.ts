@@ -69,6 +69,32 @@ describe('Verifier', () => {
     expect(verdict.pass).toBe(true);
   });
 
+  it('a typeahead select passes when the read-back is the intent plus a comma-qualifier', () => {
+    // Typed "San Jose, California" -> selected "San Jose, California, United States".
+    const verdict = verifier.verify(
+      [intent('f1', 'Location (City)', 'select', 'San Jose, California')],
+      [{ fieldId: 'f1', actual: 'San Jose, California, United States' }]
+    );
+    expect(verdict.pass).toBe(true);
+  });
+
+  it('the comma anchor must NOT accept a space-continuation of a different place', () => {
+    // "United States" must not be satisfied by "United States Minor Outlying Islands".
+    const verdict = verifier.verify(
+      [intent('f1', 'Country', 'select', 'United States')],
+      [{ fieldId: 'f1', actual: 'United States Minor Outlying Islands' }]
+    );
+    expect(verdict.pass).toBe(false);
+  });
+
+  it('a select whose display diverges entirely (dial code) still FAILS, flagged for a human', () => {
+    const verdict = verifier.verify(
+      [intent('f1', 'Country', 'select', 'United States')],
+      [{ fieldId: 'f1', actual: '+1' }]
+    );
+    expect(verdict.pass).toBe(false);
+  });
+
   it('an intent with no read-back is a FAIL (unverified is never verified)', () => {
     const verdict = verifier.verify([intent('f1', 'First Name', 'text', 'Parv')], []);
     expect(verdict.pass).toBe(false);
