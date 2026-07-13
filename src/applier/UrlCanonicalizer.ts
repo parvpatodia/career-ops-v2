@@ -16,9 +16,13 @@
  *     lives in an iframe the generic filler can't reach (the 2026-07-12 Blue
  *     River fill timeout). We fetch the embedding page ONCE, read the token from
  *     the Greenhouse embed script (boards.greenhouse.io/embed/job_board/js?for=
- *     <token>), and rewrite to the first-party job-boards.greenhouse.io/<token>/
- *     jobs/NNN URL — which the board-API schema fetch AND GreenhouseFormSource
- *     both handle.
+ *     <token>), and rewrite to the bare first-party APPLICATION FORM,
+ *     job-boards.greenhouse.io/embed/job_app?for=<token>&token=NNN. WHY the
+ *     /embed/job_app form and not /<token>/jobs/NNN: an embed-configured company
+ *     (Blue River) redirects the /jobs/NNN board URL straight back to its own
+ *     iframe page, so the fields are never top-level; /embed/job_app renders the
+ *     bare form with visible, fillable fields and does not redirect. The board-
+ *     API schema fetch parses this form URL too (parseGreenhouseRef).
  *
  * WHY graceful (never throws): a failed resolution returns the param-stripped
  * URL unchanged, so the existing generic fallback + verify-or-abstain still
@@ -68,8 +72,14 @@ export function isCanonicalGreenhouse(url: string): boolean {
   return /(?:job-)?boards\.greenhouse\.io\/[^/?#]+\/jobs\/\d+/i.test(url);
 }
 
-export function canonicalGreenhouseUrl(token: string, jobId: string): string {
-  return `https://job-boards.greenhouse.io/${token}/jobs/${jobId}`;
+/**
+ * The bare first-party Greenhouse APPLICATION FORM for a board token + job id.
+ * Greenhouse's confusing param names: `for` is the board token, `token` the job
+ * id. This endpoint renders visible top-level fields and never redirects to a
+ * company embed page, so it is the reliable fill target.
+ */
+export function greenhouseEmbedAppUrl(token: string, jobId: string): string {
+  return `https://job-boards.greenhouse.io/embed/job_app?for=${token}&token=${jobId}`;
 }
 
 /**
@@ -101,7 +111,7 @@ export class UrlCanonicalizer {
       const res = await this.fetchFn(clean);
       if (!res.ok) return clean;
       const token = extractGreenhouseEmbedToken(await res.text());
-      return token ? canonicalGreenhouseUrl(token, jid) : clean;
+      return token ? greenhouseEmbedAppUrl(token, jid) : clean;
     } catch {
       return clean;
     }

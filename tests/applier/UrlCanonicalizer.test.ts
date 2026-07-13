@@ -13,7 +13,7 @@ import {
   parseGhJid,
   isCanonicalGreenhouse,
   extractGreenhouseEmbedToken,
-  canonicalGreenhouseUrl,
+  greenhouseEmbedAppUrl,
   type HtmlFetchLike,
 } from '../../src/applier/UrlCanonicalizer.js';
 
@@ -61,17 +61,17 @@ describe('parseGhJid / isCanonicalGreenhouse / extract token', () => {
     expect(extractGreenhouseEmbedToken('<html>no greenhouse here</html>')).toBeNull();
   });
 
-  it('builds the canonical board URL', () => {
-    expect(canonicalGreenhouseUrl('bluerivertech', '7947246'))
-      .toBe('https://job-boards.greenhouse.io/bluerivertech/jobs/7947246');
+  it('builds the bare Greenhouse application-form URL (for=token, token=jobId)', () => {
+    expect(greenhouseEmbedAppUrl('bluerivertech', '7947246'))
+      .toBe('https://job-boards.greenhouse.io/embed/job_app?for=bluerivertech&token=7947246');
   });
 });
 
 describe('UrlCanonicalizer.canonicalize', () => {
-  it('resolves an embedded gh_jid URL to the first-party board URL', async () => {
+  it('resolves an embedded gh_jid URL to the bare first-party application form', async () => {
     const c = new UrlCanonicalizer(fakeFetch(BLUE_RIVER_HTML));
     const out = await c.canonicalize('https://www.bluerivertechnology.com/job/?gh_jid=7947246&utm_source=Simplify&ref=Simplify');
-    expect(out).toBe('https://job-boards.greenhouse.io/bluerivertech/jobs/7947246');
+    expect(out).toBe('https://job-boards.greenhouse.io/embed/job_app?for=bluerivertech&token=7947246');
   });
 
   it('passes a canonical Greenhouse URL through (only stripping params, no fetch)', async () => {
