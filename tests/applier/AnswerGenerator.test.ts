@@ -9,7 +9,7 @@
 import fs from 'fs';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { ProfileLoader } from '../../src/applier/ProfileLoader.js';
-import { AnswerGenerator } from '../../src/applier/AnswerGenerator.js';
+import { AnswerGenerator, fullStateName } from '../../src/applier/AnswerGenerator.js';
 import type { AnswerContext } from '../../src/applier/AnswerGenerator.js';
 
 // WHY skipIf: config/profile.yml is real personal data and gitignored, so CI
@@ -200,5 +200,29 @@ describe.skipIf(!HAS_REAL_PROFILE)('AnswerGenerator', () => {
     // Should NOT return Parv Patodia — that is the personal name
     // GenericHandler uses this for current employer
     expect(a).toBeNull(); // not a recognized identity field
+  });
+
+  // ── Location typeahead ──────────────────────────────────────────────────────
+
+  it('answers a combined location field with "City, Full State" (typeahead-matchable)', () => {
+    const a = gen.generate('Location (City)', CTX);
+    expect(a!.value).toBe('San Jose, California'); // NOT "San Jose" (ambiguous) or "San Jose, CA"
+  });
+
+  it('still answers a plain "City" field with just the city', () => {
+    const a = gen.generate('City', CTX);
+    expect(a!.value).toBe('San Jose');
+  });
+});
+
+describe('fullStateName', () => {
+  it('expands a postal abbreviation to the full state name', () => {
+    expect(fullStateName('CA')).toBe('California');
+    expect(fullStateName('ny')).toBe('New York');
+  });
+  it('passes through a full name or an unknown value unchanged', () => {
+    expect(fullStateName('California')).toBe('California');
+    expect(fullStateName('')).toBe('');
+    expect(fullStateName('Ontario')).toBe('Ontario');
   });
 });

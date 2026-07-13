@@ -92,7 +92,17 @@ export class Verifier {
       return isAffirmative(actual) === isAffirmative(intent.value);
     }
     if (OPTION_TYPES.has(intent.field.type)) {
-      return norm(actual) === norm(intent.value);
+      const a = norm(actual);
+      const e = norm(intent.value);
+      if (a === e) return true;
+      // A searchable/typeahead select shows the fully-qualified option: typing
+      // "San Jose, California" selects "San Jose, California, United States".
+      // Accept when the read-back is the intent followed by a COMMA-qualifier,
+      // so it is unambiguously the same choice. The comma anchor is deliberate:
+      // it must NOT accept "United States Minor Outlying Islands" for "United
+      // States" (that is a SPACE continuation, a different place) — never widen
+      // this to a bare prefix/substring (invariant 1; LESSONS 2026-06-19).
+      return a.startsWith(e + ', ');
     }
     return actual === intent.value;
   }
