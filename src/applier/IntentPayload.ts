@@ -133,7 +133,7 @@ export class IntentPayloadBuilder {
       }
 
       if (OPTION_TYPES.has(field.type)) {
-        this.resolveOption(field, answer, intents, reasons);
+        this.resolveOption(field, answer, intents, skipped, reasons);
         continue;
       }
 
@@ -152,6 +152,7 @@ export class IntentPayloadBuilder {
     field: FormField,
     answer: Answer,
     intents: FieldIntent[],
+    skipped: FormField[],
     reasons: AbstainReason[]
   ): void {
     const options = field.options ?? [];
@@ -170,6 +171,14 @@ export class IntentPayloadBuilder {
 
     if (matches.length === 1) {
       intents.push({ field, value: matches[0]!, source: 'answer-source', confidence: answer.confidence });
+      return;
+    }
+    // No confident single match. A REQUIRED field must abstain (block); an
+    // OPTIONAL one (e.g. a voluntary EEO Disability whose approved answer text
+    // does not match this form's exact option wording) is left BLANK, not a
+    // whole-form blocker. Never guess/first-option (LESSONS.md 2026-06-10).
+    if (!field.required) {
+      skipped.push(field);
       return;
     }
     reasons.push({

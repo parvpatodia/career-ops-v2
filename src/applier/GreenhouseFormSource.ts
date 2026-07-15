@@ -55,9 +55,20 @@ export class GreenhouseFormSource implements AtsFormSource {
   async scanSchema(): Promise<NormalizedSchema> {
     const mapped = this.mapper.map(this.job);
     const apiFields = mapped.fields.map((f) => f.field);
+    // EEOC compliance fields (Gender/Veteran/Disability/Race) are fillable from
+    // the human-approved AnswerKB, BUT only the ones whose id is actually in the
+    // rendered DOM: the API name can diverge (Nuro's API "race" renders as
+    // "hispanic_ethnicity"; [id="race"] does not exist), and filling a missing
+    // element throws. Drop the divergent ones so gender/veteran/disability fill
+    // and race is left to the human rather than blowing up the fill.
+    const compliancePresent = await this.domPresentIds(mapped.complianceFields.map((f) => f.field.id));
+    const complianceFields = mapped.complianceFields
+      .map((f) => f.field)
+      .filter((f) => compliancePresent.has(f.id));
     const known = new Set([
       ...apiFields.map((f) => f.id),
-      ...this.demographicFields().map((e) => e.id), // EEO: surfaced, not filled
+      ...complianceFields.map((f) => f.id),
+      ...this.demographicFields().map((e) => e.id), // diversity survey: surfaced, not filled
     ]);
     // The new Greenhouse React form renders REQUIRED built-in fields (location
     // Country, etc.) that the boards questions API does NOT return, so a
@@ -66,7 +77,7 @@ export class GreenhouseFormSource implements AtsFormSource {
     const builtins = await this.discoverBuiltinFields(known);
     const captcha = await detectCaptcha(this.page);
     return {
-      fields: [...apiFields, ...builtins],
+      fields: [...apiFields, ...complianceFields, ...builtins],
       eeo: this.demographicFields(),
       unmapped: mapped.unmapped.map((u) => ({
         id: u.label,
@@ -76,6 +87,22 @@ export class GreenhouseFormSource implements AtsFormSource {
       })),
       ...(captcha ? { captcha } : {}),
     };
+  }
+
+  /**
+   * Which of the candidate ids are present in the rendered DOM. WHY: the boards-
+   * API compliance field name can differ from the DOM element id, so we only mark
+   * a compliance field fillable if its element exists (else the fill would throw
+   * on a missing locator). With no live page (unit stub) we assume all present so
+   * the pure schema mapping is still testable.
+   */
+  private async domPresentIds(ids: string[]): Promise<Set<string>> {
+    if (ids.length === 0) return new Set();
+    if (typeof this.page?.evaluate !== 'function') return new Set(ids);
+    const present = await this.page
+      .evaluate((cand) => cand.filter((id) => !!document.querySelector(`[id="${id}"]`)), ids)
+      .catch(() => ids);
+    return new Set(present);
   }
 
   /**
