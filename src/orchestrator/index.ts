@@ -305,13 +305,13 @@ async function main(): Promise<void> {
       new AnswerGenerator(profileLoader!),
     ]);
 
-  // --auto runs its AUTONOMOUS pass HEADLESS (invisible): captcha-free forms fill
-  // + verify + submit with nothing on screen, and the pre-scan of captcha forms
-  // is invisible too. A HEADED window opens ONLY at a human touchpoint (captcha /
-  // unknown question), so Parv's screen is never taken over during autofill
-  // (his request 2026-07-15). --attended is headed throughout (fully manual);
-  // other modes honor CAREER_OPS_HEADLESS.
-  const headless = useAttended ? false : (useAuto ? true : process.env.CAREER_OPS_HEADLESS === '1');
+  // Attended AND auto are interactive on a touchpoint: they MUST be headed so Parv
+  // can see the form and solve the captcha. Other modes honor CAREER_OPS_HEADLESS.
+  // (A prior attempt to run --auto's scan headless with a SEPARATE headed browser
+  // for the takeover broke the fill: a headed channel:'chrome' launched alongside
+  // a headless one hits Chrome's single-instance behavior and the takeover page
+  // closes mid-fill. Reverted 2026-07-15; one headed browser is the working shape.)
+  const headless = (useAttended || useAuto) ? false : process.env.CAREER_OPS_HEADLESS === '1';
   const { browser, usingChrome } = await launchChrome({ headless });
   log.info(usingChrome ? 'Using your Google Chrome' : 'Chrome not found — fell back to bundled Chromium');
   const greenhouseProvider = new GreenhouseBoardJobProvider();
@@ -319,21 +319,6 @@ async function main(): Promise<void> {
     browser,
     greenhouseJob: (app) => greenhouseProvider.provide(app),
   });
-
-  // Headed browser for human takeovers, created ONLY on the first touchpoint so a
-  // visible window never appears until Parv must act. --attended reuses the main
-  // (already headed) browser; --auto lazily launches a headed one just-in-time.
-  let headedBrowser: Awaited<ReturnType<typeof launchChrome>>['browser'] | null = null;
-  const takeoverSessions = async (): Promise<ApplySessionFactory> => {
-    if (!useAuto) return sessions; // --attended: main browser is already headed
-    if (!headedBrowser) {
-      headedBrowser = (await launchChrome({ headless: false })).browser;
-    }
-    return new PlaywrightApplySessionFactory({
-      browser: headedBrowser,
-      greenhouseJob: (app) => greenhouseProvider.provide(app),
-    });
-  };
 
   const orch = new Orchestrator({
     ...(useTailor ? { tailor: new Tailor() } : {}),
@@ -432,7 +417,7 @@ async function main(): Promise<void> {
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
         console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id})`);
-        if (await attendedTakeover(app, await takeoverSessions(), answers, essaySource, store, rl)) submitted++;
+        if (await attendedTakeover(app, sessions, answers, essaySource, store, rl)) submitted++;
       }
       rl?.close();
       console.log(`\n═══ Attended done. Marked applied this run: ${submitted}/${queue.length}. ═══\n`);
@@ -462,7 +447,7 @@ async function main(): Promise<void> {
           if (result.phase === 'submitted') { submitted++; continue; }
           if (result.phase === 'auth_required' || result.phase === 'needs_input') {
             console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
-            const ok = await attendedTakeover(app, await takeoverSessions(), answers, essaySource, store, null, {
+            const ok = await attendedTakeover(app, sessions, answers, essaySource, store, null, {
               timeoutMs: AUTO_RESUME_TIMEOUT_MS,
               intervalMs: AUTO_RESUME_POLL_MS,
             });
@@ -507,7 +492,6 @@ async function main(): Promise<void> {
     }
   } finally {
     await browser.close();
-    if (headedBrowser) await headedBrowser.close().catch(() => {});
   }
 
   console.log(`\n═══ Done. Submitted this run: ${submitted}/${queue.length}. ═══\n`);
