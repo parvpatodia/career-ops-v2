@@ -305,13 +305,14 @@ async function main(): Promise<void> {
       new AnswerGenerator(profileLoader!),
     ]);
 
-  // Attended AND auto are interactive on a touchpoint: they MUST be headed so Parv
-  // can see the form and solve the captcha. Other modes honor CAREER_OPS_HEADLESS.
-  // (A prior attempt to run --auto's scan headless with a SEPARATE headed browser
-  // for the takeover broke the fill: a headed channel:'chrome' launched alongside
-  // a headless one hits Chrome's single-instance behavior and the takeover page
-  // closes mid-fill. Reverted 2026-07-15; one headed browser is the working shape.)
-  const headless = (useAttended || useAuto) ? false : process.env.CAREER_OPS_HEADLESS === '1';
+  // --auto is a two-phase SEQUENTIAL flow: phase 1 (the autonomous pass) runs
+  // HEADLESS so nothing appears on screen; phase 2 (the human takeover) opens a
+  // headed window ONLY after the headless browser is closed. Never two Chromes at
+  // once — a concurrent headed+headless channel:'chrome' hits Chrome's single-
+  // instance behavior and the takeover page closes mid-fill (2026-07-15). So the
+  // main browser is headless for --auto. --attended is headed throughout; other
+  // modes honor CAREER_OPS_HEADLESS.
+  const headless = useAttended ? false : (useAuto ? true : process.env.CAREER_OPS_HEADLESS === '1');
   const { browser, usingChrome } = await launchChrome({ headless });
   log.info(usingChrome ? 'Using your Google Chrome' : 'Chrome not found — fell back to bundled Chromium');
   const greenhouseProvider = new GreenhouseBoardJobProvider();
@@ -436,25 +437,56 @@ async function main(): Promise<void> {
     // seconds' reload, only on the jobs a human handles anyway). Submit stays in
     // ONE place (the Autopilot); the takeover never auto-submits.
     if (useAuto) {
-      console.log(`Auto (hybrid, Google Chrome): I submit captcha-free verified forms hands-off. On a captcha or an unknown question I surface the Chrome window and WATCH the page for your submit (no terminal prompt), then continue. The window comes to the front only when you are needed. (Ignore the macOS banner: it opens Script Editor, not the browser.)\n`);
+      console.log(`Auto (hybrid): the autonomous pass runs HEADLESS (nothing on your screen). Captcha-free verified forms submit hands-off. Any job that needs you (captcha / unknown question) is collected, then a Chrome window opens ONLY for those — after the headless pass — so your screen is never taken over during autofill.\n`);
+
+      // ── Phase 1 (HEADLESS, invisible): submit what is hands-off; collect the
+      //    jobs that need a human. No window appears.
+      const needsHuman: Application[] = [];
+      const HUMAN_PHASES = new Set(['auth_required', 'needs_input', 'verify_failed', 'submit_unconfirmed']);
       for (let i = 0; i < queue.length; i++) {
         const app = queue[i]!;
-        console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
-        // Per-job guard: one throwing job must never kill the hands-off loop.
+        console.log(`\n[${i + 1}/${queue.length}] ${app.company} — ${app.role}  (id ${app.id})`);
         try {
           const result = await orch.apply(app, approval ? { approval } : {});
           reportApply(app, result);
           if (result.phase === 'submitted') { submitted++; continue; }
-          if (result.phase === 'auth_required' || result.phase === 'needs_input') {
-            console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
-            const ok = await attendedTakeover(app, sessions, answers, essaySource, store, null, {
-              timeoutMs: AUTO_RESUME_TIMEOUT_MS,
-              intervalMs: AUTO_RESUME_POLL_MS,
-            });
-            if (ok) submitted++;
+          if (HUMAN_PHASES.has(result.phase)) {
+            console.log('  ↳ needs you — queued for the visible takeover pass.');
+            needsHuman.push(app);
           }
         } catch (err) {
           console.log(`  ⚠️  ERROR — ${(err as Error).message.replace(/\s+/g, ' ').slice(0, 160)}. Skipped (not applied); continuing.`);
+        }
+      }
+
+      // ── Phase 2 (HEADED): SEQUENTIAL — close the headless browser FIRST, then
+      //    open ONE visible window only for the jobs that need you. Never a
+      //    concurrent headed+headless Chrome (that closes the takeover page).
+      if (needsHuman.length > 0) {
+        await browser.close().catch(() => {});
+        const headed = await launchChrome({ headless: false });
+        log.info(headed.usingChrome ? 'Takeover: your Google Chrome' : 'Takeover: bundled Chromium');
+        const headedSessions = new PlaywrightApplySessionFactory({
+          browser: headed.browser,
+          greenhouseJob: (app) => greenhouseProvider.provide(app),
+        });
+        try {
+          for (let i = 0; i < needsHuman.length; i++) {
+            const app = needsHuman[i]!;
+            console.log(`\n[takeover ${i + 1}/${needsHuman.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
+            console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
+            try {
+              const ok = await attendedTakeover(app, headedSessions, answers, essaySource, store, null, {
+                timeoutMs: AUTO_RESUME_TIMEOUT_MS,
+                intervalMs: AUTO_RESUME_POLL_MS,
+              });
+              if (ok) submitted++;
+            } catch (err) {
+              console.log(`  ⚠️  ERROR — ${(err as Error).message.replace(/\s+/g, ' ').slice(0, 160)}. Skipped; continuing.`);
+            }
+          }
+        } finally {
+          await headed.browser.close().catch(() => {});
         }
       }
       console.log(`\n═══ Auto done. Submitted or applied this run: ${submitted}/${queue.length}. ═══\n`);
@@ -491,7 +523,9 @@ async function main(): Promise<void> {
       }
     }
   } finally {
-    await browser.close();
+    // --auto's phase 2 may have already closed the main (headless) browser to
+    // launch the headed takeover; closing an already-closed browser is a no-op.
+    await browser.close().catch(() => {});
   }
 
   console.log(`\n═══ Done. Submitted this run: ${submitted}/${queue.length}. ═══\n`);
