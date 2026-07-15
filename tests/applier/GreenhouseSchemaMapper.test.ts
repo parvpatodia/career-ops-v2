@@ -55,10 +55,35 @@ describe('GreenhouseSchemaMapper', () => {
     expect(schema.fields.some((m) => m.field.id === 'question_999')).toBe(false);
   });
 
-  it('keeps EEO and compliance sections out of fields and flags their presence', () => {
-    expect(schema.fields.some((m) => m.field.id === 'gender')).toBe(false);
+  it('keeps demographic EEO out of fields, routes compliance to complianceFields', () => {
+    expect(schema.fields.some((m) => m.field.id === 'gender')).toBe(false); // demographic survey: not in fields
     expect(schema.hasDemographics).toBe(true);
     expect(schema.hasCompliance).toBe(true);
+    // compliance questions are fillable candidates, SEPARATE from `fields` (DOM-gated later)
+    expect(schema.complianceFields.some((m) => m.field.id === 'gdpr_consent')).toBe(true);
+    expect(schema.fields.some((m) => m.field.id === 'gdpr_consent')).toBe(false);
+  });
+
+  it('maps EEOC compliance (Gender/Veteran) to complianceFields with options, not fields', () => {
+    const job = {
+      questions: [],
+      compliance: [
+        {
+          type: 'eeoc',
+          questions: [
+            { label: 'Gender', required: false, fields: [{ name: 'gender', type: 'multi_value_single_select', values: [{ label: 'Decline To Self Identify', value: 0 }, { label: 'Female', value: 1 }, { label: 'Male', value: 2 }] }] },
+            { label: 'Veteran Status', required: false, fields: [{ name: 'veteran_status', type: 'multi_value_single_select', values: [{ label: 'I am not a protected veteran', value: 1 }] }] },
+          ],
+        },
+      ],
+    };
+    const s = new GreenhouseSchemaMapper().map(job);
+    const gender = s.complianceFields.find((m) => m.field.id === 'gender')!;
+    expect(gender.field.type).toBe('select');
+    expect(gender.field.options).toEqual(['Decline To Self Identify', 'Female', 'Male']);
+    expect(s.complianceFields.some((m) => m.field.id === 'veteran_status')).toBe(true);
+    expect(s.fields).toHaveLength(0); // compliance never lands in `fields`
+    expect(s.hasCompliance).toBe(true);
   });
 
   it('uses the question label as the FormField label', () => {

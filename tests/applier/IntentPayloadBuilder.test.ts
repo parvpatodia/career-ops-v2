@@ -147,6 +147,40 @@ describe('IntentPayloadBuilder', () => {
     expect(result.skipped.map((f) => f.id)).toEqual(['f1']);
   });
 
+  it('fills an OPTIONAL EEO select when a human-approved answer matches an option exactly', () => {
+    const approved = (v: string): Answer => ({ value: v, confidence: 'high', needsReview: false, humanApproved: true });
+    const builder = new IntentPayloadBuilder(stub({ Gender: approved('Male') }));
+    const result = builder.build([select('f1', 'Gender', ['Decline To Self Identify', 'Female', 'Male'], false)], CTX);
+
+    expect(result.kind).toBe('ready');
+    expect(result.intents.find((i) => i.field.id === 'f1')?.value).toBe('Male');
+  });
+
+  it('SKIPS an optional option-field whose approved answer matches no option (blank, never a whole-form blocker)', () => {
+    const approved = (v: string): Answer => ({ value: v, confidence: 'high', needsReview: false, humanApproved: true });
+    const builder = new IntentPayloadBuilder(stub({ 'Disability Status': approved('I do not have a disability') }));
+    const result = builder.build(
+      [select('f1', 'Disability Status', ['I do not want to answer', 'No, I do not have a disability and have not had one in the past', 'Yes, I have a disability'], false)],
+      CTX
+    );
+
+    expect(result.kind).toBe('ready'); // did NOT abstain the whole form
+    expect(result.intents).toHaveLength(0);
+    expect(result.skipped.map((f) => f.id)).toEqual(['f1']);
+  });
+
+  it('a REQUIRED option-field near-miss STILL abstains (safety unchanged)', () => {
+    const approved = (v: string): Answer => ({ value: v, confidence: 'high', needsReview: false, humanApproved: true });
+    const builder = new IntentPayloadBuilder(stub({ 'Disability Status': approved('I do not have a disability') }));
+    const result = builder.build(
+      [select('f1', 'Disability Status', ['No, I do not have a disability and have not had one in the past', 'Yes, I have a disability'], true)],
+      CTX
+    );
+
+    expect(result.kind).toBe('abstain');
+    expect(result.reasons).toHaveLength(1);
+  });
+
   describe('resume file field', () => {
     let dir: string;
     let pdf: string;

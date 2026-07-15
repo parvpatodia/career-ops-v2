@@ -47,6 +47,14 @@ export interface GhUnmappedQuestion {
 
 export interface GhMappedSchema {
   fields: GhMappedField[];
+  /**
+   * EEOC compliance fields (Gender, Race, Veteran, Disability) from job.compliance.
+   * Kept SEPARATE from `fields` because the boards-API field name can diverge from
+   * the rendered DOM id (Nuro: API "race" renders as DOM "hispanic_ethnicity", and
+   * [id="race"] does not exist). GreenhouseFormSource adds only the ones whose id is
+   * actually present in the DOM, so a fill never targets a missing element.
+   */
+  complianceFields: GhMappedField[];
   /** Questions whose field type this mapper does not know. Required ones must abstain upstream. */
   unmapped: GhUnmappedQuestion[];
   hasDemographics: boolean;
@@ -61,6 +69,11 @@ const TYPE_MAP: Record<string, FormField['type']> = {
   multi_value_multi_select: 'multiselect',
 };
 
+interface GhComplianceSection {
+  type?: string;
+  questions?: GhQuestion[];
+}
+
 export class GreenhouseSchemaMapper {
   map(job: Record<string, unknown>): GhMappedSchema {
     const questions = (job.questions ?? []) as GhQuestion[];
@@ -68,42 +81,61 @@ export class GreenhouseSchemaMapper {
     const unmapped: GhUnmappedQuestion[] = [];
 
     for (const q of questions) {
-      // Multi-field questions (Resume/CV = input_file + textarea paste
-      // alternative): the file upload is the canonical path; the sibling
-      // is an alternative input for the same answer, not a second answer.
-      const ghField = q.fields.find((f) => f.type === 'input_file') ?? q.fields[0];
-      if (!ghField) continue;
+      const mapped = this.mapQuestion(q);
+      if (mapped) fields.push(mapped);
+      else unmapped.push({ label: q.label, type: q.fields[0]?.type ?? 'unknown', required: q.required });
+    }
 
-      const type = TYPE_MAP[ghField.type];
-      if (!type) {
-        unmapped.push({ label: q.label, type: ghField.type, required: q.required });
-        continue;
+    // EEOC compliance questions (Gender, Race, Veteran Status, Disability Status)
+    // live under job.compliance, not job.questions. They ARE fillable — from the
+    // human-approved AnswerKB only: the IntentPayloadBuilder's legal/EEO gate
+    // (invariant 7) fills them from Parv's approved answers and abstains on any
+    // field with no approved answer or no exact option match. Kept separate so
+    // GreenhouseFormSource can drop any whose id is not in the rendered DOM.
+    const compliance = (job.compliance ?? []) as GhComplianceSection[];
+    const complianceFields: GhMappedField[] = [];
+    for (const section of compliance) {
+      for (const q of section.questions ?? []) {
+        const mapped = this.mapQuestion(q);
+        if (mapped) complianceFields.push(mapped);
       }
-
-      const mapped: GhMappedField = {
-        ghName: ghField.name,
-        field: {
-          id: ghField.name,
-          label: q.label,
-          type,
-          required: q.required,
-          ...(ghField.values.length > 0 ? { options: ghField.values.map((v) => v.label) } : {}),
-        },
-      };
-      if (ghField.values.length > 0) {
-        mapped.optionValues = Object.fromEntries(ghField.values.map((v) => [v.label, v.value]));
-      }
-      fields.push(mapped);
     }
 
     const demographics = job.demographic_questions as { questions?: unknown[] } | undefined;
-    const compliance = job.compliance as unknown[] | undefined;
 
     return {
       fields,
+      complianceFields,
       unmapped,
       hasDemographics: Boolean(demographics?.questions?.length),
-      hasCompliance: Boolean(compliance?.length),
+      hasCompliance: compliance.some((s) => (s.questions?.length ?? 0) > 0),
     };
+  }
+
+  /** Map one Greenhouse question to a fillable field, or null if the type is unknown. */
+  private mapQuestion(q: GhQuestion): GhMappedField | null {
+    // Multi-field questions (Resume/CV = input_file + textarea paste alternative):
+    // the file upload is the canonical path; the sibling is an alternative input
+    // for the same answer, not a second answer.
+    const ghField = q.fields.find((f) => f.type === 'input_file') ?? q.fields[0];
+    if (!ghField) return null;
+
+    const type = TYPE_MAP[ghField.type];
+    if (!type) return null;
+
+    const mapped: GhMappedField = {
+      ghName: ghField.name,
+      field: {
+        id: ghField.name,
+        label: q.label,
+        type,
+        required: q.required,
+        ...(ghField.values.length > 0 ? { options: ghField.values.map((v) => v.label) } : {}),
+      },
+    };
+    if (ghField.values.length > 0) {
+      mapped.optionValues = Object.fromEntries(ghField.values.map((v) => [v.label, v.value]));
+    }
+    return mapped;
   }
 }
