@@ -377,3 +377,23 @@ core runs the real entry point, not just demos.
   react-selects (Yes/No, pronouns, degree) now fill AND verify green autonomously; the human is
   left with the reCAPTCHA (+ a glance at the phone-country "+1"). That is the ~90% ceiling.
 - 2026-07-13 | metrics | parv_corrections=0 repeat_mistakes=0 bugs_found=0 (planned follow-ups #1+#2) shipped_first_try=1 rework_commits=0. Location answer specificity + narrow anchored Verifier acceptance; live-verified City fills+verifies; negative case (space-continuation) rejected.
+
+## 2026-07-15 — FIRST SUBMISSION (Nuro) + EEO autofill + headless autonomous pass
+- **Nuro Software Engineer, Performance - New Grad SUBMITTED** (app 402 -> Applied, confirmed via
+  job-boards.greenhouse.io/embed/job_app/confirmation). First real end-to-end submission: URL
+  resolver + tailoring + react-select fill + human captcha. Queue now Applied 10.
+- **EEO autofill (committed 57c6572)**: map job.compliance into a separate complianceFields list,
+  DOM-gate the ids (API "race" renders as DOM "hispanic_ethnicity" -> excluded), builder skips an
+  optional option-field with no exact match instead of blocking, AnswerKB EEO patterns given short
+  CamelCase-robust forms ("gender","veteran"). Live-verified on Nuro: gender + veteran auto-fill
+  from the approved AnswerKB; disability skips (its approved wording != the form's exact option);
+  race excluded. answers.yml pattern tweak is local (gitignored).
+- **Headless autonomous pass (committed 137fe62)**: --auto now runs the autonomous pass HEADLESS;
+  a headed window is launched lazily ONLY at a human touchpoint. Captcha-free work is fully
+  invisible. LIMITATION: a captcha job's takeover window still appears (the human solves the
+  captcha in that filled form); fully hiding it needs minimize/off-screen tricks that risk
+  breaking react-select/async fills (throttling) -> left opt-in.
+- **Open items**: (1) disability EEO fills only when the approved wording exactly matches the
+  form's option (varies) -> currently a 1-click human pick; (2) the phone-country "+1" verify
+  papercut (left, per Parv); (3) optional: minimize the captcha-takeover window during fill.
+- 2026-07-15 | metrics | parv_corrections=1 (screen-stealing UX + EEO not filled) repeat_mistakes=0 bugs_found=2 (EEO never fillable; --auto stole screen) shipped_first_try=1 rework_commits=0. First real submission landed; both corrections fixed with tests + live verification.
