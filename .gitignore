@@ -64,3 +64,8 @@ files_extracted/
 data/outreach.jsonl
 data/outreach.jsonl.lock
 data/outreach/
+
+# Watcher runtime state / caches (derived; never source)
+data/new-jobs.json
+data/watch-seen.json
+data/jd-cache.json

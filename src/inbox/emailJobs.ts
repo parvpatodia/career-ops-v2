@@ -97,6 +97,9 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
       const url = decodeEntities(m[1]!).trim();
       const text = stripTags(m[2]!);
       if (!url || text.length < 4) continue;
+      // Only real web links — never javascript:/data:/relative (which would
+      // become an unsafe href in the local UI, and can't be a real posting).
+      if (!/^https?:\/\//i.test(url)) continue;
       if (SKIP_URL.test(url)) continue;
       // Keep a link only if it looks like a job AND the visible text reads as an
       // on-field, junior role (drops nav/footer/marketing anchors, off-field

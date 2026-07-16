@@ -5,6 +5,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { GreenhouseBoardScanner, htmlToText } from '../../src/scanner/GreenhouseBoardScanner.js';
 import type { FetchLike, GreenhouseBoardsConfig } from '../../src/scanner/GreenhouseBoardScanner.js';
 import type { Job, ScanQuery } from '../../src/types.js';
@@ -130,6 +133,43 @@ describe('GreenhouseBoardScanner', () => {
     const jobs = await scanner.scanPublic({ postedWithinDays: 2 });
     // 3-day-old SWE intern now too old; co-op (unknown) survives.
     expect(jobs.map((j) => j.title)).toEqual(['Robotics Co-op']);
+  });
+
+  it('with a JD cache file, fetches each posting JD once — not again next cycle (M8 #2)', async () => {
+    let detailFetches = 0;
+    const counting: FetchLike = async (url: string) => {
+      if (url.endsWith('/acme/jobs')) return { ok: true, status: 200, json: async () => LIST };
+      if (url.includes('/deadboard/')) return { ok: false, status: 404, json: async () => ({}) };
+      detailFetches++; // a /acme/jobs/<id> detail (JD) call
+      return { ok: true, status: 200, json: async () => ({ content: 'jd' }) };
+    };
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ghjd-'));
+    try {
+      const cacheFile = path.join(dir, 'jd.json');
+      const s = new Testable(CFG, counting, cacheFile);
+      await s.scanPublic({});
+      const afterFirst = detailFetches;
+      expect(afterFirst).toBeGreaterThan(0); // JDs fetched on the first cycle
+      await s.scanPublic({});
+      expect(detailFetches).toBe(afterFirst); // second cycle: served from the cache
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('without a cache file, re-fetches JDs every cycle (default; tests/daily scan)', async () => {
+    let detailFetches = 0;
+    const counting: FetchLike = async (url: string) => {
+      if (url.endsWith('/acme/jobs')) return { ok: true, status: 200, json: async () => LIST };
+      if (url.includes('/deadboard/')) return { ok: false, status: 404, json: async () => ({}) };
+      detailFetches++;
+      return { ok: true, status: 200, json: async () => ({ content: 'jd' }) };
+    };
+    const s = new Testable(CFG, counting); // no cache file
+    await s.scanPublic({});
+    const afterFirst = detailFetches;
+    await s.scanPublic({});
+    expect(detailFetches).toBe(afterFirst * 2); // no cache -> fetched again
   });
 });
 

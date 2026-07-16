@@ -62,6 +62,9 @@ export function renderPage(): string {
 <footer>Auto-refreshes every 15s · watcher scans 100+ boards every 60s · applying + captcha stay your step · runs locally, your data never leaves this machine</footer>
 <script>
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // Only http(s) URLs become clickable hrefs; anything else (javascript:, data:,
+  // a malformed link from a parsed email) collapses to a non-navigating '#'.
+  const safeUrl = (u) => { const s = String(u ?? ''); return /^https?:\/\//i.test(s) ? esc(s) : '#'; };
   const ago = (iso) => { const m = Math.round((Date.now()-new Date(iso).getTime())/60000); if(isNaN(m))return ''; if(m<1)return 'just now'; if(m<60)return m+'m ago'; const h=Math.round(m/60); if(h<24)return h+'h ago'; return Math.round(h/24)+'d ago'; };
   const dayKey = (iso) => { const d=new Date(iso); return isNaN(d)? 'unknown' : d.toISOString().slice(0,10); };
   const dayLabel = (key) => { if(key==='unknown')return 'Earlier'; const today=new Date().toISOString().slice(0,10); const y=new Date(Date.now()-864e5).toISOString().slice(0,10); if(key===today)return 'Today'; if(key===y)return 'Yesterday'; return new Date(key+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); };
@@ -73,7 +76,7 @@ export function renderPage(): string {
     '<div class="meta"><div class="role">'+esc(j.role)+'</div>'+
       '<div class="co">'+esc(j.company)+(j.location?' · '+esc(j.location):'')+' · '+esc(j.platform)+'</div></div>'+
     '<div class="when">caught '+ago(j.caughtAt)+'</div>'+
-    '<a class="apply" href="'+esc(j.applyUrl)+'" target="_blank" rel="noopener">Apply →</a></div>';
+    '<a class="apply" href="'+safeUrl(j.applyUrl)+'" target="_blank" rel="noopener">Apply →</a></div>';
 
   function renderFresh(fresh) {
     if(!fresh.length) return '<div class="empty">No new roles caught yet. The watcher checks every 60 seconds.</div>';
@@ -111,13 +114,13 @@ export function renderPage(): string {
     document.getElementById('ready').innerHTML = ready.length ? ready.map(j =>
       '<div class="card"><span class="score">'+esc(j.score)+'</span>'+
       '<div class="meta"><div class="role">'+esc(j.role)+'</div><div class="co">'+esc(j.company)+'</div></div>'+
-      '<a class="apply" href="'+esc(j.url)+'" target="_blank" rel="noopener">Open →</a></div>'
+      '<a class="apply" href="'+safeUrl(j.url)+'" target="_blank" rel="noopener">Open →</a></div>'
     ).join('') : '<div class="empty">Queue is empty. Sourcing runs every 3 hours.</div>';
     const applied = d.applied || [];
     const show = applied.slice(0,8), rest = applied.slice(8);
     const row = (j) => '<div class="card"><span class="pill">✓</span>'+
       '<div class="meta"><div class="role">'+esc(j.role)+'</div><div class="co">'+esc(j.company)+(j.appliedAt?' · applied '+ago(j.appliedAt):'')+'</div></div>'+
-      '<a class="open" href="'+esc(j.url)+'" target="_blank" rel="noopener">Open ↗</a></div>';
+      '<a class="open" href="'+safeUrl(j.url)+'" target="_blank" rel="noopener">Open ↗</a></div>';
     document.getElementById('applied').innerHTML = applied.length
       ? show.map(row).join('') + (rest.length ? '<details><summary>'+rest.length+' more applied…</summary>'+rest.map(row).join('')+'</details>' : '')
       : '<div class="empty">Nothing applied yet.</div>';

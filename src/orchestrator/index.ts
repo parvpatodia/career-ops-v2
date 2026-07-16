@@ -151,10 +151,11 @@ async function attendedTakeover(
 ): Promise<boolean> {
   const opened = await sessions.open(app, answers());
   if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); return false; }
-  if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); return false; }
   // Push the just-opened window BEHIND the user's work so the autofill does not
   // steal focus; only the touchpoint below raises Chrome (background --auto).
+  // Runs BEFORE the no-source early return so that bail path also restores focus.
   await hooks?.afterOpen?.();
+  if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); return false; }
   const ctx: AnswerContext = {
     company: app.company, role: app.role, resumeVariant: app.resumeVariant,
     ...(app.jd ? { jd: app.jd } : {}),

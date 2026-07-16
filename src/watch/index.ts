@@ -70,7 +70,9 @@ async function main(): Promise<void> {
   // The fast, no-auth, no-browser sources — the ones that see a posting the
   // moment the company publishes it. Auth/browser scanners are excluded.
   const scanners: Array<[string, () => Scanner]> = [
-    ['greenhouse', () => GreenhouseBoardScanner.fromConfig()],
+    // JD cache on: the 60s loop fetches each Greenhouse posting's JD once, ever
+    // (the detail call is the only one that scales with matches, not boards).
+    ['greenhouse', () => GreenhouseBoardScanner.fromConfig(undefined, { jdCacheFile: 'data/jd-cache.json' })],
     ['lever', () => LeverBoardScanner.fromConfig()],
     ['ashby', () => AshbyBoardScanner.fromConfig()],
     ['swelist', () => new SWEListScanner()],
@@ -119,7 +121,9 @@ async function main(): Promise<void> {
   const entries = relevant.map((j) => ({
     id: j.id, company: j.company, role: j.title, applyUrl: j.applyUrl ?? j.url,
     platform: j.platform, postedAt: j.postedAt, caughtAt,
-    category: categorize(j.title, j.jd), location: j.location ?? '',
+    // Title-only: the JD is noisy with company context ("our AI platform"),
+    // which would pull plain SWE roles into AI/ML. The title names the role.
+    category: categorize(j.title), location: j.location ?? '',
   }));
   writeJson(HOTLIST_PATH, [...entries, ...hot].slice(0, HOTLIST_CAP));
 

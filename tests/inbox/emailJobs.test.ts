@@ -21,6 +21,7 @@ const digest: EmailMessage = {
       <tr><td><a href="https://boards.greenhouse.io/bar/jobs/9">Software Engineer Intern at Bar (London, UK)</a></td></tr>
       <tr><td><a href="https://jobs.lever.co/def/2">ML Intern (requires active security clearance) at DefenseCo</a></td></tr>
       <tr><td><a href="https://boards.greenhouse.io/acme/jobs/123?gh_jid=123">Machine Learning Engineer Intern at Acme AI</a></td></tr>
+      <tr><td><a href="javascript:alert('xss')//greenhouse.io/jobs">Machine Learning Intern at Evil</a></td></tr>
     </table>
     <footer>
       <a href="https://scalar.io/unsubscribe?u=1">Unsubscribe</a>
@@ -42,6 +43,11 @@ describe('parseJobEmails', () => {
     expect(jobs.some((j) => /london|\buk\b/i.test(j.role))).toBe(false);
     expect(jobs.some((j) => /clearance/i.test(j.role))).toBe(false);
     expect(jobs.some((j) => /unsubscribe|follow|blog/i.test(j.role))).toBe(false);
+  });
+
+  it('drops non-http(s) links (javascript:/data:) so no unsafe href reaches the UI', () => {
+    expect(jobs.some((j) => /^javascript:/i.test(j.applyUrl))).toBe(false);
+    expect(jobs.some((j) => /Evil/.test(j.company + j.role))).toBe(false);
   });
 
   it('dedups by apply URL (the ML role appears twice)', () => {
