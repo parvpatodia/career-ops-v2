@@ -8,9 +8,13 @@
  * verifies F-1 eligibility from the JD (skip clearance/ITAR) and applies.
  */
 import fs from 'fs';
-const GH=['anthropic','scaleai','twitch','astranis','snorkelai','smartsheet','speechify','workato','alarmcom','pingidentity','underdogfantasy','vestwell','wayve','togetherai','flyzipline','databricks','waymo','nuro','figure','samsara','verkada','stripe','coinbase','reddit','discord','figma','instacart','robinhood','gitlab','brex'];
-const LEVER=['plaid','mistral','zoox','palantir'];
-const ASHBY=['gendigital','skydio','cohere','perplexity','sierra','harvey','baseten','modal','replit','notion','ramp','benchling'];
+import yaml from 'js-yaml';
+// Single source of truth: the same config the watcher + scanners use. Expanded
+// via `node scripts/verify-boards.mjs`. Editing the yml flows through to here.
+const cfg=(f,key)=>{try{return (yaml.load(fs.readFileSync(f,'utf8'))?.[key])||[]}catch{return[]}};
+const GH=cfg('config/greenhouse-boards.yml','boards');
+const LEVER=cfg('config/lever-boards.yml','companies');
+const ASHBY=cfg('config/ashby-boards.yml','companies');
 const ONFIELD=/(machine learning|\bml\b|\bai\b|artificial intelligence|software engineer|\bswe\b|robotics|perception|computer vision|autonom|data scien|deep learning|research (scientist|engineer))/i;
 const OFF=/(mechanical|aerospace|radiation|pcb|electrical|chemical|civil|accountant|recruit|\bsales\b|marketing|hardware|manufacturing|supply chain|facilities|bi" |clinical)/i;
 const JR=/(intern|co-?op|new ?grad|new graduate|university grad|early career|entry[- ]level|graduate (engineer|software))/i;

@@ -1,42 +1,91 @@
 # Greenhouse boards scanned via the public boards API (no auth, no browser).
-# Tokens seeded from boards already in the tracker plus curated targets.
-# A dead/renamed token costs one warning and is skipped.
+# Every token below was verified LIVE (HTTP 200 + non-empty jobs) by
+# `node scripts/verify-boards.mjs gh` on 2026-07-16. A dead/renamed token costs
+# one warning and is skipped. Re-run the verify script before a big edit.
+# The ROLE matters, not the company: the watcher's on-field + junior + freshness
+# filters decide what surfaces, so a broad board list only widens coverage.
 boards:
+  # AI / ML / LLM
   - anthropic
   - scaleai
-  - twitch
-  - astranis
   - snorkelai
+  - cresta
+  - xai
+  - togetherai
+  - speechify
+  - typeface
+  - stabilityai
+  - imbue
+  - assemblyai
+  - coreweave       # GPU cloud / ML infra
+  # Robotics / AV / drones / space
+  - waymo           # autonomous vehicles
+  - nuro            # autonomous delivery robotics
+  - motional        # autonomous vehicles
+  - wayve           # AV / end-to-end driving
+  - figure          # humanoid robotics
+  - agilityrobotics # humanoid robotics
+  - pathrobotics    # welding robotics
+  - astranis        # space / satellites
+  - flyzipline      # autonomous delivery drones
+  - trueanomalyinc  # space
+  # CV / IoT / sensing
+  - samsara
+  - verkada
+  - alarmcom
+  # Product / infra / data / fintech SWE
+  - databricks
+  - stripe
+  - cloudflare
+  - affirm
+  - instacart
+  - mongodb
+  - pinterest
+  - reddit
+  - workato
+  - datadog
+  - okta
+  - brex
+  - airbnb
+  - clickhouse
+  - elastic
+  - figma
+  - twilio
+  - gitlab
+  - lyft
+  - asana
+  - coinbase
+  - fivetran
+  - postman
+  - robinhood
   - smartsheet
+  - gusto
+  - vercel
+  - chime
+  - sofi
+  - twitch
+  - carta
+  - duolingo
+  - mercury
+  - temporaltechnologies
+  - fastly
+  - discord
+  - dropbox
+  - pingidentity
+  - tailscale
+  - airtable
+  - betterment
+  - cockroachlabs
+  - vestwell
+  - starburst
+  - planetscale
+  - underdogfantasy
+  - dremio
+  - netlify
+  - roblox
+  # Campus/university sub-boards (previously verified; not renamed)
   - tenstorrentuniversity
   - klaviyocampus
-  - speechify
-  - workato
-  - alarmcom
-  - pingidentity
-  - trueanomalyinc
-  - underdogfantasy
-  - vestwell
-  # Jack-and-Jill saved targets (tokens verified against the live boards API 2026-06-25):
-  - wayve         # 120 jobs, wayve.firststage.co
-  - togetherai    # 58 jobs, job-boards.greenhouse.io/togetherai
-  - flyzipline    # 268 jobs incl. Fall-2026 interns, www.zipline.com/open-roles
-  # AI / ML / robotics / AV / big-tech firms (identity + job count verified live 2026-07-11):
-  - databricks    # 787 jobs, databricks.com
-  - waymo         # 378 jobs, careers.withwaymo.com (autonomous vehicles)
-  - nuro          # 95 jobs, nuro.ai (autonomous delivery robotics)
-  - figure        # 26 jobs, figure (humanoid robotics)
-  - samsara       # 311 jobs, samsara.com (IoT/CV/ML)
-  - verkada       # 289 jobs (computer vision / security ML)
-  - stripe        # 510 jobs, stripe (SWE)
-  - coinbase      # 131 jobs (SWE/ML)
-  - reddit        # 189 jobs (ML/SWE)
-  - discord       # 57 jobs (SWE)
-  - figma         # 171 jobs (SWE)
-  - instacart     # 140 jobs (ML/SWE)
-  - robinhood     # 113 jobs (SWE/ML)
-  - gitlab        # 151 jobs (SWE)
-  - brex          # 266 jobs (SWE)
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026.
 title_include:
