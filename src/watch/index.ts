@@ -29,6 +29,7 @@ import { SWEListScanner } from '../scanner/SWEListScanner.js';
 import { NewGradScanner } from '../scanner/NewGradScanner.js';
 import { detectNewPostings } from './detectNewPostings.js';
 import { INELIGIBLE_KEYWORDS, isRelevantRole } from '../orchestrator/queuePlanning.js';
+import { categorize } from '../scanner/categorize.js';
 import { Notifier } from '../applier/Notifier.js';
 import { Logger } from '../utils/Logger.js';
 
@@ -76,23 +77,31 @@ async function main(): Promise<void> {
     ['newgrad', () => new NewGradScanner()],
   ];
 
-  const all: Job[] = [];
-  for (const [name, make] of scanners) {
-    try {
-      const jobs = await make().scanFresh(QUERY);
-      all.push(...jobs);
-    } catch (err) {
-      log.warn(`source "${name}" failed, skipping: ${(err as Error).message}`);
-    }
-  }
+  // Sources run concurrently (each board scanner is itself concurrency-capped
+  // internally), so a 100+ board sweep finishes well inside the 60s cadence.
+  const perSource = await Promise.all(
+    scanners.map(async ([name, make]) => {
+      try {
+        return await make().scanFresh(QUERY);
+      } catch (err) {
+        log.warn(`source "${name}" failed, skipping: ${(err as Error).message}`);
+        return [] as Job[];
+      }
+    })
+  );
+  const all: Job[] = perSource.flat();
 
   const seen = readJson<{ ids: string[] }>(SEEN_PATH, { ids: [] });
   const { fresh, nextSeen, firstRun } = detectNewPostings(all, seen.ids);
 
   writeJson(SEEN_PATH, { ids: nextSeen, updatedAt: new Date().toISOString() });
 
-  if (firstRun) {
-    log.info(`Seeded ${nextSeen.length} existing postings (first run, no alerts). New postings from now on will notify.`);
+  // WATCH_SEED=1: absorb the current board state into the seen-set WITHOUT
+  // alerting. Run this once after expanding the board list, so the backlog of
+  // fresh roles on the newly-added boards does not fire a burst of banners;
+  // from the next run on, only genuinely-new postings alert.
+  if (firstRun || process.env.WATCH_SEED === '1') {
+    log.info(`Seeded ${nextSeen.length} postings (no alerts). New postings from now on will notify.`);
     return;
   }
 
@@ -110,6 +119,7 @@ async function main(): Promise<void> {
   const entries = relevant.map((j) => ({
     id: j.id, company: j.company, role: j.title, applyUrl: j.applyUrl ?? j.url,
     platform: j.platform, postedAt: j.postedAt, caughtAt,
+    category: categorize(j.title, j.jd), location: j.location ?? '',
   }));
   writeJson(HOTLIST_PATH, [...entries, ...hot].slice(0, HOTLIST_CAP));
 

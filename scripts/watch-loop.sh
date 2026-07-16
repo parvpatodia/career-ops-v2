@@ -3,10 +3,11 @@
 # watcher on a fast launchd cadence so a fresh posting alerts within minutes.
 #
 # SAFETY: watch + notify ONLY — never applies or submits (applying stays the
-# human/captcha step, `npm run run -- --auto`). A ~5-min cadence is fast enough
-# to be among the first applicants WITHOUT hammering the public board APIs into a
-# rate-limit/ban that would break sourcing. Do not drop this below a couple
-# minutes.
+# human/captcha step, `npm run run -- --auto`). Runs every 60s (M8): the sweep is
+# list-first + concurrency-capped (8 boards at a time) and finishes in ~9s across
+# 100+ boards, so it is polite to the public APIs while catching a posting within
+# a minute. After expanding config/*-boards.yml, run once with WATCH_SEED=1 to
+# absorb the backlog silently before the 60s loop starts alerting.
 
 set -uo pipefail
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"

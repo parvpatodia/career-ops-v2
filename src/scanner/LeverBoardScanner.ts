@@ -18,6 +18,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
 import { decodeEntities } from './GreenhouseBoardScanner.js';
+import { mapPool } from '../utils/pool.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
 
 /**
@@ -59,6 +60,7 @@ export type FetchLike = (url: string) => Promise<{
 const API = 'https://api.lever.co/v0/postings';
 const DEFAULT_MAX_DAYS = 14;
 const MS_PER_DAY = 86_400_000;
+const CONCURRENCY = 8;
 const INTERN_COMMITMENT = /intern|co-?op/i;
 
 export class LeverBoardScanner extends Scanner {
@@ -87,47 +89,50 @@ export class LeverBoardScanner extends Scanner {
   protected async scan(query: ScanQuery): Promise<Job[]> {
     const maxDays = query.postedWithinDays ?? DEFAULT_MAX_DAYS;
     const now = Date.now();
+    // Parallel, order-preserving (see mapPool): identical output to a serial run.
+    const perCompany = await mapPool(this.cfg.companies, (company) => this.scanCompany(company, maxDays, now), CONCURRENCY);
+    return perCompany.flat();
+  }
+
+  private async scanCompany(company: string, maxDays: number, now: number): Promise<Job[]> {
+    let postings: LeverPosting[];
+    try {
+      const res = await this.fetchFn(`${API}/${company}?mode=json`);
+      if (!res.ok) {
+        this.log.warn(`Lever "${company}": HTTP ${res.status}, skipping`);
+        return [];
+      }
+      const body = await res.json();
+      postings = Array.isArray(body) ? (body as LeverPosting[]) : [];
+    } catch (err) {
+      this.log.warn(`Lever "${company}": ${(err as Error).message}, skipping`);
+      return [];
+    }
+
     const jobs: Job[] = [];
+    for (const p of postings) {
+      if (!this.wanted(p.text, p.categories?.commitment)) continue;
 
-    for (const company of this.cfg.companies) {
-      let postings: LeverPosting[];
-      try {
-        const res = await this.fetchFn(`${API}/${company}?mode=json`);
-        if (!res.ok) {
-          this.log.warn(`Lever "${company}": HTTP ${res.status}, skipping`);
-          continue;
-        }
-        const body = await res.json();
-        postings = Array.isArray(body) ? (body as LeverPosting[]) : [];
-      } catch (err) {
-        this.log.warn(`Lever "${company}": ${(err as Error).message}, skipping`);
-        continue;
-      }
+      const postedMs = typeof p.createdAt === 'number' ? p.createdAt : NaN;
+      // Parseable-but-old skips early. Unknown date stays in with postedAt ''
+      // so the pipeline's unknown bucket reports it.
+      if (!Number.isNaN(postedMs) && (now - postedMs) / MS_PER_DAY > maxDays) continue;
 
-      for (const p of postings) {
-        if (!this.wanted(p.text, p.categories?.commitment)) continue;
-
-        const postedMs = typeof p.createdAt === 'number' ? p.createdAt : NaN;
-        // Parseable-but-old skips early. Unknown date stays in with postedAt ''
-        // so the pipeline's unknown bucket reports it.
-        if (!Number.isNaN(postedMs) && (now - postedMs) / MS_PER_DAY > maxDays) continue;
-
-        const url = p.hostedUrl ?? p.applyUrl ?? '';
-        jobs.push({
-          id: this.generateJobId(company, p.text, url),
-          title: p.text,
-          company,
-          url,
-          applyUrl: p.applyUrl ?? p.hostedUrl ?? url,
-          platform: this.platform,
-          location: p.categories?.location ?? '',
-          remote: /remote/i.test(p.categories?.location ?? ''),
-          postedAt: Number.isNaN(postedMs) ? '' : new Date(postedMs).toISOString(),
-          discoveredAt: new Date().toISOString().split('T')[0]!,
-          jd: this.buildJd(p),
-          status: 'discovered',
-        });
-      }
+      const url = p.hostedUrl ?? p.applyUrl ?? '';
+      jobs.push({
+        id: this.generateJobId(company, p.text, url),
+        title: p.text,
+        company,
+        url,
+        applyUrl: p.applyUrl ?? p.hostedUrl ?? url,
+        platform: this.platform,
+        location: p.categories?.location ?? '',
+        remote: /remote/i.test(p.categories?.location ?? ''),
+        postedAt: Number.isNaN(postedMs) ? '' : new Date(postedMs).toISOString(),
+        discoveredAt: new Date().toISOString().split('T')[0]!,
+        jd: this.buildJd(p),
+        status: 'discovered',
+      });
     }
     return jobs;
   }

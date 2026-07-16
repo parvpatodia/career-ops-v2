@@ -12,6 +12,7 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
+import { mapPool } from '../utils/pool.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
 
 interface GhListJob {
@@ -41,6 +42,7 @@ export type FetchLike = (url: string) => Promise<{
 const API = 'https://boards-api.greenhouse.io/v1/boards';
 const DEFAULT_MAX_DAYS = 14;
 const MS_PER_DAY = 86_400_000;
+const CONCURRENCY = 8; // parallel boards per cycle (polite to the public API)
 
 export class GreenhouseBoardScanner extends Scanner {
   readonly platform: Platform = 'greenhouse';
@@ -68,49 +70,54 @@ export class GreenhouseBoardScanner extends Scanner {
   protected async scan(query: ScanQuery): Promise<Job[]> {
     const maxDays = query.postedWithinDays ?? DEFAULT_MAX_DAYS;
     const now = Date.now();
+    // Boards fetched in parallel (concurrency-capped) so a 100+ board list
+    // finishes inside the 60s watch cadence. mapPool preserves board order, so
+    // the flattened output — and every Job id — is identical to a serial run.
+    const perBoard = await mapPool(this.cfg.boards, (token) => this.scanBoard(token, maxDays, now), CONCURRENCY);
+    return perBoard.flat();
+  }
+
+  private async scanBoard(token: string, maxDays: number, now: number): Promise<Job[]> {
+    let listing: { jobs?: GhListJob[] };
+    try {
+      const res = await this.fetchFn(`${API}/${token}/jobs`);
+      if (!res.ok) {
+        this.log.warn(`Board "${token}": HTTP ${res.status}, skipping`);
+        return [];
+      }
+      listing = (await res.json()) as { jobs?: GhListJob[] };
+    } catch (err) {
+      this.log.warn(`Board "${token}": ${(err as Error).message}, skipping`);
+      return [];
+    }
+
     const jobs: Job[] = [];
+    for (const j of listing.jobs ?? []) {
+      if (!this.titleWanted(j.title)) continue;
+      if (this.deadlinePassed(j.application_deadline, now)) continue;
 
-    for (const token of this.cfg.boards) {
-      let listing: { jobs?: GhListJob[] };
-      try {
-        const res = await this.fetchFn(`${API}/${token}/jobs`);
-        if (!res.ok) {
-          this.log.warn(`Board "${token}": HTTP ${res.status}, skipping`);
-          continue;
-        }
-        listing = (await res.json()) as { jobs?: GhListJob[] };
-      } catch (err) {
-        this.log.warn(`Board "${token}": ${(err as Error).message}, skipping`);
-        continue;
-      }
+      const postedAt = j.first_published ?? '';
+      const postedMs = Date.parse(postedAt);
+      // Parseable-but-old skips early (saves a detail fetch). An
+      // unparseable date stays in with postedAt '' so the pipeline's
+      // unknown bucket reports the data-quality problem visibly.
+      if (!Number.isNaN(postedMs) && (now - postedMs) / MS_PER_DAY > maxDays) continue;
 
-      for (const j of listing.jobs ?? []) {
-        if (!this.titleWanted(j.title)) continue;
-        if (this.deadlinePassed(j.application_deadline, now)) continue;
-
-        const postedAt = j.first_published ?? '';
-        const postedMs = Date.parse(postedAt);
-        // Parseable-but-old skips early (saves a detail fetch). An
-        // unparseable date stays in with postedAt '' so the pipeline's
-        // unknown bucket reports the data-quality problem visibly.
-        if (!Number.isNaN(postedMs) && (now - postedMs) / MS_PER_DAY > maxDays) continue;
-
-        const company = j.company_name ?? token;
-        jobs.push({
-          id: this.generateJobId(company, j.title, j.absolute_url),
-          title: j.title,
-          company,
-          url: j.absolute_url,
-          applyUrl: j.absolute_url,
-          platform: this.platform,
-          location: j.location?.name ?? '',
-          remote: /remote/i.test(j.location?.name ?? ''),
-          postedAt,
-          discoveredAt: new Date().toISOString().split('T')[0]!,
-          jd: await this.fetchJd(token, j.id),
-          status: 'discovered',
-        });
-      }
+      const company = j.company_name ?? token;
+      jobs.push({
+        id: this.generateJobId(company, j.title, j.absolute_url),
+        title: j.title,
+        company,
+        url: j.absolute_url,
+        applyUrl: j.absolute_url,
+        platform: this.platform,
+        location: j.location?.name ?? '',
+        remote: /remote/i.test(j.location?.name ?? ''),
+        postedAt,
+        discoveredAt: new Date().toISOString().split('T')[0]!,
+        jd: await this.fetchJd(token, j.id),
+        status: 'discovered',
+      });
     }
     return jobs;
   }
