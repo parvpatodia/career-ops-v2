@@ -1,15 +1,16 @@
 # Lever boards scanned via the public postings API (no auth, no browser).
-# Each entry is the company slug in jobs.lever.co/<slug>. A dead/renamed slug
-# costs one warning and is skipped. Curate this toward companies you target;
-# verify a slug by opening https://jobs.lever.co/<slug>.
+# Each entry is the company slug in jobs.lever.co/<slug>. Verified LIVE (200 +
+# non-empty array) by `node scripts/verify-boards.mjs lever` on 2026-07-16.
+# A dead/renamed slug costs one warning and is skipped.
 companies:
-  # Verified live against the postings API 2026-07-11 (200, valid board).
-  - plaid
-  - mistral
-  - zoox          # 218 postings, jobs.lever.co/zoox (autonomous vehicles)
-  - palantir      # 273 postings, jobs.lever.co/palantir (data/AI SWE)
-  # Removed 2026-07-11: ramp, brex, anduril all 404 on Lever now (moved ATS) —
-  # they were 404-spamming the log and wasting a request every 5-min watch run.
+  - palantir      # data/AI SWE (clearance roles filtered by F-1 eligibility gate)
+  - zoox          # autonomous vehicles
+  - gopuff        # logistics SWE
+  - spotify       # SWE / ML
+  - matchgroup    # SWE
+  - angellist     # SWE
+  # Removed 2026-07-16: plaid, mistral (now 404 on Lever — moved ATS). ramp/brex/
+  # anduril already removed earlier for the same reason.
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026. The scanner also keeps
 # a posting when categories.commitment is Internship even if the title omits it.
