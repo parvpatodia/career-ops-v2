@@ -1,6 +1,35 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-07-11 (new-posting watcher: be first to apply).
+> Read at session start (CLAUDE.md load order). Last updated 2026-07-16 (M8 firehose + command-center UI).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-07-16) — M8: newest-role firehose + command-center UI
+Goal (Parv): surface the newest Fall-2026 intern/co-op roles within a minute, in a UI he
+keeps open, with a desktop notification, and fill in the background WITHOUT stealing his screen.
+Spec: docs/specs/M8-firehose-ui.md. 620 tests green, typecheck clean. 5 commits (0b136bd..e8634e4).
+- **More boards (live-verified).** `node scripts/verify-boards.mjs` curls a candidate pool and keeps
+  only live tokens (200 + jobs). config/*-boards.yml: Greenhouse 33->76, Ashby 12->34, Lever 6 (dead
+  plaid/mistral pruned). hunt-fresh.mjs now READS the config (single source of truth). The expansion
+  immediately surfaced a fresh Cloudflare SWE Intern (Fall 2026, Austin, 2d) the old list missed.
+- **Every-minute watch.** Scanners fetch boards in PARALLEL (src/utils/pool.ts mapPool, 8-at-a-time,
+  order-preserving so Job ids/seen-set are unchanged). Full 100+ board sweep ~9s. watch cadence
+  120s->60s (com.parv.careerops.watch, reloaded + confirmed running). After expanding boards, run
+  `WATCH_SEED=1 npm run watch` once to absorb the backlog with no banner burst.
+- **Categorized command center.** `npm run ui` (localhost:4600): fresh roles grouped by DAY then
+  CATEGORY (AI/ML | Robotics/AV | Data | Software | Other, color pills), live "newest Nm ago", 15s
+  refresh, + an **Applied** section (most-recent first, collapsible). Each hot-list entry now carries
+  category + location. src/scanner/categorize.ts (tested). Still a VIEW + launcher (no auto-submit).
+- **No screen-steal fill.** --auto phase 2 captures the frontmost macOS app, opens the takeover window
+  BEHIND it, and only raises Chrome (+ a `readyToSubmit` banner) at the human touchpoint. src/applier/
+  browserLaunch.ts frontmostApp()/restoreApp() (live osascript verified). "Only show when I submit."
+- **Email ingestion (CODE READY, live pending login).** src/inbox/emailJobs.ts parseJobEmails() turns
+  Scalar + other digest emails into hot-list candidates (on-field+junior+US+F-1 only, dedup by URL);
+  mergeHotlist() merges into data/new-jobs.json. LIMIT: the ms365 MCP only works on an active Claude
+  session (a headless loop can't call MCP), so email refresh is not part of the 60s loop. **ACTION:
+  Parv must do a one-time Outlook device-code login** (ms365 login -> microsoft.com/device) before the
+  first live ingestion; then Claude fetches + parses + merges. Freshness still enforced at apply.
+- **Fragile scrapers (LinkedIn/Indeed/Handshake/Wellfound).** Parv approved adding them; skeletons
+  exist (src/scanner/{LinkedIn,Handshake,Wellfound,GoogleJobs}Scanner.ts) but are NOT wired into the
+  60s loop — they need auth/cookies/Apify + break often. Deferred as opt-in best-effort (next).
 
 ## Latest (2026-07-11d) — local UI + no-Claude-signature + faster watch
 - **COMMIT POLICY (Parv, emphatic): NO Claude/AI signature in any commit.** Do NOT add
