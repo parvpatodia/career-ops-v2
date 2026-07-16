@@ -39,7 +39,7 @@
 import 'dotenv/config';
 import { createInterface } from 'readline/promises';
 import { stdin, stdout } from 'process';
-import { launchChrome } from '../applier/browserLaunch.js';
+import { launchChrome, frontmostApp, restoreApp } from '../applier/browserLaunch.js';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { AnswerInbox } from '../applier/AnswerInbox.js';
 import { AnswerKB, CompositeAnswerSource } from '../applier/AnswerKB.js';
@@ -146,11 +146,15 @@ async function attendedTakeover(
   essaySource: EssayAnswerSource,
   store: ApplicationStore,
   rl: ReturnType<typeof createInterface> | null,
-  autoResume?: { timeoutMs: number; intervalMs: number }
+  autoResume?: { timeoutMs: number; intervalMs: number },
+  hooks?: { afterOpen?: () => Promise<void>; onTouchpoint?: (app: Application) => void }
 ): Promise<boolean> {
   const opened = await sessions.open(app, answers());
   if (!opened.ok) { console.log(`  ⏭  unsupported ATS "${opened.ats}" — open manually: ${app.url}`); return false; }
   if (!opened.session.source) { console.log('  (no form source available)'); await opened.session.close(); return false; }
+  // Push the just-opened window BEHIND the user's work so the autofill does not
+  // steal focus; only the touchpoint below raises Chrome (background --auto).
+  await hooks?.afterOpen?.();
   const ctx: AnswerContext = {
     company: app.company, role: app.role, resumeVariant: app.resumeVariant,
     ...(app.jd ? { jd: app.jd } : {}),
@@ -166,6 +170,9 @@ async function attendedTakeover(
       // while UNSUBMITTED (Greenhouse/Generic's loose body+URL fallback), so a job
       // is marked Applied only on an OBSERVED submit (invariant 1: never claim a
       // submit we cannot observe). Unit-tested in waitForConfirmation.test.ts.
+      // Touchpoint: NOW is the only moment we surface the window (+ a banner),
+      // matching "only show when I have to click Submit".
+      hooks?.onTouchpoint?.(app);
       await opened.session.focus?.();
       console.log('  → Chrome is in front. Solve the captcha + finish any flagged field + click Submit; watching for the confirmation…');
       const outcome = await confirmViaTransition({
@@ -464,8 +471,12 @@ async function main(): Promise<void> {
       //    concurrent headed+headless Chrome (that closes the takeover page).
       if (needsHuman.length > 0) {
         await browser.close().catch(() => {});
+        // Remember what the user is looking at, so the takeover window opens
+        // behind it instead of yanking their screen to Chrome mid-fill.
+        const prevApp = await frontmostApp();
         const headed = await launchChrome({ headless: false });
-        log.info(headed.usingChrome ? 'Takeover: your Google Chrome' : 'Takeover: bundled Chromium');
+        await restoreApp(prevApp); // send focus straight back to the user's work
+        log.info(headed.usingChrome ? 'Takeover: your Google Chrome (in background)' : 'Takeover: bundled Chromium (in background)');
         const headedSessions = new PlaywrightApplySessionFactory({
           browser: headed.browser,
           greenhouseJob: (app) => greenhouseProvider.provide(app),
@@ -474,11 +485,14 @@ async function main(): Promise<void> {
           for (let i = 0; i < needsHuman.length; i++) {
             const app = needsHuman[i]!;
             console.log(`\n[takeover ${i + 1}/${needsHuman.length}] ${app.company} — ${app.role}  (id ${app.id}, ${app.url})`);
-            console.log('  ↳ Human touchpoint: surfacing the Chrome window; watching for your submit.');
+            console.log('  ↳ Filling in the background (no screen switch). You get a banner + the window only when it is ready to submit.');
             try {
               const ok = await attendedTakeover(app, headedSessions, answers, essaySource, store, null, {
                 timeoutMs: AUTO_RESUME_TIMEOUT_MS,
                 intervalMs: AUTO_RESUME_POLL_MS,
+              }, {
+                afterOpen: () => restoreApp(prevApp),
+                onTouchpoint: (a) => notifier.readyToSubmit(a.company, a.role),
               });
               if (ok) submitted++;
             } catch (err) {

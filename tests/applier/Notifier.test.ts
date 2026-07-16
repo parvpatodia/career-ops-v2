@@ -39,6 +39,16 @@ describe('Notifier', () => {
     ]);
   });
 
+  it('readyToSubmit is an urgent banner naming the company + role (background-fill touchpoint)', () => {
+    const r = recorder();
+    new Notifier(r.sink).readyToSubmit('Cloudflare', 'Software Engineer Intern (Fall 2026)');
+    expect(r.sent).toHaveLength(1);
+    expect(r.sent[0]!.urgent).toBe(true);
+    expect(r.sent[0]!.title).toContain('Cloudflare');
+    expect(r.sent[0]!.message).toContain('Software Engineer Intern');
+    expect(r.sent[0]!.message.toLowerCase()).toContain('submit');
+  });
+
   it('records history for digest/summary use', () => {
     const r = recorder();
     const n = new Notifier(r.sink);
