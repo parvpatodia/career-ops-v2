@@ -171,6 +171,21 @@ export class Notifier {
     });
   }
 
+  /**
+   * A background-filled application is verified and waiting for the human
+   * touchpoint (captcha + Submit). WHY: the fill runs headless/behind the user's
+   * work (no focus steal); this banner is how they know to switch to the
+   * already-open Chrome window and finish — "only show when I have to submit".
+   */
+  readyToSubmit(company: string, role: string): void {
+    this.notify({
+      kind: 'captcha',
+      title: `Ready to submit: ${truncate(company, 40)}`,
+      message: `${truncate(role, 60)} · filled + verified. Switch to the career-ops Chrome window to solve the captcha + click Submit.`,
+      urgent: true,
+    });
+  }
+
   error(message: string): void {
     this.notify({ kind: 'error', title: 'Career-Ops: error', message: truncate(message, 120), urgent: true });
   }
