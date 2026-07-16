@@ -19,6 +19,9 @@ export interface FreshRole {
   platform: string;
   postedAt: string;
   caughtAt: string;
+  /** Coarse bucket for UI grouping; older hot-list entries may lack it. */
+  category?: string;
+  location?: string;
 }
 
 export interface QueueRole {
@@ -29,10 +32,19 @@ export interface QueueRole {
   score: number;
 }
 
+export interface AppliedRole {
+  id: string;
+  company: string;
+  role: string;
+  url: string;
+  appliedAt: string;
+}
+
 export interface FeedSnapshot {
   fresh: FreshRole[];
   counts: Record<string, number>;
   ready: QueueRole[];
+  applied: AppliedRole[];
   generatedAt: string;
 }
 
@@ -54,7 +66,22 @@ export class JobFeedService {
     return (raw as FreshRole[]).slice(0, limit);
   }
 
-  /** A full snapshot for one UI poll: fresh roles + queue counts + the Ready list. */
+  /** Applied roles, most recently applied first (the "move to applied" section). */
+  applied(limit = 100): AppliedRole[] {
+    return this.store
+      .getByStatus('Applied')
+      .map((a) => ({
+        id: a.id,
+        company: a.company,
+        role: a.role,
+        url: a.url,
+        appliedAt: a.appliedAt ?? a.tailoredAt ?? a.date ?? '',
+      }))
+      .sort((x, y) => (y.appliedAt ?? '').localeCompare(x.appliedAt ?? ''))
+      .slice(0, limit);
+  }
+
+  /** A full snapshot for one UI poll: fresh roles + queue counts + Ready + Applied. */
   snapshot(): FeedSnapshot {
     this.store.load(); // re-read the event-log view so the UI is never stale
     const all = this.store.getAll();
@@ -66,6 +93,6 @@ export class JobFeedService {
       .map((a) => ({ id: a.id, company: a.company, role: a.role, url: a.url, score: a.score }))
       .sort((x, y) => y.score - x.score);
 
-    return { fresh: this.fresh(), counts, ready, generatedAt: new Date().toISOString() };
+    return { fresh: this.fresh(), counts, ready, applied: this.applied(), generatedAt: new Date().toISOString() };
   }
 }
