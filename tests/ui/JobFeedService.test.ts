@@ -39,6 +39,18 @@ describe('JobFeedService', () => {
     expect(snap.counts.Ready).toBe(1);   // 001 only (002 moved to Applied)
     expect(snap.counts.Applied).toBe(1); // 002
     expect(snap.ready.map((r) => r.id)).toEqual(['001']);
+    // Applied section: the moved-to-Applied role, with its applied timestamp.
+    expect(snap.applied.map((a) => a.company)).toEqual(['Waymo']);
+    expect(snap.applied[0]!.appliedAt).toBe('2026-07-11T12:00:00Z');
+  });
+
+  it('sorts Applied most-recently-applied first', () => {
+    store.add(app('001', 'Older'));
+    store.update('001', { status: 'Applied', appliedAt: '2026-07-10T09:00:00Z' });
+    store.add(app('002', 'Newer'));
+    store.update('002', { status: 'Applied', appliedAt: '2026-07-12T09:00:00Z' });
+    const snap = new JobFeedService(store, path.join(dir, 'none.json')).snapshot();
+    expect(snap.applied.map((a) => a.company)).toEqual(['Newer', 'Older']);
   });
 
   it('returns an empty fresh list (no crash) when the hot-list file is absent', () => {
