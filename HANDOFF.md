@@ -21,12 +21,15 @@ Spec: docs/specs/M8-firehose-ui.md. 620 tests green, typecheck clean. 5 commits 
 - **No screen-steal fill.** --auto phase 2 captures the frontmost macOS app, opens the takeover window
   BEHIND it, and only raises Chrome (+ a `readyToSubmit` banner) at the human touchpoint. src/applier/
   browserLaunch.ts frontmostApp()/restoreApp() (live osascript verified). "Only show when I submit."
-- **Email ingestion (CODE READY, live pending login).** src/inbox/emailJobs.ts parseJobEmails() turns
-  Scalar + other digest emails into hot-list candidates (on-field+junior+US+F-1 only, dedup by URL);
-  mergeHotlist() merges into data/new-jobs.json. LIMIT: the ms365 MCP only works on an active Claude
-  session (a headless loop can't call MCP), so email refresh is not part of the 60s loop. **ACTION:
-  Parv must do a one-time Outlook device-code login** (ms365 login -> microsoft.com/device) before the
-  first live ingestion; then Claude fetches + parses + merges. Freshness still enforced at apply.
+- **Email ingestion (CODE READY; MCP path BLOCKED by NEU tenant).** src/inbox/emailJobs.ts
+  parseJobEmails() turns Scalar + other digest emails into hot-list candidates (on-field+junior+US+F-1
+  only, dedup by URL); mergeHotlist() merges into data/new-jobs.json. **BLOCKED 2026-07-16:** the
+  @softeria ms365 MCP cannot sign into patodia.pa@northeastern.edu — NEU requires IT-admin consent for
+  third-party apps ("Your admin has been notified…"), which won't clear for a personal tool. Four
+  device codes all failed for THIS reason (code was valid; tenant blocked the app). DO NOT re-try
+  device-code login (see LESSONS). WORKAROUND (no MS auth): Parv forwards/pastes a digest email ->
+  parseJobEmails -> mergeHotlist; or an Outlook rule auto-forwards the two senders to a personal Gmail
+  read via the Google (workspace) connector. The board-API firehose (the real 60s source) needs none.
 - **Fragile scrapers (LinkedIn/Indeed/Handshake/Wellfound).** Parv approved adding them; skeletons
   exist (src/scanner/{LinkedIn,Handshake,Wellfound,GoogleJobs}Scanner.ts) but are NOT wired into the
   60s loop — they need auth/cookies/Apify + break often. Deferred as opt-in best-effort (next).
