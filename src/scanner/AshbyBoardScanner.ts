@@ -18,6 +18,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
 import { mapPool } from '../utils/pool.js';
+import { timeoutFetch } from '../utils/httpFetch.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
 
 interface AshbyPosting {
@@ -57,7 +58,7 @@ export class AshbyBoardScanner extends Scanner {
 
   constructor(
     private readonly cfg: AshbyBoardsConfig,
-    private readonly fetchFn: FetchLike = fetch
+    private readonly fetchFn: FetchLike = timeoutFetch()
   ) {
     super();
   }

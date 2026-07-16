@@ -19,6 +19,7 @@ import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
 import { decodeEntities } from './GreenhouseBoardScanner.js';
 import { mapPool } from '../utils/pool.js';
+import { timeoutFetch } from '../utils/httpFetch.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
 
 /**
@@ -68,7 +69,7 @@ export class LeverBoardScanner extends Scanner {
 
   constructor(
     private readonly cfg: LeverBoardsConfig,
-    private readonly fetchFn: FetchLike = fetch
+    private readonly fetchFn: FetchLike = timeoutFetch()
   ) {
     super();
   }

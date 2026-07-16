@@ -10,9 +10,11 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 import yaml from 'js-yaml';
 import { Scanner } from './Scanner.js';
 import { mapPool } from '../utils/pool.js';
+import { timeoutFetch } from '../utils/httpFetch.js';
 import type { Job, Platform, ScanQuery } from '../types.js';
 
 interface GhListJob {
@@ -43,28 +45,41 @@ const API = 'https://boards-api.greenhouse.io/v1/boards';
 const DEFAULT_MAX_DAYS = 14;
 const MS_PER_DAY = 86_400_000;
 const CONCURRENCY = 8; // parallel boards per cycle (polite to the public API)
+const JD_CACHE_CAP = 8_000; // bounded so the on-disk JD cache cannot grow forever
 
 export class GreenhouseBoardScanner extends Scanner {
   readonly platform: Platform = 'greenhouse';
 
   constructor(
     private readonly cfg: GreenhouseBoardsConfig,
-    private readonly fetchFn: FetchLike = fetch
+    private readonly fetchFn: FetchLike = timeoutFetch(),
+    // Opt-in cross-run JD cache file. WHY: the JD detail fetch is the one call
+    // that scales with matching-job count, and the 60s watch would re-fetch the
+    // same JDs every cycle. With a cache file the watch fetches each posting's JD
+    // once, ever. Left undefined (no cache) for tests + the one-shot daily scan.
+    private readonly jdCacheFile?: string
   ) {
     super();
   }
 
-  static fromConfig(configPath = 'config/greenhouse-boards.yml'): GreenhouseBoardScanner {
+  static fromConfig(
+    configPath = 'config/greenhouse-boards.yml',
+    opts: { jdCacheFile?: string } = {}
+  ): GreenhouseBoardScanner {
     const raw = yaml.load(fs.readFileSync(configPath, 'utf8')) as {
       boards?: string[];
       title_include?: string[];
       title_exclude?: string[];
     };
-    return new GreenhouseBoardScanner({
-      boards: raw.boards ?? [],
-      titleInclude: raw.title_include ?? ['intern', 'internship', 'co-op', 'coop'],
-      titleExclude: raw.title_exclude ?? [],
-    });
+    return new GreenhouseBoardScanner(
+      {
+        boards: raw.boards ?? [],
+        titleInclude: raw.title_include ?? ['intern', 'internship', 'co-op', 'coop'],
+        titleExclude: raw.title_exclude ?? [],
+      },
+      timeoutFetch(),
+      opts.jdCacheFile
+    );
   }
 
   protected async scan(query: ScanQuery): Promise<Job[]> {
@@ -73,11 +88,13 @@ export class GreenhouseBoardScanner extends Scanner {
     // Boards fetched in parallel (concurrency-capped) so a 100+ board list
     // finishes inside the 60s watch cadence. mapPool preserves board order, so
     // the flattened output — and every Job id — is identical to a serial run.
-    const perBoard = await mapPool(this.cfg.boards, (token) => this.scanBoard(token, maxDays, now), CONCURRENCY);
+    const jdCache = this.loadJdCache();
+    const perBoard = await mapPool(this.cfg.boards, (token) => this.scanBoard(token, maxDays, now, jdCache), CONCURRENCY);
+    this.saveJdCache(jdCache);
     return perBoard.flat();
   }
 
-  private async scanBoard(token: string, maxDays: number, now: number): Promise<Job[]> {
+  private async scanBoard(token: string, maxDays: number, now: number, jdCache: Map<string, string>): Promise<Job[]> {
     let listing: { jobs?: GhListJob[] };
     try {
       const res = await this.fetchFn(`${API}/${token}/jobs`);
@@ -115,11 +132,34 @@ export class GreenhouseBoardScanner extends Scanner {
         remote: /remote/i.test(j.location?.name ?? ''),
         postedAt,
         discoveredAt: new Date().toISOString().split('T')[0]!,
-        jd: await this.fetchJd(token, j.id),
+        jd: await this.fetchJd(token, j.id, jdCache),
         status: 'discovered',
       });
     }
     return jobs;
+  }
+
+  /** Load the cross-run JD cache (jobId -> jd). Empty when caching is disabled. */
+  private loadJdCache(): Map<string, string> {
+    if (!this.jdCacheFile) return new Map();
+    try {
+      const obj = JSON.parse(fs.readFileSync(this.jdCacheFile, 'utf8')) as Record<string, string>;
+      return new Map(Object.entries(obj));
+    } catch {
+      return new Map();
+    }
+  }
+
+  /** Persist the JD cache, capped to the most-recent JD_CACHE_CAP entries. */
+  private saveJdCache(cache: Map<string, string>): void {
+    if (!this.jdCacheFile) return;
+    try {
+      const capped = [...cache.entries()].slice(-JD_CACHE_CAP);
+      fs.mkdirSync(path.dirname(this.jdCacheFile), { recursive: true });
+      fs.writeFileSync(this.jdCacheFile, JSON.stringify(Object.fromEntries(capped)));
+    } catch {
+      /* best-effort: a cache write failure must never break the scan */
+    }
   }
 
   private titleWanted(title: string): boolean {
@@ -136,12 +176,17 @@ export class GreenhouseBoardScanner extends Scanner {
     return !Number.isNaN(ms) && ms < now;
   }
 
-  private async fetchJd(token: string, jobId: number): Promise<string> {
+  private async fetchJd(token: string, jobId: number, jdCache: Map<string, string>): Promise<string> {
+    const key = `${token}:${jobId}`;
+    const cached = jdCache.get(key);
+    if (cached !== undefined) return cached; // fetched on an earlier cycle
     try {
       const res = await this.fetchFn(`${API}/${token}/jobs/${jobId}`);
-      if (!res.ok) return '';
+      if (!res.ok) return ''; // don't cache a failure — retry next cycle
       const detail = (await res.json()) as { content?: string };
-      return htmlToText(detail.content ?? '');
+      const jd = htmlToText(detail.content ?? '');
+      jdCache.set(key, jd);
+      return jd;
     } catch {
       // Empty JD lands in the evaluator's low-signal path, visible in scores.
       return '';
