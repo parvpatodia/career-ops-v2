@@ -93,6 +93,18 @@ describe('JobFeedService', () => {
     expect(byId.get('d')).toBeNull();
   });
 
+  it('fresh() attaches a human-readable sourceLabel', () => {
+    const now = new Date().toISOString();
+    const hot = path.join(dir, 'new-jobs.json');
+    fs.writeFileSync(hot, JSON.stringify([
+      { id: '1', company: 'X', role: 'ML Intern', applyUrl: 'https://x/1', platform: 'email:swelist', postedAt: '', caughtAt: now },
+      { id: '2', company: 'Y', role: 'ML Intern', applyUrl: 'https://x/2', platform: 'greenhouse', postedAt: '', caughtAt: now },
+    ]));
+    const byId = new Map(new JobFeedService(store, hot).snapshot().fresh.map((f) => [f.id, f.sourceLabel]));
+    expect(byId.get('1')).toBe('SWE List email');
+    expect(byId.get('2')).toBe('Greenhouse');
+  });
+
   it('fresh() blanks a known-wrong company label but keeps the role', () => {
     const now = new Date().toISOString();
     const hot = path.join(dir, 'new-jobs.json');
