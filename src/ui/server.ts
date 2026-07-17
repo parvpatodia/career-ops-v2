@@ -16,6 +16,8 @@ import http from 'http';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { JobFeedService } from './JobFeedService.js';
 import { renderPage } from './page.js';
+import { roleOutreachPacks } from '../outreach/roleOutreach.js';
+import { SnippetBook } from '../outreach/SnippetBook.js';
 import { Logger } from '../utils/Logger.js';
 
 const log = new Logger('ui');
@@ -48,6 +50,20 @@ export class UiServer {
         const snapshot = this.feed.snapshot();
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(snapshot));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: (err as Error).message }));
+      }
+      return;
+    }
+
+    // Weekly LinkedIn outreach packs, derived from the SAME fresh roles the feed
+    // shows (one read boundary). Read-only + lazy: the Outreach tab fetches this.
+    if (path === '/api/outreach') {
+      try {
+        const packs = roleOutreachPacks(this.feed.fresh(200), SnippetBook.fromYaml(), { maxCompanies: 20 });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ packs, generatedAt: new Date().toISOString() }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: (err as Error).message }));

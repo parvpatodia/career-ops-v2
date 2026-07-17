@@ -93,6 +93,22 @@ export function renderPage(): string {
   .empty .big { font-size:15px; color:var(--fg); margin-bottom:4px; }
   .hint { color:var(--dim2); font-size:12.5px; margin:6px 0 0; }
   footer { position:fixed; bottom:0; left:0; right:0; color:var(--dim2); font-size:11.5px; padding:8px 22px; background:rgba(12,14,19,.92); backdrop-filter:blur(6px); border-top:1px solid var(--edge); text-align:center; }
+
+  /* Outreach tab: one panel per company (roles + people-searches + copy-paste notes). */
+  .opanel { background:var(--card); border:1px solid var(--edge); border-left-width:3px; border-radius:11px; padding:15px 17px; margin-bottom:12px; }
+  .opanel .ohead { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .opanel .oco { font-weight:700; font-size:15.5px; }
+  .opanel .ocat { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); }
+  .opanel .oroles { color:var(--dim); font-size:13px; margin-top:3px; }
+  .osearch { display:flex; gap:8px; flex-wrap:wrap; margin:11px 0 4px; }
+  a.olink { display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size:12.5px; background:var(--panel); border:1px solid var(--edge); color:var(--accent); border-radius:8px; padding:7px 11px; }
+  a.olink:hover { border-color:var(--accent); background:var(--card-hi); }
+  .omsg { margin-top:11px; }
+  .omsg .olabel { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim2); display:flex; align-items:center; gap:9px; margin-bottom:5px; }
+  .omsg .otext { background:var(--panel); border:1px solid var(--edge); border-radius:9px; padding:11px 13px; color:var(--fg); font-size:13.5px; white-space:pre-wrap; }
+  button.copy { appearance:none; cursor:pointer; font:inherit; font-size:11px; text-transform:none; letter-spacing:0; background:transparent; border:1px solid var(--edge); color:var(--dim); border-radius:7px; padding:3px 9px; }
+  button.copy:hover { color:var(--fg); border-color:var(--dim); }
+  button.copy.ok { color:var(--good); border-color:var(--good); }
 </style>
 </head>
 <body>
@@ -105,6 +121,7 @@ export function renderPage(): string {
     <button class="tab active" data-tab="fresh"><b id="c-fresh">0</b><span>Fresh</span></button>
     <button class="tab" data-tab="ready"><b id="c-ready">0</b><span>Ready</span></button>
     <button class="tab" data-tab="applied"><b id="c-applied">0</b><span>Applied</span></button>
+    <button class="tab" data-tab="outreach"><b id="c-outreach">0</b><span>Outreach</span></button>
   </nav>
 </header>
 
@@ -141,7 +158,7 @@ export function renderPage(): string {
 
   var APPLIED_KEY = 'careerops-applied-v1';
   var state = { tab:'fresh', cat:'all', src:'all', sort:'new', q:'' };
-  var data = { fresh:[], ready:[], applied:[], counts:{} };
+  var data = { fresh:[], ready:[], applied:[], counts:{}, outreach:[] };
   var hidden, showHidden = false;
   try { hidden = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch(e){ hidden = new Set(); }
   var saveHidden = function(){ try { localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden))); } catch(e){} };
@@ -252,6 +269,33 @@ export function renderPage(): string {
     return html;
   }
 
+  function omsg(label, text){
+    return '<div class="omsg"><div class="olabel">'+label+
+      '<button class="copy" data-copy="'+esc(text)+'">Copy</button></div>'+
+      '<div class="otext">'+esc(text)+'</div></div>';
+  }
+
+  function renderOutreach(){
+    var packs = data.outreach || [];
+    if(!packs.length) return '<div class="empty"><div class="big">No outreach targets yet</div>'+
+      'Once the watcher catches fresh on-field roles, this builds a weekly list: who to contact on LinkedIn at each hiring company, with copy-paste messages. No automation — you find the person, paste, and send.</div>';
+    return '<p class="hint" style="margin:2px 0 14px">'+packs.length+' companies hiring for roles you match. Open a search, find a recruiter or engineer, send the connection note, then the follow-up once they accept.</p>'+
+      packs.map(function(p){
+        var color = CATS[p.category] || 'var(--c-other)';
+        var searches = (p.searches||[]).map(function(s){
+          return '<a class="olink" href="'+safeUrl(s.url)+'" target="_blank" rel="noopener">🔍 '+esc(s.label)+'</a>';
+        }).join('');
+        var roles = (p.roles||[]).map(esc).join(' · ');
+        return '<div class="opanel" style="border-left-color:'+color+'">'+
+          '<div class="ohead"><span class="oco">'+esc(p.company)+'</span><span class="ocat">'+esc(p.category)+'</span></div>'+
+          '<div class="oroles">'+roles+'</div>'+
+          '<div class="osearch">'+searches+'</div>'+
+          omsg('Connection note', p.connectionNote || '')+
+          omsg('Follow-up after they accept', p.followUp || '')+
+        '</div>';
+      }).join('');
+  }
+
   function renderCatChips(){
     var counts = {}; var total = 0; var ai = appliedIds();
     data.fresh.forEach(function(j){ if(ai.has(j.id)) return; if(!showHidden && hidden.has(j.id)) return; var c = j.category || 'Other'; counts[c] = (counts[c]||0)+1; total++; });
@@ -265,6 +309,7 @@ export function renderPage(): string {
     el('c-fresh').textContent = data.fresh.filter(function(j){ return !hidden.has(j.id) && !ai.has(j.id); }).length;
     el('c-ready').textContent = (data.ready||[]).length;
     el('c-applied').textContent = (data.applied||[]).length + applied.length;
+    el('c-outreach').textContent = (data.outreach||[]).length;
     // tab active states
     var tabEls = document.querySelectorAll('#tabs .tab');
     for(var i=0;i<tabEls.length;i++){ tabEls[i].classList.toggle('active', tabEls[i].getAttribute('data-tab')===state.tab); }
@@ -272,7 +317,7 @@ export function renderPage(): string {
     if(state.tab === 'fresh') renderCatChips();
     var srcEls = document.querySelectorAll('#srcchips .chip');
     for(var s=0;s<srcEls.length;s++){ srcEls[s].classList.toggle('active', srcEls[s].getAttribute('data-src')===state.src); }
-    el('content').innerHTML = state.tab === 'fresh' ? renderFresh() : state.tab === 'ready' ? renderReady() : renderApplied();
+    el('content').innerHTML = state.tab === 'fresh' ? renderFresh() : state.tab === 'ready' ? renderReady() : state.tab === 'outreach' ? renderOutreach() : renderApplied();
   }
 
   function renderLive(){
@@ -286,9 +331,16 @@ export function renderPage(): string {
 
   function load(){
     fetch('/api/feed').then(function(r){ return r.json(); }).then(function(d){
-      data = { fresh:d.fresh||[], ready:d.ready||[], applied:d.applied||[], counts:d.counts||{} };
+      data.fresh = d.fresh||[]; data.ready = d.ready||[]; data.applied = d.applied||[]; data.counts = d.counts||{};
       renderLive(); render();
     }).catch(function(){ var live = el('live'); live.className = 'live stale'; live.innerHTML = '<span class="dot"></span>offline — retrying'; });
+    // Outreach packs derive from the same fresh roles; fetch independently so a
+    // slow/failed pack build never blocks the feed.
+    fetch('/api/outreach').then(function(r){ return r.json(); }).then(function(d){
+      data.outreach = (d && d.packs) || [];
+      el('c-outreach').textContent = data.outreach.length;
+      if(state.tab === 'outreach') render();
+    }).catch(function(){});
   }
 
   // events
@@ -305,7 +357,16 @@ export function renderPage(): string {
     if(un){ e.preventDefault(); var uid = un.getAttribute('data-id'); applied = applied.filter(function(m){ return m.id !== uid; }); saveApplied(); render(); return; }
     var dz = e.target.closest('button.dismiss');
     if(dz){ e.preventDefault(); hidden.add(dz.getAttribute('data-id')); saveHidden(); render(); return; }
-    // a.apply just opens the posting (native navigation) — no state change.
+    var cp = e.target.closest('button.copy');
+    if(cp){
+      e.preventDefault();
+      var txt = cp.getAttribute('data-copy') || '';
+      var done = function(){ cp.textContent = 'Copied'; cp.classList.add('ok'); setTimeout(function(){ cp.textContent = 'Copy'; cp.classList.remove('ok'); }, 1400); };
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, done); }
+      else { done(); }
+      return;
+    }
+    // a.apply / a.olink just open a URL (native navigation) — no state change.
   });
   document.addEventListener('keydown', function(e){ if(e.key === '/' && document.activeElement !== el('search')){ e.preventDefault(); el('search').focus(); } });
 
