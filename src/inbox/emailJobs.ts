@@ -44,15 +44,25 @@ export interface EmailJob {
 const JR = /(intern|co-?op|new ?grad|new graduate|university grad|early career|entry[- ]level|graduate (engineer|software))/i;
 const NONUS = /(india|bengaluru|bangalore|hyderabad|pune|gurgaon|noida|\blondon\b|\buk\b|united kingdom|canada|toronto|vancouver|singapore|dublin|ireland|berlin|germany|paris|france|amsterdam|netherlands|tokyo|japan|sydney|australia|tel aviv|israel|brazil|mexico|poland|spain|portugal)/i;
 // A hostname/path that plausibly points at a real job posting.
-const JOB_URL = /(greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|workable\.com|jobs\.|careers?\.|\/jobs?\/|\/careers?\/|gh_jid=|linkedin\.com\/jobs|smartrecruiters\.com|icims\.com|bamboohr\.com)/i;
+const JOB_URL = /(greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|workable\.com|simplify\.jobs\/p\/|jobs\.|careers?\.|\/jobs?\/|\/careers?\/|gh_jid=|linkedin\.com\/jobs|linkedin\.com\/comm\/jobs|smartrecruiters\.com|icims\.com|bamboohr\.com)/i;
 const SKIP_URL = /(unsubscribe|mailto:|\.(png|jpg|jpeg|gif|svg)(\?|$)|facebook\.com|twitter\.com|x\.com|instagram\.com|linkedin\.com\/(company|in)\b|\/privacy|\/terms|utm_medium=email#)/i;
 
 const decodeEntities = (s: string): string =>
   s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+    .replace(/&middot;|&bull;/g, '·').replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
+    .replace(/&rsquo;|&lsquo;/g, "'").replace(/&hellip;/g, '…')
+    .replace(/&#x([0-9A-Fa-f]+);/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 
-const stripTags = (s: string): string => decodeEntities(s.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+// Decode known entities, drop any leftover named entities, collapse whitespace.
+const stripTags = (s: string): string =>
+  decodeEntities(s.replace(/<[^>]+>/g, ' ')).replace(/&[a-zA-Z]+;/g, ' ').replace(/\s+/g, ' ').trim();
+
+// A bold label is only a company if it is NOT a salary/badge/location chip
+// (LinkedIn alerts put "$6K / year", "(On-site)" etc. in bold before the link).
+const looksLikeCompany = (s: string): boolean =>
+  /[a-z]/i.test(s) && !/(\$|\/\s*(yr|year|hour|hr|mo)|\bon-?site\b|\bremote\b|\bhybrid\b|per\s|salary|\bnew\b|\bapply\b|\d{3,})/i.test(s);
 
 const senderSlug = (from: string): string =>
   (from.split('@')[1] ?? from).split('.')[0]!.toLowerCase().replace(/[^a-z0-9]/g, '') || 'email';
@@ -101,16 +111,35 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
       // become an unsafe href in the local UI, and can't be a real posting).
       if (!/^https?:\/\//i.test(url)) continue;
       if (SKIP_URL.test(url)) continue;
+      // The role is the anchor text up to the first "·" (LinkedIn alerts append
+      // "· Location (On-site)"); SWE List anchors have no "·" so this is a no-op.
+      const coreText = (text.split('·')[0] ?? text).trim();
       // Keep a link only if it looks like a job AND the visible text reads as an
       // on-field, junior role (drops nav/footer/marketing anchors, off-field
       // interns like "Mechanical Engineering Intern", and senior on-field roles).
       const looksJob = JOB_URL.test(url);
-      if (!looksJob || !isRelevantRole(text) || !JR.test(text)) continue;
-      if (!eligible(text)) continue;
+      if (!looksJob || !isRelevantRole(coreText) || !JR.test(coreText)) continue;
+      if (!eligible(coreText)) continue;
       if (seen.has(url)) continue;
       seen.add(url);
 
-      const { role, company } = splitRoleCompany(text);
+      // SWE List / digest layout: "<strong>Company:</strong> <a>Role</a>". If a
+      // bold label just before this anchor looks like a company (not a salary/
+      // badge chip), trust it and keep the full role text.
+      let role = coreText;
+      let company = '';
+      let strongCompany = '';
+      if (typeof m.index === 'number') {
+        const before = msg.bodyHtml.slice(Math.max(0, m.index - 200), m.index);
+        const labels = [...before.matchAll(/<(?:strong|b)>\s*([^<]{2,60}?)\s*:?\s*<\/(?:strong|b)>/gi)];
+        const last = labels[labels.length - 1];
+        if (last) strongCompany = stripTags(last[1]!).replace(/:$/, '').trim();
+      }
+      if (strongCompany && looksLikeCompany(strongCompany)) {
+        company = strongCompany;
+      } else {
+        ({ role, company } = splitRoleCompany(coreText));
+      }
       out.push({
         id: `email-${crypto.createHash('sha256').update(url).digest('hex').slice(0, 8)}`,
         company: company || '(via ' + platform + ')',
@@ -136,15 +165,24 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
  */
 export function mergeHotlist(
   incoming: EmailJob[],
-  existing: Array<{ id?: string }>,
+  existing: Array<{ id?: string; company?: string; role?: string }>,
   cap = 200
 ): Array<Record<string, unknown>> {
-  const seen = new Set<string>();
+  const seenId = new Set<string>();
+  const seenCR = new Set<string>();
+  const norm = (s: unknown): string => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   const merged: Array<Record<string, unknown>> = [];
+  // Incoming (email) first, then existing (board/scanner). Dedup by id AND by
+  // company|role, so an email role that duplicates a board role (SWE List links
+  // to Simplify, which the scanner already sources) is not shown twice.
   for (const j of [...incoming, ...existing]) {
-    const id = String((j as { id?: string }).id ?? '');
-    if (id && seen.has(id)) continue;
-    if (id) seen.add(id);
+    const rec = j as { id?: string; company?: string; role?: string };
+    const id = String(rec.id ?? '');
+    const cr = `${norm(rec.company)}|${norm(rec.role)}`;
+    if (id && seenId.has(id)) continue;
+    if (cr !== '|' && seenCR.has(cr)) continue;
+    if (id) seenId.add(id);
+    if (cr !== '|') seenCR.add(cr);
     merged.push(j as Record<string, unknown>);
   }
   return merged.slice(0, cap);

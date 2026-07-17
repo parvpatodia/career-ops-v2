@@ -16,6 +16,7 @@
     "ui": "tsx src/ui/server.ts",
     "audit:answers": "tsx scripts/audit-answers.ts",
     "inbox": "tsx src/inbox/index.ts",
+    "inbox:mac": "tsx src/inbox/macMail.ts",
     "outreach:account": "tsx src/outreach/cli/account.ts",
     "outreach:plan": "tsx src/outreach/cli/plan.ts",
     "outreach:send": "tsx src/outreach/cli/send.ts",

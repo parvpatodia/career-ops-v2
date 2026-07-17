@@ -21,7 +21,17 @@ Spec: docs/specs/M8-firehose-ui.md. 620 tests green, typecheck clean. 5 commits 
 - **No screen-steal fill.** --auto phase 2 captures the frontmost macOS app, opens the takeover window
   BEHIND it, and only raises Chrome (+ a `readyToSubmit` banner) at the human touchpoint. src/applier/
   browserLaunch.ts frontmostApp()/restoreApp() (live osascript verified). "Only show when I submit."
-- **Email ingestion (CODE READY; MCP path BLOCKED by NEU tenant).** src/inbox/emailJobs.ts
+- **Email ingestion — WORKING via Apple Mail (2026-07-17).** `npm run inbox:mac` (src/inbox/
+  macMail.ts) reads recent Apple Mail messages (scripts/read-mail-mac.js, JXA), decodes the raw
+  source, extracts on-field junior job links (parseJobEmails), and merges them into the UI hot-list,
+  deduped by id AND company|role. Live-verified: SWE List (7, deduped vs the swelist scanner since it
+  links to Simplify) + LinkedIn alerts (6 additive: Neuralink/Pony.ai/PlusAI/…). Scheduled via
+  **com.parv.careerops.mail** (every 30 min; RunAtLoad). REQUIRES Mail.app OPEN + Automation grant
+  (verified launchd can drive it). Dead-ends (do NOT retry — see LESSONS): the ms365 Graph MCP is
+  blocked by NEU admin-consent; New Outlook for Mac (build 16.111) has no AppleScript bridge and no
+  Legacy revert. The Northeastern Exchange account is added to Apple Mail (it connected; a personal
+  Gmail is there too). Legacy/blocked path notes below kept for history:
+- **Email ingestion (superseded note; MCP path BLOCKED by NEU tenant).** src/inbox/emailJobs.ts
   parseJobEmails() turns Scalar + other digest emails into hot-list candidates (on-field+junior+US+F-1
   only, dedup by URL); mergeHotlist() merges into data/new-jobs.json. **BLOCKED 2026-07-16:** the
   @softeria ms365 MCP cannot sign into patodia.pa@northeastern.edu — NEU requires IT-admin consent for
