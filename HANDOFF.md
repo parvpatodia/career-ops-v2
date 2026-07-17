@@ -1,6 +1,49 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-07-16 (M8 firehose + command-center UI).
+> Read at session start (CLAUDE.md load order). Last updated 2026-07-17 (autonomous BUILD loop, 11 increments).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-07-17) — autonomous BUILD loop (`/loop`, 5-min cadence)
+A self-paced loop shipped 11 focused, verified, committed increments across all five
+priorities (UI, sources/accuracy, freshness, tailoring, outreach). 666 tests green, typecheck
+clean. Each has a LESSONS.md line + metrics. Newest commit: 39c62df.
+
+- **Outreach tied to fresh roles (NEW capability).** `npm run outreach:linkedin` builds a weekly
+  per-company pack from the SAME accurate roles the UI shows (JobFeedService.fresh): LinkedIn
+  people-search URLs (recruiter + category-tuned engineer) + a copy-paste connection note
+  (grounded in the approved `linkedin.intro` snippet, <=300 chars) + a follow-up + a cold EMAIL
+  (subject+body, grounded, no fabricated recipient, no Hunter/domain needed). Pure core:
+  `src/outreach/roleOutreach.ts` (tested). Also surfaced in the UI **Outreach tab** (4th tab,
+  `GET /api/outreach`), each block with a Copy button. No LinkedIn automation (invariant 5); Parv
+  finds the person, pastes, sends. StyleLinter-clean framing (tested).
+- **UI/command-center clarity.** Real posting-age + freshness signal on each fresh card
+  ("posted Xd ago" + amber "Nd left" / red "expired" pill, computed vs the shared
+  `FRESHNESS_MAX_DAYS` exported from FreshnessFilter); an **"Expiring soon"** sort that renders a
+  FLAT list (day/category grouping would trap an expiring role); human-readable **source labels**
+  (`src/utils/sourceLabel.ts`: "SWE List email"/"Greenhouse" not raw tokens); a clean meta line
+  that never orphans a "·" separator.
+- **Scraping accuracy (read-boundary + ingestion).** Shared `src/utils/company.ts`
+  (isRealCompany/cleanCompanyName) blanks known-wrong company labels (term/season like "Fall 2026")
+  at the feed boundary AND rejects them at email ingestion; used by outreach too. KeywordExtractor
+  drops business/finance acronyms (B2B/ROI/KPI/SLA/…) so they can never be injected as a fake skill,
+  while keeping real tech acronyms. **Hot-list location enrichment** (`src/watch/enrichHotlist.ts`,
+  every cycle): back-fills a blank `location` on a stale hot-list entry from the current scan's
+  record for the same id — the append-only+seen-set hot-list otherwise ossifies pre-location-parsing
+  records (live: location-less board entries 19->9). Un-blinds the US/non-US filter for those.
+- **Sources widened.** +18 live-verified boards (Greenhouse 112, Ashby 65, Lever 15 = **192**),
+  discovery synced into scripts/verify-boards.mjs; seeded with WATCH_SEED (no banner burst).
+- **Tailoring quality.** The pipeline cover-letter OPENING dropped the banned "excited" filler
+  (pure `buildOpening()`, tested against the shared FORBIDDEN_PHRASES). Resume verifier deliberately
+  NOT given a hard style gate (Parv's real curated prose uses "key"/dashes legitimately).
+- **Honestly deferred (do NOT ship guesswork):** a non-US role from a location-LESS email digest
+  (e.g. a Toronto firm with no location string) can't be geo-filtered without the aggregator
+  carrying location — needs a real SWE List email fixture to parse it; enrichment mitigates the
+  board side. Clearance roles from the newgrad/swelist LIST scanners leak because those build a
+  SYNTHETIC jd (no real posting text), so INELIGIBLE_KEYWORDS can't see "clearance"; a defense
+  company/location map was rejected as fragile (a defense co posts non-clearance roles too).
+- **Loop mechanics.** `/loop` created a session-only cron (fires the build prompt every 5 min;
+  dies when the session closes). Always-on launchd UI must be unloaded to free port 4600 for the
+  browser preview, then reloaded — it serves the working-tree code via tsx, so it picks up edits on
+  reload; the launchd watch runs working-tree code fresh each cycle (no reload needed).
 
 ## Latest (2026-07-16) — M8: newest-role firehose + command-center UI
 Goal (Parv): surface the newest Fall-2026 intern/co-op roles within a minute, in a UI he
