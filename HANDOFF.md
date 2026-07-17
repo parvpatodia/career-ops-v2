@@ -7,7 +7,7 @@ Goal (Parv): surface the newest Fall-2026 intern/co-op roles within a minute, in
 keeps open, with a desktop notification, and fill in the background WITHOUT stealing his screen.
 Spec: docs/specs/M8-firehose-ui.md. 620 tests green, typecheck clean. 5 commits (0b136bd..e8634e4).
 - **More boards (live-verified).** `node scripts/verify-boards.mjs` curls a candidate pool and keeps
-  only live tokens (200 + jobs). config/*-boards.yml: Greenhouse 33->76, Ashby 12->34, Lever 6 (dead
+  only live tokens (200 + jobs). config/*-boards.yml (verify-boards): Greenhouse 103, Ashby 56, Lever 15 (174 total, live-verified 2026-07-16/17).
   plaid/mistral pruned). hunt-fresh.mjs now READS the config (single source of truth). The expansion
   immediately surfaced a fresh Cloudflare SWE Intern (Fall 2026, Austin, 2d) the old list missed.
 - **Every-minute watch.** Scanners fetch boards in PARALLEL (src/utils/pool.ts mapPool, 8-at-a-time,
