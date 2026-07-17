@@ -138,6 +138,7 @@ export function renderPage(): string {
   </div>
   <select id="sort" title="Sort">
     <option value="new">Newest first</option>
+    <option value="expiry">Expiring soon</option>
     <option value="company">Company A–Z</option>
   </select>
   <label class="showhidden"><input type="checkbox" id="showhidden"/> show dismissed</label>
@@ -197,6 +198,12 @@ export function renderPage(): string {
       return true;
     });
     if(state.sort === 'company') arr = arr.slice().sort(function(a,b){ return String(a.company||'').localeCompare(String(b.company||'')); });
+    else if(state.sort === 'expiry'){
+      // Soonest to hit the 14-day cutoff first, so nothing ages out unapplied.
+      // Unknown expiry (email entries, no real posting date) sorts last.
+      var exp = function(j){ return j.freshness ? j.freshness.expiresInDays : Infinity; };
+      arr = arr.slice().sort(function(a,b){ return exp(a) - exp(b) || String(b.caughtAt||'').localeCompare(String(a.caughtAt||'')); });
+    }
     else arr = arr.slice().sort(function(a,b){ return String(b.caughtAt||'').localeCompare(String(a.caughtAt||'')); });
     return arr;
   }
@@ -235,6 +242,14 @@ export function renderPage(): string {
       return '<div class="empty"><div class="big">Nothing to act on right now</div>'+
         (state.q || state.cat!=='all' || state.src!=='all' ? 'No roles match your filters.' : 'The watcher scans 100+ boards every 60s. New Fall-2026 roles land here the minute they post.')+
         (hiddenN && !showHidden ? '<div class="hint">'+hiddenN+' dismissed — tick "show dismissed" to review.</div>' : '')+'</div>';
+    }
+    // "Expiring soon" is a FLAT, globally-sorted view: the day/category grouping
+    // would otherwise trap an expiring role inside its group and hide the whole
+    // point (nearest-the-cutoff first). Board roles (known expiry) lead; email
+    // entries (unknown expiry) trail.
+    if(state.sort === 'expiry'){
+      return '<div class="day">Closest to the 14-day cutoff first <span class="n">('+list.length+')</span></div>'+
+        list.map(freshCard).join('');
     }
     var byDay = {}; list.forEach(function(j){ var k = dayKey(j.caughtAt); (byDay[k] = byDay[k] || []).push(j); });
     var days = Object.keys(byDay).sort(function(a,b){ return a==='unknown'?1 : b==='unknown'?-1 : b.localeCompare(a); });
