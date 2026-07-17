@@ -75,6 +75,9 @@ export function renderPage(): string {
   .card .role { font-weight:600; font-size:15px; display:flex; align-items:center; gap:9px; }
   .card .role .txt { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .badge-new { flex:none; font-size:10px; font-weight:700; letter-spacing:.06em; color:#0c0e13; background:var(--good); border-radius:5px; padding:2px 6px; }
+  .expiry { flex:none; font-size:10px; font-weight:700; letter-spacing:.04em; border-radius:5px; padding:2px 6px; }
+  .expiry.soon { color:#0c0e13; background:var(--warn); }
+  .expiry.gone { color:#fff; background:#d0403f; }
   .card .co { color:var(--dim); font-size:13px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .card .co .src { color:var(--dim2); }
   .when { color:var(--dim); font-size:12px; white-space:nowrap; text-align:right; }
@@ -155,6 +158,16 @@ export function renderPage(): string {
   var dayKey = function(iso){ var d = new Date(iso); return isNaN(d) ? 'unknown' : d.toISOString().slice(0,10); };
   var dayLabel = function(k){ if(k === 'unknown') return 'Earlier'; var today = new Date().toISOString().slice(0,10); var y = new Date(Date.now()-864e5).toISOString().slice(0,10); if(k === today) return 'Today'; if(k === y) return 'Yesterday'; return new Date(k+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); };
   var srcOf = function(p){ return String(p || '').indexOf('email:') === 0 ? 'email' : 'board'; };
+  // Real posting-age signals (JobFeedService attaches freshness for board roles;
+  // null for email digests, whose date is only the received time).
+  var postedLabel = function(f){ if(!f) return ''; var d = f.postedAgeDays; return d <= 0 ? 'posted today' : 'posted '+d+'d ago'; };
+  var expiryHtml = function(f){
+    if(!f) return '';
+    var n = f.expiresInDays;
+    if(n <= 0) return '<span class="expiry gone" title="Past the 14-day freshness cutoff">expired</span>';
+    if(n <= 4) return '<span class="expiry soon" title="Approaching the 14-day freshness cutoff — apply soon">'+n+'d left</span>';
+    return '';
+  };
 
   var APPLIED_KEY = 'careerops-applied-v1';
   var state = { tab:'fresh', cat:'all', src:'all', sort:'new', q:'' };
@@ -195,10 +208,11 @@ export function renderPage(): string {
     var m = minsAgo(j.caughtAt);
     var isNew = m != null && m < 15;
     var loc = j.location ? ' · '+esc(j.location) : '';
+    var posted = j.freshness ? ' <span class="src">· '+esc(postedLabel(j.freshness))+'</span>' : '';
     return '<div class="card" style="border-left-color:'+color+'">'+
       '<div class="meta">'+
-        '<div class="role">'+(isNew ? '<span class="badge-new">NEW</span>' : '')+'<span class="txt">'+esc(j.role)+'</span></div>'+
-        '<div class="co">'+esc(j.company)+loc+' <span class="src">· '+esc(j.platform)+'</span></div>'+
+        '<div class="role">'+(isNew ? '<span class="badge-new">NEW</span>' : '')+expiryHtml(j.freshness)+'<span class="txt">'+esc(j.role)+'</span></div>'+
+        '<div class="co">'+esc(j.company)+loc+' <span class="src">· '+esc(j.platform)+'</span>'+posted+'</div>'+
       '</div>'+
       '<div class="when">'+esc(ago(j.caughtAt))+'</div>'+
       '<div class="actions">'+
