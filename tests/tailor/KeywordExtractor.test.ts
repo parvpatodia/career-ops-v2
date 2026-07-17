@@ -82,4 +82,20 @@ describe('KeywordExtractor', () => {
       expect(terms).not.toContain(noise);
     }
   });
+
+  it('drops business/finance acronyms but keeps real tech acronyms', () => {
+    const jd = `Machine Learning Intern building production ML systems with Python,
+      PyTorch, SQL, AWS, and an ETL pipeline exposed over a REST API using an LLM.
+      Our team tracks KPI and ROI, works B2B, follows an SLA, meets ARR and CAC
+      goals, drives GTM, and handles the RFP and NDA process. This is an FTE role.`;
+    const terms = new KeywordExtractor().extract(jd).keywords.map((k) => k.term.toUpperCase());
+    // business/finance/contract noise removed
+    for (const noise of ['B2B', 'ROI', 'KPI', 'SLA', 'ARR', 'CAC', 'GTM', 'RFP', 'NDA', 'FTE']) {
+      expect(terms).not.toContain(noise);
+    }
+    // genuine tech acronyms preserved
+    for (const skill of ['SQL', 'AWS', 'ETL', 'API', 'LLM', 'ML']) {
+      expect(terms).toContain(skill);
+    }
+  });
 });
