@@ -13,6 +13,7 @@ import type { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { isRelevantRole, INELIGIBLE_KEYWORDS } from '../orchestrator/queuePlanning.js';
 import { isLikelyNonUS } from '../utils/locations.js';
 import { cleanCompanyName } from '../utils/company.js';
+import { sourceLabel } from '../utils/sourceLabel.js';
 import { categorize } from '../scanner/categorize.js';
 import { FRESHNESS_MAX_DAYS } from '../pipeline/FreshnessFilter.js';
 
@@ -27,6 +28,8 @@ export interface FreshRole {
   /** Coarse bucket for UI grouping; older hot-list entries may lack it. */
   category?: string;
   location?: string;
+  /** Human-readable source (e.g. "SWE List email", "Greenhouse"); derived at read time. */
+  sourceLabel?: string;
   /** Real posting age + days until the 14-day freshness cutoff. Null when the
    *  posting date is unknown or only a proxy (email digests carry the received
    *  time, not the posting date), so the UI never shows a misleading age. */
@@ -93,6 +96,7 @@ export class JobFeedService {
         company: cleanCompanyName(j.company),
         category: categorize(j.role ?? ''),
         freshness: this.postingFreshness(j),
+        sourceLabel: sourceLabel(j.platform),
       }))
       .slice(0, limit);
   }

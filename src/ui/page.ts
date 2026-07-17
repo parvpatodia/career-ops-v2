@@ -207,12 +207,17 @@ export function renderPage(): string {
     var color = CATS[j.category] || 'var(--c-other)';
     var m = minsAgo(j.caughtAt);
     var isNew = m != null && m < 15;
-    var loc = j.location ? ' · '+esc(j.location) : '';
+    // Build the meta line from the pieces that exist, so a blanked company (a
+    // known-wrong label we dropped) never leaves an orphan "·" separator.
+    var head = esc(j.company || '');
+    if(j.location) head += (head ? ' · ' : '') + esc(j.location);
+    var src = esc(j.sourceLabel || j.platform || '');
+    var srcSpan = '<span class="src">' + (head ? '· ' : '') + src + '</span>';
     var posted = j.freshness ? ' <span class="src">· '+esc(postedLabel(j.freshness))+'</span>' : '';
     return '<div class="card" style="border-left-color:'+color+'">'+
       '<div class="meta">'+
         '<div class="role">'+(isNew ? '<span class="badge-new">NEW</span>' : '')+expiryHtml(j.freshness)+'<span class="txt">'+esc(j.role)+'</span></div>'+
-        '<div class="co">'+esc(j.company)+loc+' <span class="src">· '+esc(j.platform)+'</span>'+posted+'</div>'+
+        '<div class="co">'+(head ? head+' ' : '')+srcSpan+posted+'</div>'+
       '</div>'+
       '<div class="when">'+esc(ago(j.caughtAt))+'</div>'+
       '<div class="actions">'+
