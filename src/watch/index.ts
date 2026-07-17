@@ -28,6 +28,7 @@ import { AshbyBoardScanner } from '../scanner/AshbyBoardScanner.js';
 import { SWEListScanner } from '../scanner/SWEListScanner.js';
 import { NewGradScanner } from '../scanner/NewGradScanner.js';
 import { detectNewPostings } from './detectNewPostings.js';
+import { enrichHotlist } from './enrichHotlist.js';
 import { INELIGIBLE_KEYWORDS, isRelevantRole } from '../orchestrator/queuePlanning.js';
 import { categorize } from '../scanner/categorize.js';
 import { Notifier } from '../applier/Notifier.js';
@@ -92,6 +93,22 @@ async function main(): Promise<void> {
     })
   );
   const all: Job[] = perSource.flat();
+
+  // Back-fill a blank location on existing hot-list entries from this scan's
+  // richer record for the same id (the append-only + seen-set hot-list never
+  // otherwise updates a role caught before location parsing existed). Safe:
+  // pure merge, wrapped so it can never break the 60s loop; runs every cycle.
+  try {
+    const scanById = new Map(all.map((j) => [j.id, { location: j.location }]));
+    const current = readJson<Array<Record<string, unknown>>>(HOTLIST_PATH, []);
+    const { list, enriched } = enrichHotlist(current, scanById);
+    if (enriched > 0) {
+      writeJson(HOTLIST_PATH, list);
+      log.info(`Enriched ${enriched} hot-list entries with a location from the current scan.`);
+    }
+  } catch (err) {
+    log.warn(`hot-list enrichment skipped: ${(err as Error).message}`);
+  }
 
   const seen = readJson<{ ids: string[] }>(SEEN_PATH, { ids: [] });
   const { fresh, nextSeen, firstRun } = detectNewPostings(all, seen.ids);
