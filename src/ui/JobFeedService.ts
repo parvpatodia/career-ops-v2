@@ -12,6 +12,7 @@ import fs from 'fs';
 import type { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { isRelevantRole, INELIGIBLE_KEYWORDS } from '../orchestrator/queuePlanning.js';
 import { isLikelyNonUS } from '../utils/locations.js';
+import { cleanCompanyName } from '../utils/company.js';
 import { categorize } from '../scanner/categorize.js';
 import { FRESHNESS_MAX_DAYS } from '../pipeline/FreshnessFilter.js';
 
@@ -83,8 +84,16 @@ export class JobFeedService {
       // predate category tagging (would show as "Other"), and this keeps the UI
       // consistent with the current categorize() regardless of what was stored.
       // Also attach real posting freshness so the UI can flag roles nearing the
-      // 14-day cutoff (proactivity), not just when WE caught them.
-      .map((j) => ({ ...j, category: categorize(j.role ?? ''), freshness: this.postingFreshness(j) }))
+      // 14-day cutoff (proactivity), not just when WE caught them. And blank a
+      // KNOWN-WRONG company label (a term/season mis-parse like "Fall 2026" from
+      // an older email ingestion, persisted in the hot-list) so the UI never
+      // shows a wrong company — honest blank beats a wrong name.
+      .map((j) => ({
+        ...j,
+        company: cleanCompanyName(j.company),
+        category: categorize(j.role ?? ''),
+        freshness: this.postingFreshness(j),
+      }))
       .slice(0, limit);
   }
 

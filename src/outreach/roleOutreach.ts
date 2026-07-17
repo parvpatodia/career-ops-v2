@@ -16,6 +16,7 @@
  */
 
 import { categorize, type RoleCategory } from '../scanner/categorize.js';
+import { isRealCompany } from '../utils/company.js';
 import type { SnippetBook } from './SnippetBook.js';
 
 /** The minimum a fresh role needs to seed a pack (a subset of the UI FreshRole). */
@@ -80,19 +81,6 @@ const ENGINEER_KEYWORD: Record<RoleCategory, string> = {
 
 const peopleSearch = (keywords: string): string =>
   `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(keywords)}`;
-
-/** A term/season label ("Fall 2026", "Summer 2026", a bare year) that an email
- *  parser sometimes mis-captures into the company field — never a real company. */
-const TERM_LABEL = /^(fall|spring|summer|winter|autumn)?\s*20\d\d$|^(fall|spring|summer|winter|autumn)\s+20\d\d$/i;
-
-/** A blank, placeholder ("(via email:...)"), or term-label company is not an
- *  outreach target — you cannot search LinkedIn for "(via ...)" or "Fall 2026".
- *  Read-boundary hygiene: the hot-list persists across watcher builds, so a junk
- *  company written by an older ingestion must be rejected here, not trusted. */
-const isRealCompany = (company: string): boolean => {
-  const c = company.trim();
-  return c.length > 0 && !/^\(via\b/i.test(c) && !TERM_LABEL.test(c);
-};
 
 const normCompany = (company: string): string => company.trim().toLowerCase();
 
