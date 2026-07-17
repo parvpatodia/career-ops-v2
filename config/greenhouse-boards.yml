@@ -114,6 +114,16 @@ boards:
   - knock          # notifications infra SWE
   - socket         # supply-chain security SWE
   - orca           # cloud security SWE
+  # widen 2026-07-17 (live-verified: HTTP 200 + jobs via board discovery)
+  - gemini         # crypto/fintech SWE
+  - zscaler        # cloud security SWE
+  - amplitude      # product analytics / data
+  - launchdarkly   # dev infra SWE
+  - singlestore    # database eng
+  - yugabyte       # distributed SQL eng
+  - nextdoor       # social product SWE
+  - squarespace    # web product SWE
+  - ripple         # crypto/blockchain eng
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026.
 title_include:
