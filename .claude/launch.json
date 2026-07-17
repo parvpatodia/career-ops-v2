@@ -5,7 +5,8 @@
       "name": "ui",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "ui"],
-      "port": 4600
+      "port": 4600,
+      "autoPort": false
     }
   ]
 }
