@@ -306,6 +306,7 @@ export function renderPage(): string {
           '<div class="osearch">'+searches+'</div>'+
           omsg('Connection note', p.connectionNote || '')+
           omsg('Follow-up after they accept', p.followUp || '')+
+          omsg('Cold email (once you have the address)', p.coldEmail ? ('Subject: '+p.coldEmail.subject+'\\n\\n'+p.coldEmail.body) : '')+
         '</div>';
       }).join('');
   }
