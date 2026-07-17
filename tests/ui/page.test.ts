@@ -21,4 +21,11 @@ describe('renderPage', () => {
     // (which the JS parser reads as a comment).
     expect(renderPage()).toContain('https?:\\/\\/');
   });
+
+  it('wires the Outreach tab (button + renderer + endpoint fetch)', () => {
+    const html = renderPage();
+    expect(html).toContain('data-tab="outreach"');
+    expect(html).toContain('function renderOutreach()');
+    expect(html).toContain("fetch('/api/outreach')");
+  });
 });
