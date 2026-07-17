@@ -94,6 +94,41 @@ describe('parseJobEmails', () => {
     expect(jobs[0]!.role).toBe('Machine Learning Engineer Intern Neuralink'); // location tail trimmed at "·"
   });
 
+  it('LinkedIn "View job:" text block yields clean role/company/location', () => {
+    const li: EmailMessage = {
+      from: 'jobs-noreply@linkedin.com', subject: 'Deep Learning Intern at PlusAI', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml: [
+        'Machine Learning Engineer Intern',
+        'Neuralink',
+        'South San Francisco',
+        'View job: https://www.linkedin.com/comm/jobs/view/4416832802/?trackingId=abc',
+        '',
+        'Mechanical Design Intern',
+        'SpaceX',
+        'Hawthorne',
+        'View job: https://www.linkedin.com/comm/jobs/view/999/?trackingId=xyz',
+      ].join('\n'),
+    };
+    const jobs = parseJobEmails([li], new Date('2026-07-16T09:00:00Z'));
+    const nl = jobs.find((j) => j.company === 'Neuralink')!;
+    expect(nl.role).toBe('Machine Learning Engineer Intern');   // clean, no company/location mashed in
+    expect(nl.location).toBe('South San Francisco');
+    expect(nl.platform).toBe('email:linkedin');
+    expect(jobs.some((j) => j.company === 'SpaceX')).toBe(false); // off-field (Mechanical) dropped
+  });
+
+  it('a LinkedIn job is not doubled when both the text block and the HTML card anchor appear', () => {
+    const li: EmailMessage = {
+      from: 'jobs-noreply@linkedin.com', subject: 'jobs', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml:
+        'Deep Learning Intern\nPlusAI\nSanta Clara\nView job: https://www.linkedin.com/comm/jobs/view/4416832802/?trackingId=abc\n' +
+        '<a href="https://www.linkedin.com/jobs/view/4416832802/?refId=zzz">Deep Learning Intern PlusAI · Santa Clara, CA (On-site)</a>',
+    };
+    const jobs = parseJobEmails([li], new Date('2026-07-16T09:00:00Z'));
+    expect(jobs.filter((j) => /deep learning intern/i.test(j.role))).toHaveLength(1); // canonical job-id dedup
+    expect(jobs[0]!.company).toBe('PlusAI'); // the clean text-block version won
+  });
+
   it('mergeHotlist dedups an email role against an existing board role by company|role', () => {
     const emailJob = parseJobEmails([{
       from: 'noreply@swelist.com', subject: 's', receivedDateTime: '2026-07-16T08:00:00Z',

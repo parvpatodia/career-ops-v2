@@ -10,4 +10,6 @@ set -uo pipefail
 export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 cd /Users/parvpatodia/career-ops-v2 || exit 1
 echo "======== [$(date '+%Y-%m-%d %H:%M:%S')] mail ========"
-npm run inbox:mac
+# 25-message window: digests are daily and the 30-min cadence overlaps windows,
+# so 25 newest is plenty and keeps the slow AppleScript scan well under timeout.
+npm run inbox:mac -- 25 4

@@ -9,6 +9,16 @@ companies:
   - spotify       # SWE / ML
   - matchgroup    # SWE
   - angellist     # SWE
+  # Expanded 2026-07-17 (verify-boards, live): robotics/AV/AI infra + SWE
+  - waabi         # autonomous trucking (AV)
+  - osaro         # robotics / CV
+  - brightmachines # robotics manufacturing
+  - anyscale      # ML infrastructure (Ray)
+  - includedhealth # health SWE
+  - neon          # serverless Postgres SWE
+  - alloy         # fintech identity SWE
+  - sysdig        # cloud security SWE
+  - tinybird      # data infra SWE
   # Removed 2026-07-16: plaid, mistral (now 404 on Lever — moved ATS). ramp/brex/
   # anduril already removed earlier for the same reason.
 

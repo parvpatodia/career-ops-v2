@@ -51,9 +51,12 @@ type ReaderResult = { count: number; scanned: number; messages: RawMsg[] } | { e
 
 /** Run the JXA reader. Throws if Mail is not open / Automation is not permitted. */
 export function runReader(max = 40, days = 4): ReaderResult {
+  // Apple Mail's AppleScript bridge is slow + variable on a large inbox (30-90s
+  // for 20-40 msgs, occasionally more while Mail syncs), so allow generous head-
+  // room; a genuinely stuck run still gets killed rather than hanging forever.
   const buf = execFileSync('osascript', ['-l', 'JavaScript', READER, String(max), String(days)], {
     maxBuffer: 128 * 1024 * 1024,
-    timeout: 150_000,
+    timeout: 240_000,
   });
   return JSON.parse(buf.toString('utf8')) as ReaderResult;
 }
@@ -102,8 +105,11 @@ async function main(): Promise<void> {
   fs.writeFileSync(HOTLIST, JSON.stringify(merged, null, 2) + '\n');
 
   // Alert only on genuinely-new email roles (capped), same style as the watcher.
-  const notifier = new Notifier();
-  for (const j of fresh.slice(0, 8)) notifier.newPosting(j.company, j.role, j.applyUrl);
+  // MAIL_NO_NOTIFY=1 suppresses banners for a maintenance re-scan/refresh.
+  if (process.env.MAIL_NO_NOTIFY !== '1') {
+    const notifier = new Notifier();
+    for (const j of fresh.slice(0, 8)) notifier.newPosting(j.company, j.role, j.applyUrl);
+  }
 
   log.info(
     `scanned ${res.scanned} msgs -> ${candidates.length} job candidate(s), ${fresh.length} new (added + alerted); hot-list now ${merged.length}.`
