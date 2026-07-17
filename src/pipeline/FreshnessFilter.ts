@@ -11,7 +11,11 @@
 
 import type { Job } from '../types.js';
 
-const DEFAULT_MAX_DAYS = 14;
+/** The hard freshness window in days (Parv 2026-06-12: no posting older than 2
+ *  weeks). Exported so any read boundary that surfaces posting age uses the SAME
+ *  cutoff as the apply gate, never a duplicated literal. */
+export const FRESHNESS_MAX_DAYS = 14;
+const DEFAULT_MAX_DAYS = FRESHNESS_MAX_DAYS;
 const MS_PER_DAY = 86_400_000;
 
 export interface FreshnessResult {

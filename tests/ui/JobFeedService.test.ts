@@ -75,6 +75,24 @@ describe('JobFeedService', () => {
     expect(snap.fresh.map((f) => f.id).sort()).toEqual(['1', '5']);
   });
 
+  it('fresh() attaches real posting freshness for board roles, null for email/unknown', () => {
+    const now = Date.now();
+    const iso = (daysAgo: number) => new Date(now - daysAgo * 86_400_000).toISOString();
+    const caught = new Date(now).toISOString();
+    const hot = path.join(dir, 'new-jobs.json');
+    fs.writeFileSync(hot, JSON.stringify([
+      { id: 'a', company: 'A', role: 'ML Intern', applyUrl: 'https://x/a', platform: 'greenhouse', postedAt: iso(1), caughtAt: caught },
+      { id: 'b', company: 'B', role: 'ML Intern', applyUrl: 'https://x/b', platform: 'ashby', postedAt: iso(12), caughtAt: caught },   // expiring soon
+      { id: 'c', company: 'C', role: 'ML Intern', applyUrl: 'https://x/c', platform: 'email:scalar', postedAt: iso(1), caughtAt: caught }, // proxy date -> null
+      { id: 'd', company: 'D', role: 'ML Intern', applyUrl: 'https://x/d', platform: 'lever', postedAt: '', caughtAt: caught },           // unparseable -> null
+    ]));
+    const byId = new Map(new JobFeedService(store, hot).snapshot().fresh.map((f) => [f.id, f.freshness]));
+    expect(byId.get('a')).toEqual({ postedAgeDays: 1, expiresInDays: 13 });
+    expect(byId.get('b')).toEqual({ postedAgeDays: 12, expiresInDays: 2 }); // <= 4: UI flags it
+    expect(byId.get('c')).toBeNull();
+    expect(byId.get('d')).toBeNull();
+  });
+
   it('fresh() recomputes category from the role (fixes older un-tagged entries)', () => {
     const now = new Date().toISOString();
     const hot = path.join(dir, 'new-jobs.json');
