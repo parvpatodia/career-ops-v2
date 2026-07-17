@@ -64,7 +64,7 @@ export function renderPage(): string {
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   // Only http(s) URLs become clickable hrefs; anything else (javascript:, data:,
   // a malformed link from a parsed email) collapses to a non-navigating '#'.
-  const safeUrl = (u) => { const s = String(u ?? ''); return /^https?:\/\//i.test(s) ? esc(s) : '#'; };
+  const safeUrl = (u) => { const s = String(u ?? ''); return /^https?:\\/\\//i.test(s) ? esc(s) : '#'; };
   const ago = (iso) => { const m = Math.round((Date.now()-new Date(iso).getTime())/60000); if(isNaN(m))return ''; if(m<1)return 'just now'; if(m<60)return m+'m ago'; const h=Math.round(m/60); if(h<24)return h+'h ago'; return Math.round(h/24)+'d ago'; };
   const dayKey = (iso) => { const d=new Date(iso); return isNaN(d)? 'unknown' : d.toISOString().slice(0,10); };
   const dayLabel = (key) => { if(key==='unknown')return 'Earlier'; const today=new Date().toISOString().slice(0,10); const y=new Date(Date.now()-864e5).toISOString().slice(0,10); if(key===today)return 'Today'; if(key===y)return 'Yesterday'; return new Date(key+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); };
