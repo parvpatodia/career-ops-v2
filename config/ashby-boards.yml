@@ -65,6 +65,16 @@ companies:
   - weaviate         # vector DB / ML infra
   - cedar            # healthcare SWE
   - inngest          # workflow infra SWE
+  # widen 2026-07-17 (live-verified: HTTP 200 + jobs via board discovery)
+  - factory          # AI coding agents
+  - openevidence     # medical AI
+  - distyl           # enterprise AI
+  - unify            # GTM AI SWE
+  - e2b              # AI infra / sandboxes
+  - merge            # API integrations SWE
+  - attio            # CRM SaaS SWE
+  - warp             # dev tooling SWE
+  - zed              # code editor / systems SWE
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026. The scanner also keeps a
 # posting when employmentType is Intern even if the title omits it.

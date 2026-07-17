@@ -32,6 +32,8 @@ const CANDIDATES = {
     'snyk','okta','cloudflare','fastly','tailscale','tempus','recursion','benchling','smartsheet','workato',
     'alarmdotcom','pingidentity','underdogfantasy','vestwell','twitch','plaid','ramp','notion','vercel','netlify',
     'retool','postman','sourcegraph','render','fly','replicate','modal','baseten','lambdalabs','coreweave',
+    // widen 2026-07-17 (live-verified)
+    'gemini','zscaler','amplitude','launchdarkly','singlestore','yugabyte','nextdoor','squarespace','ripple',
   ],
   lever: [
     'plaid','mistral','zoox','palantir','ramp','brex','anduril','nuro','cruise','aurora',
@@ -47,6 +49,8 @@ const CANDIDATES = {
     'physical-intelligence','skild-ai','bright-machines','collaborative-robotics','cobot','chef-robotics','dexterity','1x','figure-ai','world-labs',
     'sesame','cartesia','suno','pika','luma-ai','lumalabs','browserbase','langchain','llamaindex','crewai',
     'lovable','cursor','windsurf','codeium','magic-dev','poolside','reflection-ai','thinking-machines','safe-superintelligence','ssi',
+    // widen 2026-07-17 (live-verified)
+    'abridge','factory','openevidence','distyl','unify','e2b','merge','attio','warp','zed',
   ],
 };
 
