@@ -44,7 +44,8 @@ function renderPack(date: string, packs: RoleOutreachPack[]): string {
     lines.push('', 'Find people:');
     for (const s of p.searches) lines.push(`- ${s.label}: ${s.url}`);
     lines.push('', '**Connection note** (copy-paste):', '', `> ${p.connectionNote}`);
-    lines.push('', '**Follow-up after they accept** (copy-paste):', '', `> ${p.followUp}`, '');
+    lines.push('', '**Follow-up after they accept** (copy-paste):', '', `> ${p.followUp}`);
+    lines.push('', '**Cold email** (copy-paste, once you have the address):', '', `Subject: ${p.coldEmail.subject}`, '', p.coldEmail.body, '');
   }
   return lines.join('\n');
 }

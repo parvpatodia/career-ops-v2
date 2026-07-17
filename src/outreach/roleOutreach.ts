@@ -46,6 +46,10 @@ export interface RoleOutreachPack {
   connectionNote: string;
   /** Longer copy-paste follow-up for after they accept / an InMail. */
   followUp: string;
+  /** Ready-to-send cold email (subject + body), grounded in approved snippets,
+   *  recipient-agnostic. Parv sends it once he has the address (no automation,
+   *  no Hunter dependency). Framing is StyleLinter-clean (guarded by test). */
+  coldEmail: { subject: string; body: string };
 }
 
 export interface RolePackOptions {
@@ -111,6 +115,35 @@ function followUp(company: string, role: string, intro: string): string {
 }
 
 /**
+ * A recipient-agnostic cold email grounded in approved snippets. Self-claims come
+ * ONLY from resolved snippets (industry.* — omitted, never invented, if absent);
+ * the generated framing (greeting, role line, close) is deliberately free of the
+ * banned StyleLinter vocabulary. It does NOT assert an attached resume (LESSONS
+ * 2026-06-19: a body must not claim a file it lacks) — Parv attaches + sends.
+ */
+function coldEmail(
+  company: string,
+  role: string,
+  snippets: SnippetBook
+): { subject: string; body: string } {
+  const intro = snippets.resolve('industry.intro') ?? snippets.resolve('linkedin.intro') ?? DEFAULT_INTRO;
+  const detail = snippets.resolve('industry.detail');
+  const coop = snippets.resolve('industry.coop');
+  const signature = snippets.resolve('common.signature') ?? 'Parv';
+
+  const parts = [
+    `Hi there,`,
+    `I'm reaching out about ${company}'s ${role}. ${intro}`,
+    detail,
+    coop,
+    `I can share my resume and walk through my background if that is useful. Thanks for your time.`,
+    signature,
+  ].filter((p): p is string => !!p && p.trim() !== '');
+
+  return { subject: `Interested in ${company}'s ${role} (Fall 2026)`, body: parts.join('\n\n') };
+}
+
+/**
  * Group fresh roles by company and build one LinkedIn outreach pack per company,
  * newest company first (input is expected newest-first). Roles are de-duped and
  * capped per company; companies are capped for a weekly batch.
@@ -162,6 +195,7 @@ export function roleOutreachPacks(
       ],
       connectionNote: connectionNote(entry.company, topRole, intro),
       followUp: followUp(entry.company, topRole, intro),
+      coldEmail: coldEmail(entry.company, topRole, snippets),
     });
   }
   return packs;

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { roleOutreachPacks, LINKEDIN_NOTE_MAX, type RoleSeed } from '../../src/outreach/roleOutreach.js';
 import { SnippetBook } from '../../src/outreach/SnippetBook.js';
+import { StyleLinter } from '../../src/outreach/StyleLinter.js';
 
 const snippets = new SnippetBook({ 'linkedin.intro': "I'm an MS AI student at Northeastern building ML systems." });
 
@@ -64,6 +65,33 @@ describe('roleOutreachPacks', () => {
       snippets
     );
     expect(packs.map((p) => p.company)).toEqual(['Anthropic']);
+  });
+
+  it('builds a cold email: names role + company, grounded, framing is StyleLinter-clean', () => {
+    const full = new SnippetBook({
+      'industry.intro': "I'm an MS AI student at Northeastern building ML systems.",
+      'industry.detail': 'At my last role I shipped a perception model to production.',
+      'industry.coop': "I'm looking for a Fall 2026 co-op and would value a conversation.",
+      'common.signature': 'Parv Patodia',
+    });
+    const p = roleOutreachPacks([seed('Waymo', 'ML Intern')], full)[0]!;
+    expect(p.coldEmail.subject).toContain('Waymo');
+    expect(p.coldEmail.subject).toContain('ML Intern');
+    expect(p.coldEmail.body).toContain("Waymo's ML Intern");
+    expect(p.coldEmail.body).toContain('perception model'); // grounded in the snippet
+    expect(p.coldEmail.body).toContain('Parv Patodia');      // signature
+    // The email must NOT assert an attached file it lacks (LESSONS 2026-06-19).
+    expect(p.coldEmail.body.toLowerCase()).not.toContain('attached');
+    // The generated framing carries no banned vocabulary (reuse the outreach checker).
+    const lint = new StyleLinter().lint(p.coldEmail.subject + '\n' + p.coldEmail.body);
+    expect(lint.ok).toBe(true);
+  });
+
+  it('cold email omits missing detail/coop snippets instead of leaving blank gaps', () => {
+    const p = roleOutreachPacks([seed('Nuro', 'ML Intern')], snippets)[0]!; // only linkedin.intro set
+    expect(p.coldEmail.body).not.toMatch(/\n\n\n/);       // no empty paragraph gaps
+    expect(p.coldEmail.body).toContain('MS AI student at Northeastern'); // intro fallback used
+    expect(new StyleLinter().lint(p.coldEmail.body).ok).toBe(true);
   });
 
   it('caps companies and roles-per-company', () => {
