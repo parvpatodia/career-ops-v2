@@ -86,6 +86,34 @@ boards:
   # Campus/university sub-boards (previously verified; not renamed)
   - tenstorrentuniversity
   - klaviyocampus
+  # Expanded 2026-07-17 (verify-boards, live 200+jobs): robotics/AV/AI + SWE-heavy infra
+  - apptronik      # humanoid robotics
+  - kodiak         # autonomous trucking
+  - maymobility    # autonomous vehicles
+  - thinkingmachines # AI research (frontier models)
+  - worldlabs      # spatial AI
+  - labelbox       # ML data
+  - inflectionai   # LLM
+  - descript       # AI media
+  - suki           # healthcare voice AI
+  - diligentrobotics # service robotics
+  - locusrobotics  # warehouse robotics
+  - nauto          # AV safety / CV
+  - formic         # robotics automation
+  - turing         # AI/ML services
+  - imply          # data (Druid)
+  - lithic         # fintech SWE
+  - checkr         # SWE
+  - marqeta        # fintech SWE
+  - huntress       # security SWE
+  - expel          # security SWE
+  - chainguard     # security SWE
+  - dragos         # OT security SWE
+  - abnormalsecurity # security ML
+  - descope        # auth SWE
+  - knock          # notifications infra SWE
+  - socket         # supply-chain security SWE
+  - orca           # cloud security SWE
 
 # Invariant 10: intern/co-op focus for Summer/Fall 2026.
 title_include:

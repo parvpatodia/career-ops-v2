@@ -64,6 +64,16 @@ const stripTags = (s: string): string =>
 const looksLikeCompany = (s: string): boolean =>
   /[a-z]/i.test(s) && !/(\$|\/\s*(yr|year|hour|hr|mo)|\bon-?site\b|\bremote\b|\bhybrid\b|per\s|salary|\bnew\b|\bapply\b|\d{3,})/i.test(s);
 
+const mkId = (url: string): string => `email-${crypto.createHash('sha256').update(url).digest('hex').slice(0, 8)}`;
+
+// Canonical dedup key: collapse a LinkedIn posting's many tracking URLs to its
+// numeric job id, so the clean text-block version and the HTML card anchor of
+// the SAME job dedup to one. Non-LinkedIn falls back to the path (no query).
+const canonUrl = (url: string): string => {
+  const m = url.match(/jobs\/view\/(\d+)/);
+  return m ? `li:${m[1]}` : url.split('?')[0]!;
+};
+
 const senderSlug = (from: string): string =>
   (from.split('@')[1] ?? from).split('.')[0]!.toLowerCase().replace(/[^a-z0-9]/g, '') || 'email';
 
@@ -103,6 +113,35 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
 
   for (const msg of messages) {
     const platform = `email:${senderSlug(msg.from)}`;
+
+    // LinkedIn job-alert layout (text part): "Role\nCompany\nLocation\nView job:
+    // <url>". This gives CLEAN role/company/location, unlike the HTML card anchor
+    // where they are mashed into one string. Run FIRST so it wins the dedup.
+    // Cheap guard: only run this scan on emails that actually contain the marker
+    // (skips the regex — and any backtracking cost — on every non-LinkedIn mail).
+    const viewBlocks = msg.bodyHtml.includes('View job:')
+      ? msg.bodyHtml.matchAll(
+          /(?:^|\n)[ \t>]*([^\n]{3,90}?)[ \t]*\n[ \t>]*([^\n]{2,60}?)[ \t]*\n[ \t>]*([^\n]{2,60}?)[ \t]*\n[ \t>]*View job:[ \t]*(https?:\/\/\S+)/g
+        )
+      : [];
+    for (const vm of viewBlocks) {
+      const url = decodeEntities(vm[4]!).replace(/[)\].,]+$/, '').trim();
+      const role = stripTags(vm[1]!);
+      const company = stripTags(vm[2]!);
+      const location = stripTags(vm[3]!);
+      if (!JOB_URL.test(url) || SKIP_URL.test(url)) continue;
+      if (!isRelevantRole(role) || !JR.test(role)) continue;
+      if (!eligible(`${role} ${location}`)) continue;
+      const key = canonUrl(url);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({
+        id: mkId(url), company: company || `(via ${platform})`, role, applyUrl: url,
+        platform, postedAt: msg.receivedDateTime, caughtAt,
+        category: categorize(role), location, source: msg.from,
+      });
+    }
+
     for (const m of msg.bodyHtml.matchAll(anchor)) {
       const url = decodeEntities(m[1]!).trim();
       const text = stripTags(m[2]!);
@@ -120,8 +159,9 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
       const looksJob = JOB_URL.test(url);
       if (!looksJob || !isRelevantRole(coreText) || !JR.test(coreText)) continue;
       if (!eligible(coreText)) continue;
-      if (seen.has(url)) continue;
-      seen.add(url);
+      const key = canonUrl(url);
+      if (seen.has(key)) continue;
+      seen.add(key);
 
       // SWE List / digest layout: "<strong>Company:</strong> <a>Role</a>". If a
       // bold label just before this anchor looks like a company (not a salary/
