@@ -70,6 +70,41 @@ describe('parseJobEmails', () => {
     expect(splitRoleCompany('Data Science Internship')).toEqual({ role: 'Data Science Internship', company: '' });
   });
 
+  it('SWE List layout: simplify.jobs link + preceding <strong>Company:</strong>', () => {
+    const swelist: EmailMessage = {
+      from: 'noreply@swelist.com', subject: 'New Internships', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml: `<p class="internship"><strong>The Trade Desk:</strong> <a href="https://simplify.jobs/p/abc?utm_source=swelist">Software Engineer Intern - Data Platform</a></p>
+                 <p class="internship"><strong>Boeing:</strong> <a href="https://simplify.jobs/p/def">Structural Analysis Intern</a></p>`,
+    };
+    const jobs = parseJobEmails([swelist], new Date('2026-07-16T09:00:00Z'));
+    const tt = jobs.find((j) => j.applyUrl.includes('/p/abc'))!;
+    expect(tt.company).toBe('The Trade Desk');           // from the bold label, not split from the role
+    expect(tt.role).toBe('Software Engineer Intern - Data Platform'); // full role kept (has " - ")
+    expect(jobs.some((j) => /structural/i.test(j.role))).toBe(false); // off-field dropped
+  });
+
+  it('LinkedIn layout: trims "· Location (On-site)" and rejects a salary/badge bold label as company', () => {
+    const li: EmailMessage = {
+      from: 'jobs-noreply@linkedin.com', subject: 'jobs', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml: `<strong>$6K / year</strong> <a href="https://www.linkedin.com/jobs/view/123">Machine Learning Engineer Intern Neuralink &middot; Fremont, CA (On-site)</a>`,
+    };
+    const jobs = parseJobEmails([li], new Date('2026-07-16T09:00:00Z'));
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.company).not.toBe('$6K / year');   // salary chip rejected as company
+    expect(jobs[0]!.role).toBe('Machine Learning Engineer Intern Neuralink'); // location tail trimmed at "·"
+  });
+
+  it('mergeHotlist dedups an email role against an existing board role by company|role', () => {
+    const emailJob = parseJobEmails([{
+      from: 'noreply@swelist.com', subject: 's', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml: '<strong>Waymo:</strong> <a href="https://simplify.jobs/p/xyz">Machine Learning Intern</a>',
+    }], new Date('2026-07-16T09:00:00Z'));
+    // the board scanner already has the same role under a different id/url
+    const existing = [{ id: 'swelist-9f9f', company: 'Waymo', role: 'Machine Learning Intern', platform: 'swelist' }];
+    const merged = mergeHotlist(emailJob, existing);
+    expect(merged.filter((m) => /waymo/i.test(String(m.company)))).toHaveLength(1); // not doubled
+  });
+
   it('mergeHotlist prepends new, dedups by id, caps', () => {
     const incoming = jobs as EmailJob[];
     const existing = [{ id: jobs[0]!.id, company: 'dupe' }, { id: 'watch-1', company: 'Board Co' }];
