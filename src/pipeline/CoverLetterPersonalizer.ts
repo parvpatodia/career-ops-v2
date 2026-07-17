@@ -14,22 +14,33 @@ const COVER_LETTERS: Record<string, string> = {
   robotics: 'cv/cover_letter_robotics.md',
 };
 
-// Custom opening paragraph per variant — mentions role + company
-const OPENINGS: Record<string, (role: string, company: string) => string> = {
-  ai_ml: (role, company) =>
+/**
+ * The machine-generated opening paragraph per variant (names role + company).
+ * This is the only generated prose in this path, so it must be free of the
+ * banned AI-filler vocabulary the CoverLetterVerifier enforces — recruiters
+ * reject boilerplate on sight. Exported + pure so a test can assert it stays
+ * clean (see tests/pipeline/coverLetterOpening.test.ts). The body paragraphs
+ * are Parv's own hand-written cv/ prose and are left untouched.
+ */
+export function buildOpening(variant: ResumeVariant, role: string, company: string): string {
+  const key = variant === 'robotics' ? 'robotics' : 'ai_ml';
+  if (key === 'robotics') {
+    return (
+      `My interest in robotics began with a simple fascination with how machines move through ` +
+      `the world, and has grown through hands-on experience in perception, autonomous systems, ` +
+      `and intelligent decision-making. Today, as a Master's student in Artificial Intelligence ` +
+      `at Northeastern University in Silicon Valley, I am drawn to roles like ` +
+      `${role} at ${company}, where software, sensing, and real-world behavior come together.`
+    );
+  }
+  return (
     `I started out curious about how machines move, and over time that curiosity grew into ` +
     `a deeper interest in how they can learn, reason, and make useful decisions from data. ` +
     `That is what led me to pursue my Master's in Artificial Intelligence at Northeastern ` +
     `University in Silicon Valley. I am applying for the ${role} position at ${company} ` +
-    `and am excited to contribute to real systems and keep building at a high level.`,
-
-  robotics: (role, company) =>
-    `My interest in robotics began with a simple fascination with how machines move through ` +
-    `the world, and has grown through hands-on experience in perception, autonomous systems, ` +
-    `and intelligent decision-making. Today, as a Master's student in Artificial Intelligence ` +
-    `at Northeastern University in Silicon Valley, I am most excited by roles like ` +
-    `${role} at ${company}, where software, sensing, and real-world behavior come together.`,
-};
+    `and want to contribute to real systems and keep building at a high level.`
+  );
+}
 
 export class CoverLetterPersonalizer {
   personalize(
@@ -44,7 +55,7 @@ export class CoverLetterPersonalizer {
     let letter = fs.readFileSync(templatePath, 'utf8');
 
     // Replace the first paragraph with the role/company-specific opening
-    const opening = OPENINGS[templateKey](role, company);
+    const opening = buildOpening(variant, role, company);
     letter = this.replaceFirstParagraph(letter, opening);
 
     // Write to output
