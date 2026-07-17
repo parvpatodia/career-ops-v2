@@ -62,7 +62,10 @@ const stripTags = (s: string): string =>
 // A bold label is only a company if it is NOT a salary/badge/location chip
 // (LinkedIn alerts put "$6K / year", "(On-site)" etc. in bold before the link).
 const looksLikeCompany = (s: string): boolean =>
-  /[a-z]/i.test(s) && !/(\$|\/\s*(yr|year|hour|hr|mo)|\bon-?site\b|\bremote\b|\bhybrid\b|per\s|salary|\bnew\b|\bapply\b|\d{3,})/i.test(s);
+  /[a-z]/i.test(s) &&
+  !/(\$|\/\s*(yr|year|hour|hr|mo)|\bon-?site\b|\bremote\b|\bhybrid\b|per\s|salary|\bnew\b|\bapply\b|\d{3,})/i.test(s) &&
+  // A season/term label ("Fall 2026", "Summer") is a posting attribute, not a company.
+  !/^(fall|spring|summer|winter|autumn)(\s+20\d\d)?$/i.test(s.trim());
 
 const mkId = (url: string): string => `email-${crypto.createHash('sha256').update(url).digest('hex').slice(0, 8)}`;
 
