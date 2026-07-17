@@ -20,6 +20,7 @@
 import crypto from 'crypto';
 import { isRelevantRole, INELIGIBLE_KEYWORDS } from '../orchestrator/queuePlanning.js';
 import { categorize } from '../scanner/categorize.js';
+import { isLikelyNonUS } from '../utils/locations.js';
 
 export interface EmailMessage {
   from: string;
@@ -42,7 +43,6 @@ export interface EmailJob {
 }
 
 const JR = /(intern|co-?op|new ?grad|new graduate|university grad|early career|entry[- ]level|graduate (engineer|software))/i;
-const NONUS = /(india|bengaluru|bangalore|hyderabad|pune|gurgaon|noida|\blondon\b|\buk\b|united kingdom|canada|toronto|vancouver|singapore|dublin|ireland|berlin|germany|paris|france|amsterdam|netherlands|tokyo|japan|sydney|australia|tel aviv|israel|brazil|mexico|poland|spain|portugal)/i;
 // A hostname/path that plausibly points at a real job posting.
 const JOB_URL = /(greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|workable\.com|simplify\.jobs\/p\/|jobs\.|careers?\.|\/jobs?\/|\/careers?\/|gh_jid=|linkedin\.com\/jobs|linkedin\.com\/comm\/jobs|smartrecruiters\.com|icims\.com|bamboohr\.com)/i;
 const SKIP_URL = /(unsubscribe|mailto:|\.(png|jpg|jpeg|gif|svg)(\?|$)|facebook\.com|twitter\.com|x\.com|instagram\.com|linkedin\.com\/(company|in)\b|\/privacy|\/terms|utm_medium=email#)/i;
@@ -98,7 +98,7 @@ export function splitRoleCompany(text: string): { role: string; company: string 
 
 function eligible(text: string): boolean {
   const hay = text.toLowerCase();
-  return !INELIGIBLE_KEYWORDS.some((kw) => hay.includes(kw)) && !NONUS.test(hay);
+  return !INELIGIBLE_KEYWORDS.some((kw) => hay.includes(kw)) && !isLikelyNonUS(text);
 }
 
 /**

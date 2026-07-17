@@ -84,8 +84,10 @@ export function renderPage(): string {
   a.apply:hover { background:var(--accent-hi); }
   a.open { color:var(--accent); text-decoration:none; font-size:13px; white-space:nowrap; padding:8px 6px; }
   a.open:hover { text-decoration:underline; }
-  .dismiss { appearance:none; cursor:pointer; background:transparent; border:1px solid var(--edge); color:var(--dim2); width:30px; height:30px; border-radius:8px; font-size:15px; line-height:1; }
-  .dismiss:hover { color:var(--fg); border-color:var(--dim); }
+  .dismiss,.mark,.undo { appearance:none; cursor:pointer; background:transparent; border:1px solid var(--edge); width:31px; height:31px; border-radius:8px; font-size:14px; line-height:1; }
+  .dismiss { color:var(--dim2); } .dismiss:hover { color:var(--fg); border-color:var(--dim); }
+  .mark { color:var(--good); font-weight:700; } .mark:hover { border-color:var(--good); background:rgba(63,185,80,.14); }
+  .undo { color:var(--dim); } .undo:hover { color:var(--fg); border-color:var(--dim); }
   .applied-row { opacity:.72; }
   .empty { color:var(--dim); background:var(--panel); border:1px dashed var(--edge); border-radius:11px; padding:26px; text-align:center; }
   .empty .big { font-size:15px; color:var(--fg); margin-bottom:4px; }
@@ -137,17 +139,27 @@ export function renderPage(): string {
   var dayLabel = function(k){ if(k === 'unknown') return 'Earlier'; var today = new Date().toISOString().slice(0,10); var y = new Date(Date.now()-864e5).toISOString().slice(0,10); if(k === today) return 'Today'; if(k === y) return 'Yesterday'; return new Date(k+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); };
   var srcOf = function(p){ return String(p || '').indexOf('email:') === 0 ? 'email' : 'board'; };
 
+  var APPLIED_KEY = 'careerops-applied-v1';
   var state = { tab:'fresh', cat:'all', src:'all', sort:'new', q:'' };
   var data = { fresh:[], ready:[], applied:[], counts:{} };
   var hidden, showHidden = false;
   try { hidden = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch(e){ hidden = new Set(); }
   var saveHidden = function(){ try { localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden))); } catch(e){} };
+  // Self-reported "I applied to this" markers (client-only; the UI never writes
+  // verified application state to the event log — those come from real submits).
+  var applied;
+  try { applied = JSON.parse(localStorage.getItem(APPLIED_KEY) || '[]'); } catch(e){ applied = []; }
+  if(!Array.isArray(applied)) applied = [];
+  var saveApplied = function(){ try { localStorage.setItem(APPLIED_KEY, JSON.stringify(applied)); } catch(e){} };
+  var appliedIds = function(){ var s = new Set(); applied.forEach(function(m){ s.add(m.id); }); return s; };
 
   var el = function(id){ return document.getElementById(id); };
 
   function visibleFresh(){
     var q = state.q.trim().toLowerCase();
+    var ai = appliedIds();
     var arr = data.fresh.filter(function(j){
+      if(ai.has(j.id)) return false;
       if(!showHidden && hidden.has(j.id)) return false;
       if(state.cat !== 'all' && (j.category || 'Other') !== state.cat) return false;
       if(state.src !== 'all' && srcOf(j.platform) !== state.src) return false;
@@ -173,8 +185,9 @@ export function renderPage(): string {
       '</div>'+
       '<div class="when">'+esc(ago(j.caughtAt))+'</div>'+
       '<div class="actions">'+
-        '<a class="apply" data-id="'+esc(j.id)+'" href="'+safeUrl(j.applyUrl)+'" target="_blank" rel="noopener">Apply →</a>'+
-        '<button class="dismiss" data-id="'+esc(j.id)+'" title="Dismiss (I have handled this)">✕</button>'+
+        '<a class="apply" href="'+safeUrl(j.applyUrl)+'" target="_blank" rel="noopener">Apply →</a>'+
+        '<button class="mark" data-id="'+esc(j.id)+'" data-co="'+esc(j.company)+'" data-role="'+esc(j.role)+'" data-url="'+esc(j.applyUrl)+'" title="I applied — move to Applied">✓</button>'+
+        '<button class="dismiss" data-id="'+esc(j.id)+'" title="Not interested — hide it">✕</button>'+
       '</div>'+
     '</div>';
   }
@@ -215,28 +228,43 @@ export function renderPage(): string {
   }
 
   function renderApplied(){
-    var a = data.applied || [];
-    if(!a.length) return '<div class="empty"><div class="big">Nothing applied yet</div>Roles you submit will be tracked here.</div>';
-    return a.map(function(j){
-      return '<div class="card applied-row" style="border-left-color:var(--good)">'+
-        '<div class="meta"><div class="role"><span class="txt">✓ '+esc(j.role)+'</span></div><div class="co">'+esc(j.company)+(j.appliedAt ? ' · applied '+esc(ago(j.appliedAt)) : '')+'</div></div>'+
-        '<div class="actions"><a class="open" href="'+safeUrl(j.url)+'" target="_blank" rel="noopener">Open ↗</a></div>'+
-      '</div>';
-    }).join('');
+    var verified = data.applied || [];
+    if(!applied.length && !verified.length) return '<div class="empty"><div class="big">Nothing applied yet</div>Hit ✓ on a Fresh role after you apply, or submit through the pipeline — both show here.</div>';
+    var html = '';
+    if(applied.length){
+      html += '<div class="day">Marked applied by you <span class="n">('+applied.length+')</span></div>';
+      html += applied.map(function(j){
+        return '<div class="card applied-row" style="border-left-color:var(--good)">'+
+          '<div class="meta"><div class="role"><span class="txt">✓ '+esc(j.role)+'</span></div><div class="co">'+esc(j.company)+(j.at ? ' · marked '+esc(ago(j.at)) : '')+'</div></div>'+
+          '<div class="actions"><a class="open" href="'+safeUrl(j.url)+'" target="_blank" rel="noopener">Open ↗</a><button class="undo" data-id="'+esc(j.id)+'" title="Undo — back to Fresh">↩</button></div>'+
+        '</div>';
+      }).join('');
+    }
+    if(verified.length){
+      html += '<div class="day">Submitted through the pipeline <span class="n">('+verified.length+')</span></div>';
+      html += verified.map(function(j){
+        return '<div class="card applied-row" style="border-left-color:var(--accent)">'+
+          '<div class="meta"><div class="role"><span class="txt">✓ '+esc(j.role)+'</span></div><div class="co">'+esc(j.company)+(j.appliedAt ? ' · applied '+esc(ago(j.appliedAt)) : '')+'</div></div>'+
+          '<div class="actions"><a class="open" href="'+safeUrl(j.url)+'" target="_blank" rel="noopener">Open ↗</a></div>'+
+        '</div>';
+      }).join('');
+    }
+    return html;
   }
 
   function renderCatChips(){
-    var counts = {}; var total = 0;
-    data.fresh.forEach(function(j){ if(!showHidden && hidden.has(j.id)) return; var c = j.category || 'Other'; counts[c] = (counts[c]||0)+1; total++; });
+    var counts = {}; var total = 0; var ai = appliedIds();
+    data.fresh.forEach(function(j){ if(ai.has(j.id)) return; if(!showHidden && hidden.has(j.id)) return; var c = j.category || 'Other'; counts[c] = (counts[c]||0)+1; total++; });
     var chips = '<button class="chip'+(state.cat==='all'?' active':'')+'" data-cat="all">All <span class="n">'+total+'</span></button>';
     CAT_ORDER.forEach(function(c){ if(!counts[c]) return; chips += '<button class="chip'+(state.cat===c?' active':'')+'" data-cat="'+esc(c)+'"><span class="swatch" style="width:8px;height:8px;border-radius:2px;background:'+(CATS[c]||'var(--c-other)')+'"></span>'+esc(c)+' <span class="n">'+counts[c]+'</span></button>'; });
     el('catchips').innerHTML = chips;
   }
 
   function render(){
-    el('c-fresh').textContent = data.fresh.filter(function(j){ return !hidden.has(j.id); }).length;
+    var ai = appliedIds();
+    el('c-fresh').textContent = data.fresh.filter(function(j){ return !hidden.has(j.id) && !ai.has(j.id); }).length;
     el('c-ready').textContent = (data.ready||[]).length;
-    el('c-applied').textContent = (data.counts && data.counts.Applied) || (data.applied||[]).length;
+    el('c-applied').textContent = (data.applied||[]).length + applied.length;
     // tab active states
     var tabEls = document.querySelectorAll('#tabs .tab');
     for(var i=0;i<tabEls.length;i++){ tabEls[i].classList.toggle('active', tabEls[i].getAttribute('data-tab')===state.tab); }
@@ -271,10 +299,13 @@ export function renderPage(): string {
   el('search').addEventListener('input', function(e){ state.q = e.target.value; render(); });
   el('showhidden').addEventListener('change', function(e){ showHidden = e.target.checked; render(); });
   el('content').addEventListener('click', function(e){
-    var applyEl = e.target.closest('a.apply');
-    if(applyEl && applyEl.getAttribute('data-id')){ hidden.add(applyEl.getAttribute('data-id')); saveHidden(); setTimeout(render, 50); return; }
+    var mk = e.target.closest('button.mark');
+    if(mk){ e.preventDefault(); applied.unshift({ id:mk.getAttribute('data-id'), company:mk.getAttribute('data-co'), role:mk.getAttribute('data-role'), url:mk.getAttribute('data-url'), at:new Date().toISOString() }); saveApplied(); render(); return; }
+    var un = e.target.closest('button.undo');
+    if(un){ e.preventDefault(); var uid = un.getAttribute('data-id'); applied = applied.filter(function(m){ return m.id !== uid; }); saveApplied(); render(); return; }
     var dz = e.target.closest('button.dismiss');
-    if(dz){ e.preventDefault(); hidden.add(dz.getAttribute('data-id')); saveHidden(); render(); }
+    if(dz){ e.preventDefault(); hidden.add(dz.getAttribute('data-id')); saveHidden(); render(); return; }
+    // a.apply just opens the posting (native navigation) — no state change.
   });
   document.addEventListener('keydown', function(e){ if(e.key === '/' && document.activeElement !== el('search')){ e.preventDefault(); el('search').focus(); } });
 
