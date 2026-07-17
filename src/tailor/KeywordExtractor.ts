@@ -43,13 +43,19 @@ const MAX_KEYWORDS = 25;
 const REQUIRED_HEADERS = ['required', 'must have', 'qualifications', 'requirements', "what you'll need", 'what you need'];
 const PREFERRED_HEADERS = ['preferred', 'nice to have', 'nice-to-have', 'bonus', 'what we offer', 'benefits', 'perks'];
 
-// All-caps tokens that are grammar/HR/legal noise, not skills. Kept conservative
-// so real acronym skills (ML, AI, NLP, RAG, ETL, AWS, GPU, SDK...) are not lost.
+// All-caps tokens that are grammar/HR/legal/business noise, not skills. Kept
+// conservative so real acronym skills (ML, AI, NLP, RAG, ETL, AWS, GPU, SDK,
+// SQL, API, LLM, CI, CD, UI, UX...) are never lost — only tokens that are
+// unambiguously NOT a resume skill are listed.
 const ACRONYM_STOPWORDS: ReadonlySet<string> = new Set([
+  // grammar / filler / time / HR / legal
   'AND', 'OR', 'THE', 'FOR', 'WITH', 'YOU', 'WE', 'OUR', 'US', 'TO', 'OF', 'IN',
   'ON', 'AT', 'IS', 'ARE', 'BE', 'AS', 'IF', 'IT', 'BY', 'AN', 'A', 'ALL', 'NEW',
-  'NOW', 'EEO', 'EOE', 'PTO', 'FLSA', 'ADA', 'HR', 'CEO', 'CTO', 'OK', 'FAQ',
-  'USA', 'PST', 'EST', 'PDT', 'EDT', 'AM', 'PM', 'Q1', 'Q2', 'Q3', 'Q4',
+  'NOW', 'EEO', 'EOE', 'PTO', 'FLSA', 'ADA', 'HR', 'HRIS', 'CEO', 'CTO', 'OK', 'FAQ',
+  'USA', 'PST', 'EST', 'PDT', 'EDT', 'AM', 'PM', 'Q1', 'Q2', 'Q3', 'Q4', 'FTE', 'NDA',
+  // business / finance / go-to-market metrics + contract docs (never a skill)
+  'B2B', 'B2C', 'ROI', 'KPI', 'OKR', 'SLA', 'RFP', 'RFQ', 'SOW', 'MSA', 'KYC',
+  'ARR', 'MRR', 'CAC', 'LTV', 'GTM', 'SMB', 'YOY', 'QOQ',
 ]);
 
 interface Candidate {
