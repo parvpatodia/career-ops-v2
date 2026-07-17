@@ -94,6 +94,17 @@ describe('parseJobEmails', () => {
     expect(jobs[0]!.role).toBe('Machine Learning Engineer Intern Neuralink'); // location tail trimmed at "·"
   });
 
+  it('rejects a season/term bold label ("Fall 2026") as the company', () => {
+    const jr: EmailMessage = {
+      from: 'eric@jobrightai.com', subject: 'jobs', receivedDateTime: '2026-07-16T08:00:00Z',
+      bodyHtml: `<strong>Fall 2026:</strong> <a href="https://boards.greenhouse.io/x/jobs/1">Machine Learning Intern at Databricks</a>`,
+    };
+    const jobs = parseJobEmails([jr], new Date('2026-07-16T09:00:00Z'));
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.company).not.toBe('Fall 2026'); // term label is not a company; falls back to the split
+    expect(jobs[0]!.company).toBe('Databricks');
+  });
+
   it('LinkedIn "View job:" text block yields clean role/company/location', () => {
     const li: EmailMessage = {
       from: 'jobs-noreply@linkedin.com', subject: 'Deep Learning Intern at PlusAI', receivedDateTime: '2026-07-16T08:00:00Z',
