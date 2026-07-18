@@ -22,6 +22,7 @@
     "outreach:send": "tsx src/outreach/cli/send.ts",
     "outreach:canary": "tsx src/outreach/cli/canary.ts",
     "outreach:linkedin": "tsx src/outreach/cli/linkedinRoles.ts",
+    "tailor:fresh": "tsx src/tailor/cli/tailorFresh.ts",
     "outreach:daily": "npm run outreach:plan && npm run outreach:send",
     "mcp": "tsx src/mcp/server.ts",
     "demo": "tsx scripts/demo.ts",
