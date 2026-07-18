@@ -28,6 +28,7 @@ import { Tailor } from '../Tailor.js';
 import { CoverLetterDataBuilder } from '../CoverLetterDataBuilder.js';
 import { ProfileLoader } from '../../applier/ProfileLoader.js';
 import { fetchJd } from '../jdFetch.js';
+import { PdfGenerator } from '../../pdf/PdfGenerator.js';
 import { Notifier } from '../../applier/Notifier.js';
 import { Logger } from '../../utils/Logger.js';
 import type { Job, EvaluationResult, ResumeVariant } from '../../types.js';
@@ -52,6 +53,7 @@ interface ManifestEntry {
   variant: ResumeVariant;
   resumePath?: string;
   coverLetterPath?: string;
+  coverLetterPdfPath?: string;
   verified: boolean;
   abstainReason?: string;
   jdChars: number;
@@ -107,6 +109,21 @@ export function buildCoverTemplate(id: {
   ].join('\n');
 }
 
+/** Render a cover-letter .md (the filled template: header + paragraphs, blank-line
+ *  separated) to clean letter HTML for a PDF. Escapes HTML; the PdfGenerator does
+ *  the ATS Unicode normalization. Pure + exported so it is unit-tested. */
+export function coverLetterHtml(markdown: string): string {
+  const esc = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const blocks = (markdown ?? '').split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+  const body = blocks.map((b) => `<p>${esc(b).replace(/\n/g, '<br/>')}</p>`).join('\n');
+  return (
+    `<!doctype html><html><head><meta charset="utf-8"/><style>` +
+    `body{font:11.5pt/1.55 Georgia,'Times New Roman',serif;color:#111;max-width:660px;margin:0 auto;}` +
+    `p{margin:0 0 12px;}p:first-child{font-weight:700;line-height:1.35;}` +
+    `</style></head><body>${body}</body></html>`
+  );
+}
+
 /** Recent = posted within ~24h (board roles) or first-caught within 24h (email/
  *  list roles, which carry no real posting date). Matches the UI "Last 24h" rule. */
 function isRecent(j: FreshRole): boolean {
@@ -160,6 +177,7 @@ async function main(): Promise<void> {
   const coverTemplatePath = path.join(OUT_DIR, '.cover-template.md');
   fs.writeFileSync(coverTemplatePath, buildCoverTemplate(profile.getIdentity()));
   const tailor = new Tailor({ outputDir: OUT_DIR, coverOutputDir: path.join(OUT_DIR, 'cover_letters'), coverTemplatePath });
+  const coverPdf = new PdfGenerator(path.join(OUT_DIR, 'cover_letters'));
   const notifier = new Notifier();
 
   let tailored = 0;
@@ -211,6 +229,18 @@ async function main(): Promise<void> {
 
     try {
       const result = await tailor.tailor(job, evaluation, clData);
+      // Render the cover letter to an uploadable PDF (Tailor only writes the .md).
+      let coverLetterPdfPath: string | undefined;
+      if (result.coverLetterPath && fs.existsSync(result.coverLetterPath)) {
+        try {
+          const md = fs.readFileSync(result.coverLetterPath, 'utf8');
+          const pdfOut = result.coverLetterPath.replace(/\.md$/, '.pdf');
+          await coverPdf.htmlToPdf(coverLetterHtml(md), pdfOut);
+          coverLetterPdfPath = pdfOut;
+        } catch (err) {
+          log.warn(`cover-letter PDF failed for ${role.id}: ${(err as Error).message}`);
+        }
+      }
       manifest[role.id] = {
         company: role.company,
         role: role.role,
@@ -218,6 +248,7 @@ async function main(): Promise<void> {
         variant,
         resumePath: result.pdfPath,
         coverLetterPath: result.coverLetterPath,
+        coverLetterPdfPath,
         verified: !!result.verified,
         abstainReason: result.abstainReason,
         jdChars: jd.length,
