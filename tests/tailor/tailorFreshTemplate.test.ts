@@ -4,7 +4,7 @@
  * every letter). Guard that the generated template is clean and complete.
  */
 import { describe, it, expect } from 'vitest';
-import { buildCoverTemplate } from '../../src/tailor/cli/tailorFresh.js';
+import { buildCoverTemplate, coverLetterHtml } from '../../src/tailor/cli/tailorFresh.js';
 
 const id = {
   name: 'Parv Patodia',
@@ -33,5 +33,20 @@ describe('buildCoverTemplate', () => {
     const t = buildCoverTemplate(id);
     expect(t).toContain('Parv Patodia');
     expect(t).toContain('Northeastern');
+  });
+});
+
+describe('coverLetterHtml', () => {
+  it('wraps blank-line-separated blocks in <p>, joins inner lines with <br/>', () => {
+    const html = coverLetterHtml('Name\nContact\n\nDear Team,\n\nA paragraph.');
+    expect(html).toContain('<p>Name<br/>Contact</p>');
+    expect(html).toContain('<p>Dear Team,</p>');
+    expect(html).toContain('<p>A paragraph.</p>');
+  });
+
+  it('escapes HTML so letter text cannot inject markup', () => {
+    const html = coverLetterHtml('a < b & c > d');
+    expect(html).toContain('a &lt; b &amp; c &gt; d');
+    expect(html).not.toContain('a < b & c > d');
   });
 });
