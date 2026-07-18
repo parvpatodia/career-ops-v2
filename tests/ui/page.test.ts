@@ -28,4 +28,11 @@ describe('renderPage', () => {
     expect(html).toContain('function renderOutreach()');
     expect(html).toContain("fetch('/api/outreach')");
   });
+
+  it('wires the Last-24h recency toggle (control + helper + filter)', () => {
+    const html = renderPage();
+    expect(html).toContain('id="recent24"');
+    expect(html).toContain('function isRecent(j)');
+    expect(html).toContain('state.recent');
+  });
 });

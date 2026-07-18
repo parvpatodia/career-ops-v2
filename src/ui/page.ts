@@ -141,6 +141,7 @@ export function renderPage(): string {
     <option value="expiry">Expiring soon</option>
     <option value="company">Company A–Z</option>
   </select>
+  <label class="showhidden"><input type="checkbox" id="recent24"/> Last 24h</label>
   <label class="showhidden"><input type="checkbox" id="showhidden"/> show dismissed</label>
 </div>
 
@@ -171,7 +172,7 @@ export function renderPage(): string {
   };
 
   var APPLIED_KEY = 'careerops-applied-v1';
-  var state = { tab:'fresh', cat:'all', src:'all', sort:'new', q:'' };
+  var state = { tab:'fresh', cat:'all', src:'all', sort:'new', q:'', recent:false };
   var data = { fresh:[], ready:[], applied:[], counts:{}, outreach:[] };
   var hidden, showHidden = false;
   try { hidden = new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]')); } catch(e){ hidden = new Set(); }
@@ -186,12 +187,21 @@ export function renderPage(): string {
 
   var el = function(id){ return document.getElementById(id); };
 
+  // Recent = posted within ~24h (board roles carry a real posting date), else
+  // caught within 24h (email/list roles have no posting date, so first-seen is
+  // the best proxy). Drives the "Last 24h" focus toggle.
+  function isRecent(j){
+    if(j.freshness) return j.freshness.postedAgeDays <= 1;
+    var m = minsAgo(j.caughtAt); return m != null && m < 1440;
+  }
+
   function visibleFresh(){
     var q = state.q.trim().toLowerCase();
     var ai = appliedIds();
     var arr = data.fresh.filter(function(j){
       if(ai.has(j.id)) return false;
       if(!showHidden && hidden.has(j.id)) return false;
+      if(state.recent && !isRecent(j)) return false;
       if(state.cat !== 'all' && (j.category || 'Other') !== state.cat) return false;
       if(state.src !== 'all' && srcOf(j.platform) !== state.src) return false;
       if(q && (String(j.role||'')+' '+String(j.company||'')).toLowerCase().indexOf(q) < 0) return false;
@@ -333,7 +343,7 @@ export function renderPage(): string {
 
   function renderCatChips(){
     var counts = {}; var total = 0; var ai = appliedIds();
-    data.fresh.forEach(function(j){ if(ai.has(j.id)) return; if(!showHidden && hidden.has(j.id)) return; var c = j.category || 'Other'; counts[c] = (counts[c]||0)+1; total++; });
+    data.fresh.forEach(function(j){ if(ai.has(j.id)) return; if(!showHidden && hidden.has(j.id)) return; if(state.recent && !isRecent(j)) return; var c = j.category || 'Other'; counts[c] = (counts[c]||0)+1; total++; });
     var chips = '<button class="chip'+(state.cat==='all'?' active':'')+'" data-cat="all">All <span class="n">'+total+'</span></button>';
     CAT_ORDER.forEach(function(c){ if(!counts[c]) return; chips += '<button class="chip'+(state.cat===c?' active':'')+'" data-cat="'+esc(c)+'"><span class="swatch" style="width:8px;height:8px;border-radius:2px;background:'+(CATS[c]||'var(--c-other)')+'"></span>'+esc(c)+' <span class="n">'+counts[c]+'</span></button>'; });
     el('catchips').innerHTML = chips;
@@ -384,6 +394,7 @@ export function renderPage(): string {
   el('srcchips').addEventListener('click', function(e){ var c = e.target.closest('.chip'); if(!c) return; state.src = c.getAttribute('data-src'); render(); });
   el('sort').addEventListener('change', function(e){ state.sort = e.target.value; render(); });
   el('search').addEventListener('input', function(e){ state.q = e.target.value; render(); });
+  el('recent24').addEventListener('change', function(e){ state.recent = e.target.checked; render(); });
   el('showhidden').addEventListener('change', function(e){ showHidden = e.target.checked; render(); });
   el('content').addEventListener('click', function(e){
     var mk = e.target.closest('button.mark');
