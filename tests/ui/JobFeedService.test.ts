@@ -93,6 +93,26 @@ describe('JobFeedService', () => {
     expect(byId.get('d')).toBeNull();
   });
 
+  it('fresh() attaches tailored-doc flags from the manifest (verified résumé only)', () => {
+    const now = new Date().toISOString();
+    const hot = path.join(dir, 'new-jobs.json');
+    fs.writeFileSync(hot, JSON.stringify([
+      { id: 'a', company: 'A', role: 'ML Intern', applyUrl: 'https://x/a', platform: 'greenhouse', postedAt: '', caughtAt: now },
+      { id: 'b', company: 'B', role: 'ML Intern', applyUrl: 'https://x/b', platform: 'greenhouse', postedAt: '', caughtAt: now },
+      { id: 'c', company: 'C', role: 'ML Intern', applyUrl: 'https://x/c', platform: 'greenhouse', postedAt: '', caughtAt: now },
+    ]));
+    const manifest = path.join(dir, 'manifest.json');
+    fs.writeFileSync(manifest, JSON.stringify({
+      a: { verified: true, resumePath: 'output/tailored/a-ml.pdf', coverLetterPdfPath: 'output/tailored/cover_letters/a.pdf' },
+      b: { verified: false, resumePath: 'output/tailored/b-ml.pdf' }, // résumé abstained -> not offered
+      // c: no entry -> no tailored field
+    }));
+    const byId = new Map(new JobFeedService(store, hot, manifest).snapshot().fresh.map((f) => [f.id, f.tailored]));
+    expect(byId.get('a')).toEqual({ resume: true, cover: true });
+    expect(byId.get('b')).toBeUndefined(); // unverified résumé + no cover -> nothing to offer
+    expect(byId.get('c')).toBeUndefined();
+  });
+
   it('fresh() attaches a human-readable sourceLabel', () => {
     const now = new Date().toISOString();
     const hot = path.join(dir, 'new-jobs.json');

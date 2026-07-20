@@ -13,6 +13,8 @@
  */
 
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
 import { ApplicationStore } from '../tracker/ApplicationStore.js';
 import { JobFeedService } from './JobFeedService.js';
 import { renderPage } from './page.js';
@@ -25,7 +27,8 @@ const log = new Logger('ui');
 export class UiServer {
   constructor(
     private readonly feed: JobFeedService,
-    private readonly port: number = 4600
+    private readonly port: number = 4600,
+    private readonly manifestPath = 'output/tailored-manifest.json'
   ) {}
 
   start(): http.Server {
@@ -71,8 +74,40 @@ export class UiServer {
       return;
     }
 
+    // Serve a pre-tailored, uploadable PDF: /docs/resume/<id> | /docs/cover/<id>.
+    // The id is looked up in the tailor:fresh manifest and the resolved path is
+    // confined to output/tailored/ (no traversal, only tailored docs served).
+    const docMatch = path.match(/^\/docs\/(resume|cover)\/(.+)$/);
+    if (docMatch) {
+      this.serveDoc(docMatch[1] as 'resume' | 'cover', decodeURIComponent(docMatch[2]!), res);
+      return;
+    }
+
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not found');
+  }
+
+  /** Stream a tailored PDF by job id, confined to output/tailored/. */
+  private serveDoc(kind: 'resume' | 'cover', id: string, res: http.ServerResponse): void {
+    const notFound = (): void => { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('Not found'); };
+    try {
+      const manifest = JSON.parse(fs.readFileSync(this.manifestPath, 'utf8')) as Record<
+        string,
+        { resumePath?: string; coverLetterPdfPath?: string }
+      >;
+      const entry = manifest[id];
+      const file = kind === 'resume' ? entry?.resumePath : entry?.coverLetterPdfPath;
+      if (!file) return notFound();
+      // Confine to output/tailored/ so a poisoned manifest path can't escape.
+      const base = path.resolve('output/tailored');
+      const resolved = path.resolve(file);
+      if (resolved !== base && !resolved.startsWith(base + path.sep)) return notFound();
+      if (!fs.existsSync(resolved)) return notFound();
+      res.writeHead(200, { 'Content-Type': 'application/pdf' });
+      res.end(fs.readFileSync(resolved));
+    } catch {
+      notFound();
+    }
   }
 }
 
