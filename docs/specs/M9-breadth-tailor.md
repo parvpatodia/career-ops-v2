@@ -30,7 +30,7 @@ surface on the **last 24 hours** (be first, minutes after posting).
 ## Features (each gated by a check the loop can run)
 - **F1 — Last-24h recency focus (UI).** Pure `isRecent(role)` (posted <=1d, else caught
   <24h) + a "Last 24h" toggle in the command center. `passes:` filter narrows the feed,
-  screenshot-verified. [SHIPPED FIRST]
+  screenshot-verified. [SHIPPED]
 - **F2 — Broaden email senders.** Confirm which digests arrive in Apple Mail; extend
   parseJobEmails sender handling (Runway/Scalar/generic) so their roles surface. `passes:`
   a fixture test per new sender layout + live mailbox check.
