@@ -1,6 +1,31 @@
 # HANDOFF — career-ops-v2
-> Read at session start (CLAUDE.md load order). Last updated 2026-07-17 (autonomous BUILD loop, 11 increments).
+> Read at session start (CLAUDE.md load order). Last updated 2026-07-20 (M9 breadth + auto-tailor).
 > Branch: feat/v2-foundation. MODE: BUILD.
+
+## Latest (2026-07-20) — M9: breadth + 24h focus + auto-tailor (spec: docs/specs/M9-breadth-tailor.md)
+Parv brief: widen beyond Simplify, focus last-24h, and have a resume + cover letter tailored
++ dated per role, ready to upload at apply-time. 687 tests green. All F1-F7 shipped.
+- **Auto-tailor (headline).** `npm run tailor:fresh` pre-tailors the fresh/on-field/last-24h
+  shortlist: fetch JD (src/tailor/jdFetch.ts, best-effort; JS-only pages degrade to base resume)
+  -> resume variant by category -> grounded CoverLetterData (src/tailor/CoverLetterDataBuilder.ts,
+  from profile narrative/projects, dashes normalized) -> Tailor (resume PDF + cover-letter PDF,
+  dated today, verify-or-abstain) -> output/tailored/ + output/tailored-manifest.json. It generates
+  its OWN clean cover-letter template at runtime (the cv/ one has instruction lines with em dashes
+  that abstained every letter). HONEST: resume "tailoring" = variant pick + attestation-gated
+  keyword injection (only real skills; off-stack roles ship the clean base variant) + the grounded
+  dated cover letter. NOT keyword-stuffing.
+- **Scheduled.** launchd **com.parv.careerops.tailor** (scripts/tailor-loop.sh, every 30 min,
+  RunAtLoad, logs batch/logs/tailor.*) runs it autonomously; idempotent (skips roles done today).
+- **UI.** "Last 24h" toggle (recency focus). Tailored cards show "Résumé · Cover letter" links;
+  server serves the PDFs at /docs/{resume,cover}/<id>, confined to output/tailored/ (traversal 404).
+- **Breadth.** parseJobEmails unwrapTracker() pulls the real posting out of aggregator click-trackers
+  (Runway/RippleMatch/Getro), matching on the query-STRIPPED base; sourceLabel gained Runway et al.
+  HONEST LIMIT: the Apple Mail reader hangs on the 47k inbox here, so Runway/Scalar ARRIVAL is
+  unconfirmed; run `npm run inbox:mac` with Mail open to pull them. Board APIs stay thin (~3/feed):
+  few intern-titled Fall-2026 openings on individual company boards right now; the GitHub lists
+  (New Grad/SWE List, which link to Simplify) are the breadth. Clearance roles (RTX/Boeing/Wyetech)
+  still leak from the LIST scanners (synthetic JD, no "clearance" text to catch) — surfaced not fixed.
+- **Entry points added:** `npm run tailor:fresh` [--limit N|--force|--dry-run], `npm run outreach:linkedin`.
 
 ## Latest (2026-07-17) — autonomous BUILD loop (`/loop`, 5-min cadence)
 A self-paced loop shipped 11 focused, verified, committed increments across all five
