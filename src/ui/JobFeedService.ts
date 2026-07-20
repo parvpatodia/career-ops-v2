@@ -34,6 +34,9 @@ export interface FreshRole {
    *  posting date is unknown or only a proxy (email digests carry the received
    *  time, not the posting date), so the UI never shows a misleading age. */
   freshness?: { postedAgeDays: number; expiresInDays: number } | null;
+  /** Present when `npm run tailor:fresh` has produced verified docs for this role
+   *  (F6): which uploadable PDFs exist, so the UI can link to them. */
+  tailored?: { resume: boolean; cover: boolean };
 }
 
 export interface QueueRole {
@@ -63,7 +66,8 @@ export interface FeedSnapshot {
 export class JobFeedService {
   constructor(
     private readonly store: ApplicationStore,
-    private readonly hotlistPath = 'data/new-jobs.json'
+    private readonly hotlistPath = 'data/new-jobs.json',
+    private readonly manifestPath = 'output/tailored-manifest.json'
   ) {}
 
   /**
@@ -81,6 +85,7 @@ export class JobFeedService {
       return []; // no watcher output yet is a normal empty state, not an error
     }
     if (!Array.isArray(raw)) return [];
+    const docs = this.tailoredDocs();
     return (raw as FreshRole[])
       .filter((j) => this.isCorrect(j))
       // Recompute category from the role at read time: older hot-list entries
@@ -97,8 +102,32 @@ export class JobFeedService {
         category: categorize(j.role ?? ''),
         freshness: this.postingFreshness(j),
         sourceLabel: sourceLabel(j.platform),
+        tailored: docs.get(j.id),
       }))
       .slice(0, limit);
+  }
+
+  /**
+   * jobId -> which tailored PDFs exist, from the `tailor:fresh` manifest. A
+   * résumé counts only when it verified; the cover PDF when it rendered. No
+   * manifest is a normal empty state (auto-tailor not run yet).
+   */
+  private tailoredDocs(): Map<string, { resume: boolean; cover: boolean }> {
+    const out = new Map<string, { resume: boolean; cover: boolean }>();
+    try {
+      const raw = JSON.parse(fs.readFileSync(this.manifestPath, 'utf8')) as Record<
+        string,
+        { verified?: boolean; resumePath?: string; coverLetterPdfPath?: string }
+      >;
+      for (const [id, e] of Object.entries(raw)) {
+        const resume = !!e.resumePath && e.verified === true;
+        const cover = !!e.coverLetterPdfPath;
+        if (resume || cover) out.set(id, { resume, cover });
+      }
+    } catch {
+      /* no manifest yet */
+    }
+    return out;
   }
 
   /**

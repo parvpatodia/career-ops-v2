@@ -78,6 +78,10 @@ export function renderPage(): string {
   .expiry { flex:none; font-size:10px; font-weight:700; letter-spacing:.04em; border-radius:5px; padding:2px 6px; }
   .expiry.soon { color:#0c0e13; background:var(--warn); }
   .expiry.gone { color:#fff; background:#d0403f; }
+  .docs { margin-top:5px; font-size:12px; }
+  a.doc { color:var(--good); text-decoration:none; font-weight:600; }
+  a.doc:hover { text-decoration:underline; }
+  .docs .dot-sep { color:var(--dim2); font-weight:400; }
   .card .co { color:var(--dim); font-size:13px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .card .co .src { color:var(--dim2); }
   .when { color:var(--dim); font-size:12px; white-space:nowrap; text-align:right; }
@@ -231,10 +235,19 @@ export function renderPage(): string {
     var src = esc(j.sourceLabel || j.platform || '');
     var srcSpan = '<span class="src">' + (head ? '· ' : '') + src + '</span>';
     var posted = j.freshness ? ' <span class="src">· '+esc(postedLabel(j.freshness))+'</span>' : '';
+    // Pre-tailored docs (F6): link to the uploadable PDFs npm run tailor:fresh made.
+    var docs = '';
+    if(j.tailored){
+      var dl = [];
+      if(j.tailored.resume) dl.push('<a class="doc" href="/docs/resume/'+encodeURIComponent(j.id)+'" target="_blank" rel="noopener">📄 Résumé</a>');
+      if(j.tailored.cover) dl.push('<a class="doc" href="/docs/cover/'+encodeURIComponent(j.id)+'" target="_blank" rel="noopener">Cover letter</a>');
+      if(dl.length) docs = '<div class="docs">'+dl.join(' <span class="dot-sep">·</span> ')+'</div>';
+    }
     return '<div class="card" style="border-left-color:'+color+'">'+
       '<div class="meta">'+
         '<div class="role">'+(isNew ? '<span class="badge-new">NEW</span>' : '')+expiryHtml(j.freshness)+'<span class="txt">'+esc(j.role)+'</span></div>'+
         '<div class="co">'+(head ? head+' ' : '')+srcSpan+posted+'</div>'+
+        docs+
       '</div>'+
       '<div class="when">'+esc(ago(j.caughtAt))+'</div>'+
       '<div class="actions">'+

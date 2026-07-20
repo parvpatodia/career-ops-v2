@@ -35,4 +35,11 @@ describe('renderPage', () => {
     expect(html).toContain('function isRecent(j)');
     expect(html).toContain('state.recent');
   });
+
+  it('wires the tailored-docs links (F6)', () => {
+    const html = renderPage();
+    expect(html).toContain('j.tailored');
+    expect(html).toContain('/docs/resume/');
+    expect(html).toContain('/docs/cover/');
+  });
 });
