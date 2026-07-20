@@ -14,6 +14,8 @@ describe('sourceLabel', () => {
     expect(sourceLabel('email:linkedin')).toBe('LinkedIn email');
     expect(sourceLabel('email:swelist')).toBe('SWE List email');
     expect(sourceLabel('email:jobrighteric')).toBe('Jobright email');
+    expect(sourceLabel('email:runway')).toBe('Runway email');
+    expect(sourceLabel('email:ripplematch')).toBe('RippleMatch email');
   });
 
   it('title-cases an unknown token / sender rather than showing a raw slug', () => {

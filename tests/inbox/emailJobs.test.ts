@@ -5,7 +5,7 @@
  * URL; role/company split is best-effort.
  */
 import { describe, it, expect } from 'vitest';
-import { parseJobEmails, splitRoleCompany, mergeHotlist } from '../../src/inbox/emailJobs.js';
+import { parseJobEmails, splitRoleCompany, mergeHotlist, unwrapTracker } from '../../src/inbox/emailJobs.js';
 import type { EmailMessage, EmailJob } from '../../src/inbox/emailJobs.js';
 
 const digest: EmailMessage = {
@@ -92,6 +92,28 @@ describe('parseJobEmails', () => {
     expect(jobs).toHaveLength(1);
     expect(jobs[0]!.company).not.toBe('$6K / year');   // salary chip rejected as company
     expect(jobs[0]!.role).toBe('Machine Learning Engineer Intern Neuralink'); // location tail trimmed at "·"
+  });
+
+  it('unwrapTracker pulls the real job URL out of an aggregator click-tracker', () => {
+    const inner = 'https://jobs.lever.co/foo/abc123';
+    const tracker = `https://email.runway.com/ss/c/xyz/1/2?url=${encodeURIComponent(inner)}`;
+    expect(unwrapTracker(tracker)).toBe(inner);
+    // a direct job URL is returned unchanged (fast path, no behavior change)
+    expect(unwrapTracker(inner)).toBe(inner);
+    // a non-job tracker with no inner job URL is left as-is
+    expect(unwrapTracker('https://email.runway.com/c/open?u=hello')).toBe('https://email.runway.com/c/open?u=hello');
+  });
+
+  it('parses a tracker-wrapped aggregator digest (Runway/RippleMatch-style)', () => {
+    const inner = 'https://boards.greenhouse.io/acme/jobs/999';
+    const msg: EmailMessage = {
+      from: 'Runway <jobs@runway.com>', subject: 'New internships', receivedDateTime: '2026-07-18T08:00:00Z',
+      bodyHtml: `<a href="https://email.runway.com/ss/c/aaa/bbb?url=${encodeURIComponent(inner)}">Machine Learning Intern at Acme</a>`,
+    };
+    const jobs = parseJobEmails([msg], new Date('2026-07-18T09:00:00Z'));
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.applyUrl).toBe(inner);           // the REAL posting, not the tracker
+    expect(jobs[0]!.platform).toBe('email:runway');
   });
 
   it('rejects a season/term bold label ("Fall 2026") as the company', () => {
