@@ -24,6 +24,11 @@ const EMAIL_SENDERS: Record<string, string> = {
   indeed: 'Indeed',
   handshake: 'Handshake',
   wellfound: 'Wellfound',
+  runway: 'Runway',
+  ripplematch: 'RippleMatch',
+  getro: 'Getro',
+  otta: 'Otta',
+  hiringcafe: 'Hiring Cafe',
 };
 
 const titleCase = (s: string): string => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);

@@ -77,6 +77,37 @@ const canonUrl = (url: string): string => {
   return m ? `li:${m[1]}` : url.split('?')[0]!;
 };
 
+/**
+ * Aggregator digests (Runway, RippleMatch, Getro-powered lists, mailer click
+ * trackers) wrap the real posting in a redirect whose destination is an encoded
+ * URL in a query param. If the OUTER url is not itself a job URL but a param holds
+ * an encoded job URL, return that inner URL; otherwise return the url unchanged.
+ * Only activates on non-job outer URLs, so existing direct links are untouched.
+ */
+export function unwrapTracker(url: string): string {
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return url;
+  }
+  // Test the base (origin + path, query stripped): a tracker's ENCODED inner URL
+  // sits in the query and would false-match JOB_URL on the full string. If the
+  // base itself is a job URL, it is a direct posting, keep it (query and all).
+  if (JOB_URL.test(u.origin + u.pathname)) return url;
+  for (const [, raw] of u.searchParams) {
+    if (!raw) continue;
+    let inner = raw;
+    try {
+      inner = decodeURIComponent(raw);
+    } catch {
+      /* keep the raw value */
+    }
+    if (/^https?:\/\//i.test(inner) && JOB_URL.test(inner) && !SKIP_URL.test(inner)) return inner;
+  }
+  return url;
+}
+
 const senderSlug = (from: string): string =>
   (from.split('@')[1] ?? from).split('.')[0]!.toLowerCase().replace(/[^a-z0-9]/g, '') || 'email';
 
@@ -146,12 +177,16 @@ export function parseJobEmails(messages: EmailMessage[], now: Date = new Date())
     }
 
     for (const m of msg.bodyHtml.matchAll(anchor)) {
-      const url = decodeEntities(m[1]!).trim();
+      const rawUrl = decodeEntities(m[1]!).trim();
       const text = stripTags(m[2]!);
-      if (!url || text.length < 4) continue;
+      if (!rawUrl || text.length < 4) continue;
       // Only real web links — never javascript:/data:/relative (which would
       // become an unsafe href in the local UI, and can't be a real posting).
-      if (!/^https?:\/\//i.test(url)) continue;
+      if (!/^https?:\/\//i.test(rawUrl)) continue;
+      // Aggregator digests (Runway, RippleMatch, Getro-powered lists) wrap the
+      // real posting in a click-tracker; use the inner job URL when present so
+      // the posting is captured AND the apply link is the real one, not the tracker.
+      const url = unwrapTracker(rawUrl);
       if (SKIP_URL.test(url)) continue;
       // The role is the anchor text up to the first "·" (LinkedIn alerts append
       // "· Location (On-site)"); SWE List anchors have no "·" so this is a no-op.
