@@ -53,6 +53,54 @@ export async function fetchRecentHeaders(acct: ImapAccount, sinceDays = 30): Pro
   return out;
 }
 
+/** A recent message with its raw RFC822 source (for body/link extraction). */
+export interface ImapMessage {
+  from: string;
+  subject: string;
+  date: string; // ISO
+  source: string; // raw RFC822 (QP/UTF-8 decoded by the caller, like macMail)
+}
+
+/**
+ * Fetch the NEWEST `max` INBOX messages WITH their raw source, read-only. Bounded
+ * by sequence range (not "everything since N days") so it stays fast on a large
+ * mailbox, mirroring the Apple Mail reader's newest-N approach. `sinceDays` then
+ * drops anything older than the window. The caller decodes `source` and runs
+ * parseJobEmails on it (the digest-link extractor).
+ */
+export async function fetchRecentMessages(acct: ImapAccount, sinceDays = 5, max = 40): Promise<ImapMessage[]> {
+  const client = new ImapFlow({ host: acct.host, port: 993, secure: true, auth: { user: acct.user, pass: acct.password }, logger: false });
+  const out: ImapMessage[] = [];
+  const cutoff = Date.now() - sinceDays * 86_400_000;
+  await client.connect();
+  try {
+    const lock = await client.getMailboxLock('INBOX');
+    try {
+      const mbox = client.mailbox as { exists?: number } | false;
+      const exists = mbox && typeof mbox === 'object' ? mbox.exists ?? 0 : 0;
+      if (exists === 0) return out;
+      const start = Math.max(1, exists - max + 1); // newest `max` by sequence number
+      for await (const msg of client.fetch(`${start}:*`, { envelope: true, source: true })) {
+        const env = msg.envelope;
+        const dateMs = (env?.date ?? new Date()).getTime();
+        if (dateMs < cutoff) continue; // older than the window
+        const from = (env?.from ?? []).map((a) => a.address ?? a.name ?? '').filter(Boolean).join(', ');
+        out.push({
+          from,
+          subject: env?.subject ?? '',
+          date: new Date(dateMs).toISOString(),
+          source: msg.source ? msg.source.toString('utf8') : '',
+        });
+      }
+    } finally {
+      lock.release();
+    }
+  } finally {
+    await client.logout().catch(() => {});
+  }
+  return out.reverse(); // newest first
+}
+
 /** Build the configured accounts from environment app passwords (.env). */
 export function accountsFromEnv(env: NodeJS.ProcessEnv = process.env): ImapAccount[] {
   const accts: ImapAccount[] = [];
