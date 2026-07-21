@@ -16,13 +16,14 @@
  *   npm run inbox:gmail                 newest 60 msgs, 5-day window
  *   npm run inbox:gmail -- 100 7        newest 100 msgs, 7-day window
  *
- * LIMIT: qpDecodeUtf8 handles quoted-printable HTML parts (what most digests use);
- * a purely base64-encoded HTML part won't yield anchors (graceful: fewer results).
+ * Bodies are decoded with mailparser's simpleParser (quoted-printable, base64,
+ * multipart, and charset all handled), so digests in any common encoding parse.
  */
 
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
+import { simpleParser } from 'mailparser';
 import { parseJobEmails, mergeHotlist } from './emailJobs.js';
 import type { EmailMessage } from './emailJobs.js';
 import { qpDecodeUtf8 } from './macMail.js';
@@ -69,12 +70,20 @@ async function main(): Promise<void> {
     senders[s] = (senders[s] ?? 0) + 1;
   }
 
-  const emails: EmailMessage[] = msgs.map((m) => ({
-    from: m.from,
-    subject: m.subject,
-    receivedDateTime: m.date,
-    bodyHtml: qpDecodeUtf8(m.source),
-  }));
+  // Decode each message's body robustly (simpleParser handles quoted-printable AND
+  // base64 AND multipart/charset); fall back to the QP-only decoder if it throws.
+  const emails: EmailMessage[] = await Promise.all(
+    msgs.map(async (m): Promise<EmailMessage> => {
+      let bodyHtml = '';
+      try {
+        const parsed = await simpleParser(m.source);
+        bodyHtml = String(parsed.html || parsed.textAsHtml || parsed.text || '');
+      } catch {
+        bodyHtml = qpDecodeUtf8(m.source);
+      }
+      return { from: m.from, subject: m.subject, receivedDateTime: m.date, bodyHtml };
+    })
+  );
   const candidates = parseJobEmails(emails);
 
   let existing: Array<Record<string, unknown>> = [];
