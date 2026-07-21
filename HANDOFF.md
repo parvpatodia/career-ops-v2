@@ -20,8 +20,15 @@ Parv brief: widen beyond Simplify, focus last-24h, and have a resume + cover let
   server serves the PDFs at /docs/{resume,cover}/<id>, confined to output/tailored/ (traversal 404).
 - **Breadth.** parseJobEmails unwrapTracker() pulls the real posting out of aggregator click-trackers
   (Runway/RippleMatch/Getro), matching on the query-STRIPPED base; sourceLabel gained Runway et al.
-  HONEST LIMIT: the Apple Mail reader hangs on the 47k inbox here, so Runway/Scalar ARRIVAL is
-  unconfirmed; run `npm run inbox:mac` with Mail open to pull them. Board APIs stay thin (~3/feed):
+  **Mail ingestion moved to Gmail IMAP** (`npm run inbox:gmail`, scripts/gmail-loop.sh, launchd
+  **com.parv.careerops.gmail** @30min): ImapClient.fetchRecentMessages (newest-N by seq + raw source)
+  + mailparser simpleParser (QP/base64/multipart) + parseJobEmails + mergeHotlist. Reliable + fast,
+  unlike the Apple Mail JXA reader which HANGS (osascript ETIMEDOUT, even for 5 msgs, even with the
+  Automation grant) on the large local inbox; that agent is DISABLED (com.parv.careerops.mail.plist.disabled).
+  HONEST yield ~1/60 today: the target digests (Runway/Scalar) are NOT forwarded to this Gmail yet, and
+  the job senders present are off-field (ZipRecruiter senior RF), non-US (KPMG SG), notifications not
+  alerts (LinkedIn), or tracker-only to non-job domains (Indeed cts.*). To lift it, forward the digest
+  senders (Runway/Scalar/SWE List) from Outlook/NEU to the Gmail so they land in INBOX. Board APIs stay thin (~3/feed):
   few intern-titled Fall-2026 openings on individual company boards right now; the GitHub lists
   (New Grad/SWE List, which link to Simplify) are the breadth. Clearance roles (RTX/Boeing/Wyetech)
   still leak from the LIST scanners (synthetic JD, no "clearance" text to catch) — surfaced not fixed.
