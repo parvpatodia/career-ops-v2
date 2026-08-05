@@ -24,7 +24,8 @@ import { StyleLinter } from '../StyleLinter.js';
 import { SnippetBook } from '../SnippetBook.js';
 import { Mailer } from '../Mailer.js';
 import { OutreachStore } from '../OutreachStore.js';
-import { OutreachSender } from '../OutreachSender.js';
+import { OutreachSender, dryFunnelAlert } from '../OutreachSender.js';
+import { Notifier } from '../../applier/Notifier.js';
 import { ProfileLoader } from '../../applier/ProfileLoader.js';
 
 function arg(flag: string): string | undefined {
@@ -53,6 +54,11 @@ async function main(): Promise<void> {
   }
   if (drafts.length === 0) {
     console.log(`No valid drafts in ${dir}.`);
+    // A real run (not dry) with nothing to send is the dry-funnel signal too.
+    if (!dryRun) {
+      const alert = dryFunnelAlert({ sent: [], abstained: [], capSkipped: [] });
+      if (alert) new Notifier().notify(alert);
+    }
     return;
   }
 
@@ -82,8 +88,20 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const sender = new OutreachSender({ gate, mailer, store, ...(cap !== undefined ? { dailyCap: cap } : {}) });
+  const notifier = new Notifier();
+  const sender = new OutreachSender({
+    gate,
+    mailer,
+    store,
+    notify: (n) => notifier.notify(n),
+    ...(cap !== undefined ? { dailyCap: cap } : {}),
+  });
   const summary = await sender.sendBatch(drafts);
+
+  // Dry-funnel alarm: a real run that sends 0 is the failure that went unnoticed
+  // for eleven days. Fire a banner so an empty pipeline can never be silent again.
+  const alert = dryFunnelAlert(summary);
+  if (alert) notifier.notify(alert);
 
   // Write abstained drafts to the review pile so Parv can fix and resend.
   if (summary.abstained.length) {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { OutreachSender } from '../../src/outreach/OutreachSender.js';
+import { OutreachSender, dryFunnelAlert, type SendSummary } from '../../src/outreach/OutreachSender.js';
 import { DraftGate } from '../../src/outreach/DraftGate.js';
 import { StyleLinter } from '../../src/outreach/StyleLinter.js';
 import { SnippetBook } from '../../src/outreach/SnippetBook.js';
@@ -145,5 +145,66 @@ describe('OutreachSender', () => {
     const summary = await sender.sendBatch([d]);
     expect(summary.sent).toHaveLength(1);
     expect(store.readAll().events.map((e) => e.type)).toEqual(['email_verified', 'email_sent']);
+  });
+
+  it('fires a dry-funnel banner when a real send sent 0 but abstained, in one live batch', async () => {
+    const notes: string[] = [];
+    const sender = new OutreachSender({
+      gate: makeGate(),
+      mailer: fakeMailer(confirmAll),
+      store,
+      notify: (n) => notes.push(n.title),
+    });
+    const bad = draftTo('eng@startup.ai');
+    bad.emailStatus = 'accept_all'; // gate abstains: not Hunter-valid
+    const summary = await sender.sendBatch([bad]);
+
+    expect(summary.sent).toHaveLength(0);
+    // The CLI fires dryFunnelAlert from the batch summary; assert it triggers here.
+    expect(dryFunnelAlert(summary)).not.toBeNull();
+  });
+});
+
+describe('dryFunnelAlert', () => {
+  const summary = (over: Partial<SendSummary>): SendSummary => ({ sent: [], abstained: [], capSkipped: [], ...over });
+  const draft = { contactId: 'a'.repeat(12), to: 'x@y.ai' } as unknown as EmailDraft;
+
+  it('returns null when at least one email went out', () => {
+    expect(dryFunnelAlert(summary({ sent: [draft] }))).toBeNull();
+  });
+
+  it('returns null even if some sent and some abstained (partial success is not a dry funnel)', () => {
+    expect(dryFunnelAlert(summary({ sent: [draft], abstained: [{ draft, reasons: ['x'] }] }))).toBeNull();
+  });
+
+  it('returns null when 0 sent but drafts were cap-skipped (cap already met earlier, not dry)', () => {
+    expect(dryFunnelAlert(summary({ capSkipped: [draft] }))).toBeNull();
+  });
+
+  it('fires an urgent error banner when 0 sent with abstentions', () => {
+    const alert = dryFunnelAlert(summary({ abstained: [{ draft, reasons: ['gate said no'] }] }));
+    expect(alert).not.toBeNull();
+    expect(alert!.kind).toBe('error');
+    expect(alert!.urgent).toBe(true);
+    expect(alert!.message).toMatch(/0 emails sent/);
+    expect(alert!.message).toMatch(/outreach-targets\.yml/);
+  });
+
+  it('counts invalid-address abstentions in the message', () => {
+    const alert = dryFunnelAlert(
+      summary({
+        abstained: [
+          { draft, reasons: ['email status is "invalid", only "valid" auto-sends'] },
+          { draft, reasons: ['email status is "invalid", only "valid" auto-sends'] },
+        ],
+      })
+    );
+    expect(alert!.message).toMatch(/2 abstained/);
+    expect(alert!.message).toMatch(/2 invalid address/);
+  });
+
+  it('reports "no drafts to send" when the batch was empty', () => {
+    const alert = dryFunnelAlert(summary({}));
+    expect(alert!.message).toMatch(/no drafts to send/);
   });
 });

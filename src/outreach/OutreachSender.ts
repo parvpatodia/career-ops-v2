@@ -18,7 +18,7 @@ import type { EmailDraft } from './types.js';
 import type { DraftGate } from './DraftGate.js';
 import type { Mailer, Attachment } from './Mailer.js';
 import type { OutreachStore } from './OutreachStore.js';
-import type { NotifySink } from '../applier/Notifier.js';
+import type { NotifySink, Notification } from '../applier/Notifier.js';
 
 export interface SenderDeps {
   gate: DraftGate;
@@ -36,6 +36,34 @@ export interface SendSummary {
   abstained: Array<{ draft: EmailDraft; reasons: string[] }>;
   /** Drafts that passed the gate but were not sent because the daily cap was reached. */
   capSkipped: EmailDraft[];
+}
+
+/**
+ * Batch-level "dry funnel" alarm. The daily agent silently sent 0 emails for
+ * eleven days (2026-07-24 -> 08-04): every sourced contact had a Hunter-invalid
+ * address, the gate correctly abstained, and nothing surfaced it. WHY a pure
+ * helper: the alarm CONDITION is unit-tested without a CLI or a real banner.
+ * Returns the notification to fire, or null when at least one email went out.
+ */
+export function dryFunnelAlert(summary: SendSummary): Notification | null {
+  // Not a dry funnel if anything sent, OR if drafts passed the gate but were held
+  // only by the daily cap (cap already met by an earlier run today). Firing on
+  // cap-skipped would be a false alarm on the 2nd+ run of a productive day.
+  if (summary.sent.length > 0 || summary.capSkipped.length > 0) return null;
+  const abstained = summary.abstained.length;
+  const invalid = summary.abstained.filter((a) =>
+    a.reasons.some((r) => r.toLowerCase().includes('invalid'))
+  ).length;
+  const detail =
+    abstained === 0
+      ? 'no drafts to send'
+      : `${abstained} abstained${invalid ? `, ${invalid} invalid address` : ''}`;
+  return {
+    kind: 'error',
+    title: 'Outreach: 0 sent today',
+    message: `Funnel dry — 0 emails sent (${detail}). Refill config/outreach-targets.yml with new companies.`,
+    urgent: true,
+  };
 }
 
 export class OutreachSender {

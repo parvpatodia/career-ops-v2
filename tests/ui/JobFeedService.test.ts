@@ -28,10 +28,14 @@ describe('JobFeedService', () => {
     store.add(app('002', 'Waymo', 91));
     store.update('002', { status: 'Applied', appliedAt: '2026-07-11T12:00:00Z' });
 
+    // caughtAt must be now-relative: a fixed date time-bombs once it passes the
+    // 14-day freshness window and the read-boundary gate (rightly) drops it as
+    // stale. Mirror the now() pattern the other fresh() tests use.
+    const t0 = Date.now();
     const hot = path.join(dir, 'new-jobs.json');
     fs.writeFileSync(hot, JSON.stringify([
-      { id: 'gh-1', company: 'Perplexity', role: 'ML Intern', applyUrl: 'https://p/1', platform: 'ashby', postedAt: '2026-07-11', caughtAt: '2026-07-11T13:00:00Z' },
-      { id: 'gh-2', company: 'Figure', role: 'Robotics Intern', applyUrl: 'https://f/2', platform: 'greenhouse', postedAt: '2026-07-11', caughtAt: '2026-07-11T13:01:00Z' },
+      { id: 'gh-1', company: 'Perplexity', role: 'ML Intern', applyUrl: 'https://p/1', platform: 'ashby', postedAt: '', caughtAt: new Date(t0 - 120_000).toISOString() },
+      { id: 'gh-2', company: 'Figure', role: 'Robotics Intern', applyUrl: 'https://f/2', platform: 'greenhouse', postedAt: '', caughtAt: new Date(t0 - 60_000).toISOString() },
     ]));
 
     const snap = new JobFeedService(store, hot).snapshot();
