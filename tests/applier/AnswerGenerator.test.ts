@@ -24,9 +24,15 @@ const CTX: AnswerContext = {
 
 describe.skipIf(!HAS_REAL_PROFILE)('AnswerGenerator', () => {
   let gen: AnswerGenerator;
+  // WHY read identity from the loader instead of hardcoding: profile.yml is the
+  // single source of truth for personal facts (AGENTS.md). A literal here leaks
+  // that fact into the tracked tree, which is how the phone number ended up in
+  // a public repo on 2026-08-25.
+  let identity: ReturnType<ProfileLoader['getIdentity']>;
 
   beforeAll(() => {
     const loader = new ProfileLoader('config/profile.yml');
+    identity = loader.getIdentity();
     gen = new AnswerGenerator(loader);
   });
 
@@ -58,7 +64,7 @@ describe.skipIf(!HAS_REAL_PROFILE)('AnswerGenerator', () => {
 
   it('answers phone', () => {
     const a = gen.generate('Phone Number', CTX);
-    expect(a!.value).toBe('555-555-0142');
+    expect(a!.value).toBe(identity.phone);
     expect(a!.needsReview).toBe(false);
   });
 

@@ -69,3 +69,12 @@ data/outreach/
 data/new-jobs.json
 data/watch-seen.json
 data/jd-cache.json
+
+# Personal job-search data (2026-08-25: repo went public with 246 company names,
+# 367 application outcomes, and 4.8K log lines naming Parv. History was rewritten
+# with git-filter-repo. Never track these again.)
+data/events.jsonl
+data/applications.legacy.json
+data/daily_log/*.json
+data/daily_log/*.jsonl
+!data/**/.gitkeep
