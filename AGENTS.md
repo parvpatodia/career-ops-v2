@@ -23,8 +23,10 @@ End-to-end autonomous job application system. Two goals, in priority order:
 10. Target focus (Parv 2026-06-12): intern and co-op roles for Summer/Fall 2026. Scanner queries, ranking, and batch selection optimize for this first.
 
 ## Secrets and personal data
-- Gitignored, never commit, never echo into logs: .env, .browser-profile/, cv/, config/profile.yml, data/applications.json, files_extracted/.
-- Remote `origin` must be the private repo. The public fork remote is `public-fork`; never push to it.
+- **`origin` is PUBLIC** (github.com/parvpatodia/career-ops-v2). There is no private remote and no `public-fork`. Anything committed is world-readable the moment it is pushed. Default branch on the remote is `feat/v2-foundation`.
+- **A history rewrite does not scrub this repo.** `refs/pull/N/head` survives branch deletion and force-push, is listable and fetchable with zero credentials, and only GitHub can remove it. 11 such refs are still live by Parv's decision (2026-08-25), so data scrubbed from the branches remains publicly fetchable. Enumerate every server-side ref before claiming an exposure is closed.
+- Gitignored, never commit, never echo into logs: `.env`, `.browser-profile/`, `cv/`, `config/profile.yml`, `data/applications.json`, `data/applications.legacy.json`, `data/events.jsonl`, `data/outreach.jsonl`, `data/daily_log/*.json{,l}`, `files_extracted/`.
+- **No personal fact is hardcoded in tracked source, including test fixtures.** A test that pins profile truth READS the profile (`ProfileLoader.getIdentity()`); it never restates the value. Where a literal is unavoidable, use an obvious placeholder (`555-010-1234`), never a real-looking one.
 
 ## Learning loop
 Every defect found in review, testing, or production gets one line in LESSONS.md (append-only) and, where possible, a regression test. Read LESSONS.md before designing any new component. This file is how the system improves instead of deteriorating.
