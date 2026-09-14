@@ -41,10 +41,10 @@ describe('Verifier', () => {
 
   it('mutation test: one sabotaged value fails the whole verdict', () => {
     const verdict = verifier.verify(
-      [intent('f1', 'First Name', 'text', 'Parv'), intent('f2', 'Phone', 'phone', '555-555-0142')],
+      [intent('f1', 'First Name', 'text', 'Parv'), intent('f2', 'Phone', 'phone', '555-010-1234')],
       [
         { fieldId: 'f1', actual: 'Parv' },
-        { fieldId: 'f2', actual: '408-401-9857' }, // one digit off
+        { fieldId: 'f2', actual: '555-010-1235' }, // one digit off
       ]
     );
     expect(verdict.pass).toBe(false);
